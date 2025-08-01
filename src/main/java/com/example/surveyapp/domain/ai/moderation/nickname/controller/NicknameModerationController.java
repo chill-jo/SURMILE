@@ -1,9 +1,8 @@
-package com.example.surveyapp.domain.ai.moderation.controller;
+package com.example.surveyapp.domain.ai.moderation.nickname.controller;
 
-import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationRequestDto;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationResponseDto;
-import com.example.surveyapp.domain.ai.moderation.service.NicknameModerationService;
+import com.example.surveyapp.domain.ai.moderation.nickname.controller.dto.NicknameModerationRequestDto;
+import com.example.surveyapp.domain.ai.moderation.nickname.controller.dto.NicknameModerationResponseDto;
+import com.example.surveyapp.domain.ai.moderation.nickname.service.NicknameModerationService;
 import com.example.surveyapp.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

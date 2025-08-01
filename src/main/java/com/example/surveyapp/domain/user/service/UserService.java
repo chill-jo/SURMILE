@@ -1,9 +1,9 @@
 package com.example.surveyapp.domain.user.service;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationRequestDto;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationResponseDto;
-import com.example.surveyapp.domain.ai.moderation.service.NicknameModerationService;
+import com.example.surveyapp.domain.ai.moderation.nickname.controller.dto.NicknameModerationRequestDto;
+import com.example.surveyapp.domain.ai.moderation.nickname.controller.dto.NicknameModerationResponseDto;
+import com.example.surveyapp.domain.ai.moderation.nickname.service.NicknameModerationService;
 import com.example.surveyapp.domain.point.domain.model.entity.Point;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.user.controller.dto.*;
@@ -13,7 +13,6 @@ import com.example.surveyapp.domain.user.controller.dto.UserResponseDto;
 import com.example.surveyapp.domain.user.domain.model.CategoryEnum;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserBaseData;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.domain.user.domain.repository.UserBaseDataRepository;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
 import com.example.surveyapp.global.response.exception.CustomException;

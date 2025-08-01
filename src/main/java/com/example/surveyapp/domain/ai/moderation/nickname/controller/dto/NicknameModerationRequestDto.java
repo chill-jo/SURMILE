@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.ai.moderation.controller.dto;
+package com.example.surveyapp.domain.ai.moderation.nickname.controller.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

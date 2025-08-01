@@ -1,8 +1,8 @@
 package com.example.surveyapp.domain.user.service;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationResponseDto;
-import com.example.surveyapp.domain.ai.moderation.service.NicknameModerationService;
+import com.example.surveyapp.domain.ai.moderation.nickname.controller.dto.NicknameModerationResponseDto;
+import com.example.surveyapp.domain.ai.moderation.nickname.service.NicknameModerationService;
 import com.example.surveyapp.domain.user.controller.dto.UserRequestDto;
 import com.example.surveyapp.domain.user.controller.dto.UserResponseDto;
 import com.example.surveyapp.domain.user.domain.model.User;

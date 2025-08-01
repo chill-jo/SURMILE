@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.ai.moderation.prompt;
+package com.example.surveyapp.domain.ai.moderation.nickname.prompt;
 
 public class NicknameModerationPromptTemplate {
     public static final String promptTemplate = """
