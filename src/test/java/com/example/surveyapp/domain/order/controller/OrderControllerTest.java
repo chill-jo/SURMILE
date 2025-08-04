@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
+@DisplayName("컨트롤러: Order 컨트롤러 테스트")
 @WebMvcTest(controllers = OrderController.class,
             excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class))
 @AutoConfigureMockMvc(addFilters = false)

@@ -47,7 +47,7 @@ public class ProductService {
         }
 
         if (productRepository.existsByTitleAndIsDeletedFalse(requestDto.getTitle())){
-            throw new CustomException(ErrorCode.NOT_SAME_PRODUCT_TITLE);
+            throw new CustomException(ErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE);
         }
 
         Product product = Product.create(requestDto.getTitle(),

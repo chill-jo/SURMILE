@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
+@DisplayName("서비스: Product 서비스 테스트")
 @WebMvcTest(controllers = ProductController.class,
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class))
 // 웹계층 테스트에 필요한 Bean들만 등록해주는 Annotations
@@ -54,7 +55,7 @@ class ProductControllerTest {
 
 
     @Test
-    @DisplayName("상품을 생성한다")
+    @DisplayName("기능_테스트_상품을 생성한다")
     @WithCustomMockUser(id = 1, role = UserRoleEnum.ADMIN)
     void 상품_생성한다() throws Exception {
         // Given
@@ -87,7 +88,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 계정으로 상품을 전체 조회한다.")
+    @DisplayName("기능_테스트_관리자 계정으로 상품을 전체 조회한다.")
     @WithCustomMockUser(id = 1, role = UserRoleEnum.ADMIN)
     void 상품_전체_조회를_한다() throws Exception {
         // Given
@@ -116,7 +117,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("참여자 계정으로 상품 조회는 가능하다.")
+    @DisplayName("기능_테스트_참여자 계정으로 상품 조회는 가능하다.")
     @WithCustomMockUser(id = 2, role = UserRoleEnum.SURVEYEE)
     void 상품_전체_조회_참여자계정은_가능해야한다() throws Exception {
         // Given
@@ -146,7 +147,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품을 한개 조회한다.")
+    @DisplayName("기능_테스트_상품을 한개 조회한다.")
     @WithCustomMockUser(id = 2, role = UserRoleEnum.SURVEYEE)
     void 상품_한개를_조회한다() throws Exception{
         // Given
@@ -171,7 +172,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품을 수정 한다.")
+    @DisplayName("기능_테스트_상품을 수정 한다.")
     @WithCustomMockUser(id = 1, role = UserRoleEnum.ADMIN)
     void 상품을_수정한다() throws Exception{
         // Given
@@ -198,7 +199,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품을 삭제 한다.")
+    @DisplayName("기능_테스트_상품을 삭제 한다.")
     @WithCustomMockUser(id = 1, role = UserRoleEnum.ADMIN)
     void 상품을_삭제한다() throws Exception{
 
