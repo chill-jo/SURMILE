@@ -3,12 +3,12 @@ package com.example.surveyapp.domain.point.controller;
 import com.example.surveyapp.domain.point.controller.dto.request.PointChargeRequestDto;
 import com.example.surveyapp.domain.point.controller.dto.response.PointHistoryResponseDto;
 import com.example.surveyapp.domain.point.service.PointService;
-import com.example.surveyapp.global.response.PageResponse;
 import com.example.surveyapp.global.response.ApiResponse;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,11 +33,9 @@ public class PointController {
 
     //포인트 조회
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<PointHistoryResponseDto>>> getHistories(
-            @AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable){
-        Page<PointHistoryResponseDto> page = pointService.getHistories(userDetails.getId(),pageable);
-        return ResponseEntity.ok(ApiResponse.success("포인트 내역이 조회되었습니다.",new PageResponse<>(page)));
+    public ResponseEntity<ApiResponse<Page<PointHistoryResponseDto>>> getHistories(
+            @AuthenticationPrincipal CustomUserDetails userDetails, @PageableDefault(page = 0, size = 10) Pageable pageable){
+        Page<PointHistoryResponseDto> page = pointService.getHistories(userDetails.getId(), pageable);
+        return ResponseEntity.ok(ApiResponse.success("포인트 내역이 조회되었습니다.",page));
     }
-
-
 }
