@@ -38,7 +38,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@DisplayName("서비스 : 주문 서비스 테스트")
+@DisplayName("서비스 : Order 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
@@ -61,7 +61,7 @@ class OrderServiceTest {
     private PointService pointService;
 
     @Test
-    @DisplayName("참여자가 주문을 생성한다")
+    @DisplayName("기능_테스트_참여자가 주문을 생성한다")
     void 주문_생성() {
 
         // Given
@@ -96,7 +96,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("관리자가 주문을 조회한다.")
+    @DisplayName("기능_테스트_관리자가 주문을 조회한다.")
     void 관리자_주문_조회() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -135,7 +135,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("관리자가 주문 단건을 조회한다.")
+    @DisplayName("기능_테스트_관리자가 주문 단건을 조회한다.")
     void 관리자_주문_단건_조회하기() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -157,7 +157,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("본인의 주문 이력은 본인만 확인 할 수 있다.")
+    @DisplayName("기능_테스트_본인의 주문 이력은 본인만 확인 할 수 있다.")
     void 본인_주문내역_확인하기() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -195,7 +195,7 @@ class OrderServiceTest {
 
     }
     @Test
-    @DisplayName("참여자는 주문 단건 조회를 할 수 있다.")
+    @DisplayName("기능_테스트_참여자는 주문 단건 조회를 할 수 있다.")
     void 참여자_주문_단건_조회() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -219,7 +219,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("참여자는 자신이 주문하지 않은 주문은 볼수 없다.")
+    @DisplayName("예외_테스트_참여자는 자신이 주문하지 않은 주문은 볼수 없다.")
     void 자신이_주문하지않은_다른_주문은_조회가_불가능하다() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -241,5 +241,34 @@ class OrderServiceTest {
         assertThatThrownBy(() -> orderService.readOneMyOrder(order.getId(),anotherUser.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining("본인 주문만 확인 할 수 있습니다.");
+    }
+
+    @Test
+    @DisplayName("예외_테스트_주문 생성 시 금액이 부족하면 구매할 수 없다.")
+    void 참여자_주문_생성_시_포인트가_부족하면_교환할_수_없다(){
+        // Given
+        //테스트 전제 조건 및 환경 설정
+        User user = UserFixtureGenerator.generateUserFixture();
+        Point point = Point.of(user);
+        point.pointCharge(5000L);
+
+        ReflectionTestUtils.setField(user,"id",1L);
+        Product product = ProductFixtureGenerator.generateProductFixture();
+        ReflectionTestUtils.setField(product,"price",5500L);
+        Order order = OrderFixtureGenerator.generateOrderFixture(user,product);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+        when(pointRepository.findByUser(user)).thenReturn(Optional.of(point));
+
+        OrderCreateRequestDto requestDto = new OrderCreateRequestDto(product.getId());
+        // When
+        //실행할 행동
+
+        // Then
+        //검증 사항
+        assertThatThrownBy(() -> orderService.createOrder(requestDto,user.getId()))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining("포인트가 부족합니다.");
     }
 }

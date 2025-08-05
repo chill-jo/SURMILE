@@ -6,6 +6,8 @@ import com.example.surveyapp.global.config.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Entity
@@ -52,12 +54,21 @@ public class Order extends BaseEntity {
 
     public static Order create(User user, Product product) {
 
+        String orderNumber = orderNumberGenerator();
         return Order.builder()
                 .user(user)
-                .orderNumber(UUID.randomUUID().toString())
+                .orderNumber(orderNumber)
                 .product(product)
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .build();
+    }
+
+
+    //UUID 날짜 + 랜덤 숫자 8개를 만들기 위한 generator
+    private static String orderNumberGenerator() {
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        int randoNum = (int) ((Math.random() * 90000000) + 10000000); //8자리 랜덤 숫자 만들기
+        return date + randoNum;
     }
 }

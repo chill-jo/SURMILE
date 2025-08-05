@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.*;
 
-@DisplayName("상품 서비스")
+@DisplayName("서비스: Product 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
@@ -48,7 +48,7 @@ class ProductServiceTest {
     private ProductService productService;
 
     @Test
-    @DisplayName("상품 생성을 관리자가 정상적으로 한다.")
+    @DisplayName("기능_테스트_상품 생성을 관리자가 정상적으로 한다.")
     void 상품_생성() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -78,7 +78,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("참여자는 상품생성이 불가능하다.")
+    @DisplayName("예외_테스트_참여자는 상품생성이 불가능하다.")
     void 상품_생성_참여자는_불가능_하다() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -100,7 +100,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("출제자는 상품생성이 불가능하다.")
+    @DisplayName("예외_테스트_출제자는 상품생성이 불가능하다.")
     void 상품_생성_출제자는_불가능_하다() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -122,7 +122,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품 생성중 동일한 상품명을 가질 수 없다.")
+    @DisplayName("예외_테스트_상품 생성중 동일한 상품명을 가질 수 없다.")
     void 상품_생성시_동일한_상품명으로_생성_불가_하다() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -146,7 +146,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품 전체를 조회한다.")
+    @DisplayName("기능_테스트_상품 전체를 조회한다.")
     void 전체_상품_조회() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -175,7 +175,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품 한개만 조회한다.")
+    @DisplayName("기능_테스트_상품 한개만 조회한다.")
     void 상품_단건_조회() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -195,7 +195,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품을 수정한다")
+    @DisplayName("기능_테스트_상품을 수정한다")
     void 상품_수정_가능하다() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -218,11 +218,11 @@ class ProductServiceTest {
         verify(productRepository, times(1)).findById(id);
         assertThat(responseDto.getTitle()).isEqualTo("변경된상품명");
         assertThat(adminUser.getUserRole()).isEqualTo(UserRoleEnum.ADMIN);
-
     }
 
+
     @Test
-    @DisplayName("상품을 삭제한다")
+    @DisplayName("기능_테스트_상품을 삭제한다")
     void 상품_삭제() {
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -240,11 +240,5 @@ class ProductServiceTest {
         //검증 사항
         assertThat(product.isDeleted()).isTrue();
         verify(productRepository,times(1)).findByIdAndIsDeletedFalse(id);
-
-
-
-
-
-
-    }
+            }
 }

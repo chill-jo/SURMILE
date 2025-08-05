@@ -24,6 +24,7 @@ public enum ErrorCode {
     NOT_FOUND_PRODUCT(HttpStatus.UNAUTHORIZED,"존재하지 않는 상품입니다." ),
     NOT_SAME_PRODUCT_TITLE(HttpStatus.BAD_REQUEST,"동일한 상품명으로 수정이 불가합니다."),
     NOT_FOUND_PRODUCT_STATUS(HttpStatus.UNAUTHORIZED,"판매중인  상품이 아닙니다." ),
+    NOT_SAME_CREATE_PRODUCT_TITLE(HttpStatus.BAD_REQUEST,"동일한 상품명으로 등록이 불가능합니다." ),
 
     //주문
     NOT_ORDER_USER(HttpStatus.UNAUTHORIZED,"주문이 불가한 계정입니다."),
