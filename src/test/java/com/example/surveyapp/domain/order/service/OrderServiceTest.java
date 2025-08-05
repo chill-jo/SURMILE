@@ -38,7 +38,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@DisplayName("서비스 : Order 서비스 테스트")
+@DisplayName("service : Order 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 

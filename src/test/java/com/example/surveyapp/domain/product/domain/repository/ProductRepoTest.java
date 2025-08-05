@@ -16,7 +16,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ActiveProfiles("test")
-@DisplayName("레포지터리: Product 레포지터리 테스트")
+@DisplayName("repository: Product 레포지터리 테스트")
 public class ProductRepoTest extends DataJpaTestBase {
     @Autowired
     private ProductRepository productRepository;
