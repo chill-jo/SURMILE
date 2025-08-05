@@ -3,18 +3,20 @@ package com.example.surveyapp.domain.survey.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.example.surveyapp.config.generator.UserFixtureGenerator;
+import com.example.surveyapp.domain.point.service.PointService;
 import com.example.surveyapp.domain.survey.controller.dto.SurveyMapper;
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyCreateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyStatusUpdateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyUpdateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.PageSurveyResponseDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.SurveyResponseDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.SurveyStatusResponseDto;
+import com.example.surveyapp.domain.survey.controller.dto.request.*;
+import com.example.surveyapp.domain.survey.controller.dto.response.*;
+import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
+import com.example.surveyapp.domain.survey.domain.model.entity.SurveyAnswer;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import com.example.surveyapp.domain.survey.domain.repository.OptionsRepository;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
+import com.example.surveyapp.domain.survey.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.survey.facade.UserFacade;
+import com.example.surveyapp.domain.survey.service.strategy.SurveyQuestionStrategy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,8 +24,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.example.surveyapp.config.generator.SurveyFixtureGenerator;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
@@ -48,10 +52,19 @@ public class SurveyServiceTest {
     private OptionsRepository optionsRepository;
 
     @Mock
+    private SurveyAnswerRepository surveyAnswerRepository;
+
+    @Mock
     private SurveyMapper surveyMapper;
 
     @Mock
     private UserFacade userFacade;
+
+    @Mock
+    private PointService pointService;
+
+    @Mock
+    private List<SurveyQuestionStrategy> surveyQuestionStrategies;
 
     @InjectMocks
     private SurveyService surveyService;
@@ -316,4 +329,140 @@ public class SurveyServiceTest {
 
     }
 
+
+    // 참여자 테스트
+    @Test
+    @DisplayName("기능: 설문 상세조회를 성공한다")
+    void success_getSurvey() {
+
+        //given
+        Long surveyId = 1L;
+        Long surveyeeCount = 1L;
+        Survey survey = SurveyFixtureGenerator.generateSurveyFixture();
+        when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(survey));
+        when(surveyMapper.toResponseDto(survey))
+                .thenReturn(new SurveyResponseDto(
+                                survey.getId(),
+                                survey.getTitle(),
+                                survey.getDescription(),
+                                survey.getMaxSurveyee(),
+                                survey.getPointPerPerson(),
+                                survey.getTotalPoint(),
+                                survey.getDeadline(),
+                                survey.getExpectedTime(),
+                                survey.getStatus(),
+                                0L
+                        )
+                );
+
+        when(surveyAnswerRepository.countBySurveyId(survey)).thenReturn(surveyeeCount);
+
+        //when
+        SurveyResponseDto result = surveyService.getSurvey(surveyId);
+
+        //then
+        assertThat(result.getSurveyeeCount()).isEqualTo(surveyeeCount);
+    }
+
+    @Test
+    @DisplayName("기능: 설문 시작, 설문지를 조회한다.")
+    void success_startSurvey() {
+
+        //given
+        Long userId = 1L;
+        Long surveyId = 1L;
+        User user = UserFixtureGenerator.generateUserFixture();
+        Survey survey = SurveyFixtureGenerator.generateSurveyFixture();
+        ReflectionTestUtils.setField(survey, "status", SurveyStatus.IN_PROGRESS);
+        ReflectionTestUtils.setField(survey, "deadline", LocalDateTime.now().plusDays(1));
+
+        List<Question> questionList = new ArrayList<>();
+        Question question = mock(Question.class);
+        questionList.add(question);
+
+        List<OptionResponseDto> optionsList = new ArrayList<>();
+        OptionResponseDto optionResponseDto = mock(OptionResponseDto.class);
+        optionsList.add(optionResponseDto);
+
+        when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(survey));
+        when(userFacade.findUser(userId)).thenReturn(user);
+        when(surveyAnswerRepository.existsBySurveyIdAndUserId(survey, user)).thenReturn(false);
+        when(questionRepository.findAllBySurveyIdOrderByNumberASC(surveyId)).thenReturn(questionList);
+        when(optionsRepository.findAllByQuestionIdOrderByNumberAsc(question.getId())).thenReturn(optionsList);
+
+        //when
+        SurveyQuestionDto result = surveyService.startSurvey(userId, surveyId);
+
+        //then
+        assertThat(result).isNotNull();
+
+    }
+
+    @Test
+    @DisplayName("기능: 설문 응답을 저장한다.")
+    void success_saveSurveyAnswer() {
+
+        //given
+        Long userId = 1L;
+        Long surveyId = 1L;
+        Long questionId = 1L;
+
+        User user = UserFixtureGenerator.generateUserFixture();
+        Survey survey = SurveyFixtureGenerator.generateSurveyFixture();
+        ReflectionTestUtils.setField(survey, "status", SurveyStatus.IN_PROGRESS);
+        ReflectionTestUtils.setField(survey, "deadline", LocalDateTime.now().plusDays(1));
+
+        Question question = mock(Question.class);
+
+        QuestionAnswerRequestDto questionAnswerRequestDto = mock(QuestionAnswerRequestDto.class);
+        ReflectionTestUtils.setField(questionAnswerRequestDto, "number", questionId);
+        List<QuestionAnswerRequestDto> answers = List.of(questionAnswerRequestDto);
+        SurveyAnswerRequestDto surveyAnswerRequestDto = new SurveyAnswerRequestDto(answers);
+
+        SurveyQuestionStrategy surveyQuestionStrategy = mock(SurveyQuestionStrategy.class);
+        when(surveyQuestionStrategy.isSupport(question.getType())).thenReturn(true);
+        when(surveyQuestionStrategies.stream()).thenReturn(Stream.of(surveyQuestionStrategy));
+
+        when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(survey));
+        when(userFacade.findUser(userId)).thenReturn(user);
+        when(surveyAnswerRepository.existsBySurveyIdAndUserId(survey, user)).thenReturn(false);
+        when(surveyAnswerRepository.save(any(SurveyAnswer.class))).thenReturn(mock(SurveyAnswer.class));
+        when(questionRepository.findById(questionAnswerRequestDto.getNumber())).thenReturn(Optional.of(question));
+        when(surveyAnswerRepository.countBySurveyId(survey)).thenReturn(survey.getMaxSurveyee()-1);
+
+        //when
+        surveyService.saveSurveyAnswer(surveyId, surveyAnswerRequestDto, userId);
+
+        //then
+        verify(surveyRepository).findByIdAndIsDeletedFalse(surveyId);
+        verify(userFacade).findUser(userId);
+        verify(surveyAnswerRepository).existsBySurveyIdAndUserId(survey, user);
+        verify(surveyAnswerRepository).save(any(SurveyAnswer.class));
+        verify(questionRepository).findById(questionAnswerRequestDto.getNumber());
+        verify(surveyAnswerRepository).countBySurveyId(survey);
+
+    }
+
+    @Test
+    @DisplayName("기능: 참여한 설문 목록을 조회한다.")
+    void success_getSurveyeeSurveyList() {
+
+        // given
+        Long userId = 1L;
+        User user = UserFixtureGenerator.generateUserFixture();
+        Survey survey = SurveyFixtureGenerator.generateSurveyFixture();
+        SurveyAnswer surveyAnswer = mock(SurveyAnswer.class);
+
+        when(surveyAnswer.getSurveyId()).thenReturn(survey);
+
+        when(userFacade.findUser(userId)).thenReturn(user);
+        when(surveyAnswerRepository.findAllByUserIdOrderByCreatedAtDesc(user)).thenReturn(List.of(surveyAnswer));
+
+        // when
+        SurveyeeSurveyListDto result = surveyService.getSurveyeeSurveyList(userId);
+
+        // then
+        assertThat(result).isNotNull();
+
+    }
 }
