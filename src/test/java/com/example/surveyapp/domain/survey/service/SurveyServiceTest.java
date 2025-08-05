@@ -70,6 +70,7 @@ public class SurveyServiceTest {
     private SurveyService surveyService;
 
     @Test
+    @DisplayName("기능_설문 생성을 성공한다")
     void 설문을_생성한다(){
         //Given
         User userMock = mock(User.class);
@@ -130,6 +131,7 @@ public class SurveyServiceTest {
     }
 
     @Test
+    @DisplayName("기능_설문 목록 조회를 성공한다")
     void 설문_목록을_조회한다(){
         //Given
         int page = 0;
@@ -193,6 +195,7 @@ public class SurveyServiceTest {
     }
 
     @Test
+    @DisplayName("기능_설문 상세정보 수정을 성공한다")
     void 설문_출제자가_설문_상세정보를_수정한다(){
         //given
         User userMock = mock(User.class);
@@ -252,6 +255,7 @@ public class SurveyServiceTest {
     }
 
     @Test
+    @DisplayName("기능_설문 상태 변경을 성공한다")
     void 관리자가_설문_상태를_변경한다(){
         //given
         User userMock = mock(User.class);
@@ -287,6 +291,7 @@ public class SurveyServiceTest {
     }
 
     @Test
+    @DisplayName("기능_설문 삭제를 성공한다")
     void 설문을_삭제한다(){
         //given
         User userMock = mock(User.class);
