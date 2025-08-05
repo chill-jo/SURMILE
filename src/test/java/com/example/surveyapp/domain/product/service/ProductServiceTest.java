@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.*;
 
-@DisplayName("서비스: Product 서비스 테스트")
+@DisplayName("service: Product 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 

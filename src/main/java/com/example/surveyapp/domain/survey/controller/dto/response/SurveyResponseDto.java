@@ -3,6 +3,8 @@ package com.example.surveyapp.domain.survey.controller.dto.response;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
