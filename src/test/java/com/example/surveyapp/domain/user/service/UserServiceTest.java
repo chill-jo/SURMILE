@@ -9,6 +9,7 @@ import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
 import com.example.surveyapp.global.response.exception.CustomException;
 import com.example.surveyapp.global.response.exception.ErrorCode;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Service: User 서비스 테스트")
 public class UserServiceTest {
     @InjectMocks
     private UserService userService;
@@ -37,7 +39,8 @@ public class UserServiceTest {
     private NicknameModerationService nicknameModerationService;
 
     @Test
-    void 유저_정보를_조회한다(){
+    @DisplayName("기능_테스트_회원_정보를_조회한다")
+    void 회원_정보를_조회한다(){
         // Given
         when(userRepository.findById(ID)).thenReturn(Optional.of(generateUserFixture()));
 
@@ -52,7 +55,8 @@ public class UserServiceTest {
     }
 
     @Test
-    void 유저_정보를_수정한다(){
+    @DisplayName("기능_테스트_회원_정보를_수정한다")
+    void 회원_정보를_수정한다(){
         // Given
         User user = generateUserFixture();
         UserRequestDto requestDto = new UserRequestDto("new@example.com", "newPw123!", "NewName", "newNickname");
@@ -77,7 +81,8 @@ public class UserServiceTest {
     }
 
     @Test
-    void 유저_수정_도중_이메일이_중복되었다(){
+    @DisplayName("예외_테스트_회원_정보_수정_도중_이메일이_중복되었다")
+    void 회원_수정_도중_이메일이_중복되었다(){
         // Given
         User user = generateUserFixture();
         UserRequestDto requestDto = new UserRequestDto("duplicate@example.com", "password", "name", "nickname");
