@@ -54,7 +54,7 @@ class AdminServiceTest {
 
 
     @Test
-    @DisplayName("검색어를 조건으로 전체 회원을 조회한다")
+    @DisplayName("기능: 검색어를 조건으로 전체 회원을 조회한다")
     void success_getUserList() {
 
         // given
@@ -72,7 +72,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("단일 회원을 조회한다")
+    @DisplayName("기능: 단일 회원을 조회한다")
     void success_getUser() {
 
         // given
@@ -89,7 +89,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("일치하는 회원이 없어서 단일 회원 조회를 실패한다")
+    @DisplayName("예외: 일치하는 회원이 없어서 단일 회원 조회를 실패한다")
     void fail_getUser() {
 
         // given
@@ -103,7 +103,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("분류별 참여자 통계를 조회한다")
+    @DisplayName("기능: 분류별 참여자 통계를 조회한다")
     void getStats() {
 
         //given
@@ -125,7 +125,7 @@ class AdminServiceTest {
 
 
     @Test
-    @DisplayName("블랙리스트에 등록한다")
+    @DisplayName("기능: 블랙리스트에 등록한다")
     void success_addBlackList() {
 
         // given
@@ -141,7 +141,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("일치하는 회원이 없어서 블랙리스트 등록을 실패한다")
+    @DisplayName("예외: 일치하는 회원이 없어서 블랙리스트 등록을 실패한다")
     void fail_addBlackList_1() {
 
         // given
@@ -155,7 +155,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("이미 블랙회원일 경우 블랙리스트 등록을 실패한다")
+    @DisplayName("예외: 이미 블랙회원일 경우 블랙리스트 등록을 실패한다")
     void fail_addBlackList_2() {
 
         // given
@@ -172,7 +172,7 @@ class AdminServiceTest {
 
 
     @Test
-    @DisplayName("블랙리스트에서 삭제한다")
+    @DisplayName("기능: 블랙리스트에서 삭제한다")
     void success_deleteBlackList() {
 
         // given
@@ -190,7 +190,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("일치하는 회원이 없어서 블랙리스트 삭제를 실패한다")
+    @DisplayName("예외: 일치하는 회원이 없어서 블랙리스트 삭제를 실패한다")
     void fail_deleteBlackList_1() {
 
         // given
@@ -204,7 +204,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("블랙회원이 아니라서 블랙리스트 삭제를 실패한다")
+    @DisplayName("예외: 블랙회원이 아니라서 블랙리스트 삭제를 실패한다")
     void fail_deleteBlackList_2() {
 
         // given
