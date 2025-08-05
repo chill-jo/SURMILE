@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
-@DisplayName("서비스: Product 서비스 테스트")
+@DisplayName("controller: Product 컨트롤 테스트")
 @WebMvcTest(controllers = ProductController.class,
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class))
 // 웹계층 테스트에 필요한 Bean들만 등록해주는 Annotations

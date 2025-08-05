@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
-@DisplayName("컨트롤러: Order 컨트롤러 테스트")
+@DisplayName(" controller : Order 컨트롤러 테스트")
 @WebMvcTest(controllers = OrderController.class,
             excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class))
 @AutoConfigureMockMvc(addFilters = false)
@@ -54,7 +54,7 @@ public class OrderControllerTest {
     private OrderService orderService;
 
     @Test
-    @DisplayName("참여자가 주문을 생성한다.")
+    @DisplayName("기능_테스트_참여자가 주문을 생성한다.")
     @WithCustomMockUser(id = 1, role = UserRoleEnum.SURVEYEE)
     void 주문_생성() throws Exception {
         // Given
@@ -91,7 +91,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    @DisplayName("관리자는 모든 계정의 주문 조회가 가능하다.")
+    @DisplayName("기능_테스트_관리자는 모든 계정의 주문 조회가 가능하다.")
     @WithCustomMockUser(id = 2, role = UserRoleEnum.ADMIN)
     void 관리자_주문_전체조회_가능하다() throws Exception{
         // Given
@@ -123,7 +123,7 @@ public class OrderControllerTest {
 
 
     @Test
-    @DisplayName("참여자는 자신의 주문목록을 조회 할 수 있다.")
+    @DisplayName("기능_테스트_참여자는 자신의 주문목록을 조회 할 수 있다.")
     @WithCustomMockUser(id = 3,role = UserRoleEnum.SURVEYEE)
     void 참여자_주문조회() throws Exception {
         // Given
@@ -153,7 +153,7 @@ public class OrderControllerTest {
 
 
     @Test
-    @DisplayName("주문자는 주문내역을 삭제할 수있다.")
+    @DisplayName("기능_테스트_주문자는 주문내역을 삭제할 수있다.")
     @WithCustomMockUser(id =3,role = UserRoleEnum.SURVEYEE)
     void 주문자_주문내역_삭제() throws Exception {
         // Given
@@ -177,7 +177,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    @DisplayName("관리자는 주문 단건을 조회할 수  있다.")
+    @DisplayName("기능_테스트_관리자는 주문 단건을 조회할 수  있다.")
     @WithCustomMockUser(id = 1,role = UserRoleEnum.ADMIN)
     void 관리자_주문_단건_조회() throws Exception {
         // Given
@@ -201,7 +201,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    @DisplayName("참여자는 자신의 주문 단건을 조회할 수 있다.")
+    @DisplayName("기능_테스트_참여자는 자신의 주문 단건을 조회할 수 있다.")
     @WithCustomMockUser(id = 3,role = UserRoleEnum.SURVEYEE)
     void readOneMyOrder() throws Exception {
         // Given
