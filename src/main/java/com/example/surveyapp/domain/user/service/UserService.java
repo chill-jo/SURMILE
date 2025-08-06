@@ -114,6 +114,7 @@ public class UserService {
         return UserResponseDto.from(user);
     }
 
+    // 유저 정보 중복 여부 검사
     private void validateDuplicatedUser(UserRequestDto userRequestDto) {
         if (userRepository.existsByEmail(userRequestDto.getEmail())) {
             throw new CustomException(ErrorCode.EXISTS_EMAIL);
@@ -124,6 +125,7 @@ public class UserService {
         }
     }
 
+    // 닉네임 적절성 검사
     private void validateNicknameModeration(String nickname){
         ModerationResultStatusEnum status = moderationService.moderate("nickname", nickname);
 
@@ -132,6 +134,7 @@ public class UserService {
         }
     }
 
+    // ID로 유저 찾기
     private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
