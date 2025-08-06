@@ -35,6 +35,7 @@ public enum ErrorCode {
     NOT_FOUND_ORDER(HttpStatus.UNAUTHORIZED,"해당 주문을 찾을 수 없습니다." ),
     NOT_YOUR_ORDER(HttpStatus.UNAUTHORIZED,"본인 주문만 확인 할 수 있습니다." ),
     NOT_SAME_ORDER_USER(HttpStatus.BAD_REQUEST,"본인이 주문한 주문만 삭제할 수 있습니다." ),
+
     //설문 에러
     SURVEY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 설문입니다."),
     SURVEY_ALREADY_DELETED(HttpStatus.GONE, "이미 삭제된 설문입니다."),
@@ -43,7 +44,8 @@ public enum ErrorCode {
     SURVEY_CANNOT_BE_MODIFIED(HttpStatus.CONFLICT, "설문 상세정보를 수정할 수 없습니다."),
     SURVEYEE_NOT_ALLOWED(HttpStatus.UNAUTHORIZED, "참여자 권한으로는 요청이 불가합니다."),
     SURVEY_STARTED(HttpStatus.FORBIDDEN, "설문 참여가 시작되었을 때는 요청이 불가합니다."),
-
+    INVALID_TITLE(HttpStatus.BAD_REQUEST, "제목에 적합하지 않은 내용이 포함되어 있습니다."),
+    INVALID_DESCRIPTION(HttpStatus.BAD_REQUEST, "상세 설명에 적합하지 않은 내용이 포함되어 있습니다."),
 
     //질문 에러
     QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 질문입니다."),
