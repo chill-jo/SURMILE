@@ -54,5 +54,5 @@ jobs:
             
             cd /home/ec2-user/survey-app
             sudo fuser -k -n tcp 8080 || true # 기존 서비스 종료
-            nohup java -jar /home/ec2-user/board-app/app.jar > application-log 2>&1 & # 신규 서비스 시작
+            nohup java -jar /home/ec2-user/survey-app/app.jar > application-log 2>&1 & # 신규 서비스 시작
             rm -rf /home/ec2-user/deploy
