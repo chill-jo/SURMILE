@@ -141,7 +141,7 @@ class ProductServiceTest {
         // Then
         //검증 사항
         assertThatThrownBy(() -> productService.createProduct(requestDto,adminUser.getId())).isInstanceOf(CustomException.class)
-                .hasMessageContaining(ErrorCode.NOT_SAME_PRODUCT_TITLE.getMessage());
+                .hasMessageContaining(ErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE.getMessage());
 
     }
 
