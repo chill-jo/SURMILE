@@ -1,5 +1,7 @@
 package com.example.surveyapp.domain.survey.service;
 
+import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
 import com.example.surveyapp.domain.point.service.PointService;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.survey.controller.dto.SurveyMapper;
@@ -43,11 +45,14 @@ public class SurveyService {
     private final UserFacade userFacade;
     private final PointService pointService;
     private final List<SurveyQuestionStrategy> surveyQuestionStrategies;
+    private final ModerationService moderationService;
 
     @Transactional
     public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
 
         User user = userFacade.findUser(userId);
+
+        validateSurveyModeration(requestDto.getTitle(), requestDto.getDescription());
 
         Survey survey = surveyMapper.createSurveyEntity(requestDto, user);
 
@@ -82,6 +87,8 @@ public class SurveyService {
 
         currentUserMatchesSurveyCreatorOrAdmin(user, survey);
         isSurveyNotStarted(survey);
+
+        validateSurveyModeration(requestDto.getTitle(), requestDto.getDescription());
 
         surveyMapper.updateSurvey(requestDto, survey);
 
@@ -258,4 +265,17 @@ public class SurveyService {
         }
     }
 
+    // 설문 제목 적절성 검사
+    private void validateSurveyModeration(String title, String description) {
+        ModerationResultStatusEnum titleStatus = moderationService.moderate("title", title);
+        ModerationResultStatusEnum descriptionStatus = moderationService.moderate("description", description);
+
+        if(titleStatus == ModerationResultStatusEnum.DENIED){
+            throw new CustomException(ErrorCode.INVALID_TITLE);
+        }
+
+        if(descriptionStatus == ModerationResultStatusEnum.DENIED){
+            throw new CustomException(ErrorCode.INVALID_DESCRIPTION);
+        }
+    }
 }
