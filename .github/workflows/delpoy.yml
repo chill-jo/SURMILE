@@ -4,7 +4,7 @@ on:
     branches: [ "dev" ]
 
 jobs:
-  create_issue_branch_job:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Git repository checkout
