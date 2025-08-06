@@ -57,6 +57,7 @@ public enum ErrorCode {
     //선택지 에러
     OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 선택지입니다."),
     OPTION_INVALID_FOR_SUBJECTIVE_QUESTION(HttpStatus.BAD_REQUEST, "주관식 질문에는 선택지를 생성할 수 없습니다."),
+    INVALID_OPTION_CONTENT(HttpStatus.BAD_REQUEST, "선택지 내용에 적합하지 않은 내용이 포함되어 있습니다."),
 
     //설문 응답 등록 에러
     SURVEY_ALREADY_PARTICIPATED(HttpStatus.BAD_REQUEST, "이미 설문에 응답하셨습니다."),
