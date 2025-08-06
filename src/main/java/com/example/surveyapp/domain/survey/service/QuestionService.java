@@ -1,5 +1,7 @@
 package com.example.surveyapp.domain.survey.service;
 
+import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
 import com.example.surveyapp.domain.survey.controller.dto.request.QuestionCreateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.QuestionUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.PageQuestionResponseDto;
@@ -36,6 +38,7 @@ public class QuestionService {
     private final SurveyRepository surveyRepository;
     private final UserFacade userFacade;
     private final OptionsRepository optionsRepository;
+    private final ModerationService moderationService;
 
     @Transactional
     public QuestionResponseDto createQuestion(Long userId, Long surveyId, QuestionCreateRequestDto requestDto){
@@ -46,6 +49,7 @@ public class QuestionService {
 
         currentUserMatchesSurveyCreatorOrAdmin(user, survey);
         isSurveyNotStarted(survey);
+        validateQuestionModeration(requestDto.getContent());
 
         Question question = new Question(
                 survey,
@@ -123,6 +127,7 @@ public class QuestionService {
         currentUserMatchesSurveyCreatorOrAdmin(user, survey);
         isSurveyNotStarted(survey);
         isQuestionFromSurvey(survey, question);
+        validateQuestionModeration(requestDto.getContent());
 
         if(requestDto.getNumber() != null){
             question.changeNumber(requestDto.getNumber());
@@ -188,6 +193,15 @@ public class QuestionService {
     public void isQuestionFromSurvey(Survey survey, Question question){
         if(!question.isFromSurvey(survey)){
             throw new CustomException(ErrorCode.QUESTION_NOT_FROM_SURVEY);
+        }
+    }
+
+    // 질문 내용 적절성 검사
+    private void validateQuestionModeration(String content) {
+        ModerationResultStatusEnum titleStatus = moderationService.moderate("content", content);
+
+        if(titleStatus == ModerationResultStatusEnum.DENIED){
+            throw new CustomException(ErrorCode.INVALID_TITLE);
         }
     }
 }
