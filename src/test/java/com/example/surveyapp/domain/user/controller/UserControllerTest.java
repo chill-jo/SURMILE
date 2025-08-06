@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DisplayName("Controller:User")
+@DisplayName("Controller: User 컨트롤러 테스트")
 @Import(TestMockBeans.class)
 public class UserControllerTest extends WebMvcTestBase {
     @Autowired
@@ -36,6 +36,7 @@ public class UserControllerTest extends WebMvcTestBase {
 
     @Test
     @WithCustomMockUser(id = 1, role = UserRoleEnum.SURVEYEE)
+    @DisplayName("기능_테스트_User_조회_API를_호출하면_회원이_조회된다")
     public void User_조회_API를_호출하면_회원이_조회된다() throws Exception {
         // Given
         when(userService.getMyInfo(ID)).thenReturn(responseDto);
@@ -58,6 +59,7 @@ public class UserControllerTest extends WebMvcTestBase {
 
     @Test
     @WithCustomMockUser(id = 1, role = UserRoleEnum.SURVEYEE)
+    @DisplayName("기능_테스트_User_수정_API를_호출하면_회원정보가_수정된다")
     public void User_수정_API를_호출하면_회원정보가_수정된다() throws Exception {
         // Given
         UserRequestDto dto = new UserRequestDto(
