@@ -22,13 +22,11 @@ public class Order extends BaseEntity {
     @Column(name = "order_number", nullable = false, unique = true, length = 36)
     private String orderNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+   @JoinColumn(name = "user_id", nullable = false)
+    private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+  @JoinColumn(name = "product_id", nullable = false)
+    private Long productId;
 
     @Column(nullable = false)
     private String title;
@@ -44,23 +42,23 @@ public class Order extends BaseEntity {
     }
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Order(User user, Product product, String title, Long price, String orderNumber) {
-        this.user = user;
-        this.product = product;
+    private Order(String orderNumber, Long userId, Long productId, String title, Long price) {
+        this.orderNumber = orderNumber;
+        this.userId = userId;
+        this.productId = productId;
         this.title = title;
         this.price = price;
-        this.orderNumber = orderNumber;
     }
 
-    public static Order create(User user, Product product) {
+    public static Order create(Long userId, Long productId, String title, Long price) {
 
         String orderNumber = orderNumberGenerator();
         return Order.builder()
-                .user(user)
+                .userId(userId)
                 .orderNumber(orderNumber)
-                .product(product)
-                .title(product.getTitle())
-                .price(product.getPrice())
+                .productId(productId)
+                .title(title)
+                .price(price)
                 .build();
     }
 
