@@ -1,9 +1,7 @@
 package com.example.surveyapp.domain.user.service;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.nickname.controller.dto.NicknameModerationRequestDto;
-import com.example.surveyapp.domain.ai.moderation.nickname.controller.dto.NicknameModerationResponseDto;
-import com.example.surveyapp.domain.ai.moderation.nickname.service.NicknameModerationService;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
 import com.example.surveyapp.domain.point.domain.model.entity.Point;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.user.controller.dto.*;
@@ -34,7 +32,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final PointRepository pointRepository;
     private final UserBaseDataRepository userBaseDataRepository;
-    private final NicknameModerationService nicknameModerationService;
+    private final ModerationService moderationService;
 
     @Transactional
     public void register(RegisterRequestDto requestDto) {
@@ -126,11 +124,10 @@ public class UserService {
         }
     }
 
-    private void validateNicknameModeration(String nicknmae){
-        NicknameModerationRequestDto nicknameModerationRequest = new NicknameModerationRequestDto(nicknmae);
-        NicknameModerationResponseDto nicknameModerationResult = nicknameModerationService.moderate(nicknameModerationRequest);
+    private void validateNicknameModeration(String nickname){
+        ModerationResultStatusEnum status = moderationService.moderate("nickname", nickname);
 
-        if(nicknameModerationResult.getStatus() == ModerationResultStatusEnum.DENIED){
+        if(status == ModerationResultStatusEnum.DENIED){
             throw new CustomException(ErrorCode.INVALID_NICKNAME);
         }
     }
