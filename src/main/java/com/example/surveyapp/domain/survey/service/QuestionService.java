@@ -201,7 +201,7 @@ public class QuestionService {
         ModerationResultStatusEnum titleStatus = moderationService.moderate("content", content);
 
         if(titleStatus == ModerationResultStatusEnum.DENIED){
-            throw new CustomException(ErrorCode.INVALID_TITLE);
+            throw new CustomException(ErrorCode.INVALID_QUESTION_CONTENT);
         }
     }
 }

@@ -52,6 +52,7 @@ public enum ErrorCode {
     NOT_SURVEY_CREATOR(HttpStatus.UNAUTHORIZED, "해당 설문 출제자가 아니면 요청이 불가합니다."),
     QUESTION_NOT_FROM_SURVEY(HttpStatus.NOT_FOUND, "질문이 설문에 존재하지 않습니다."),
     OPTIONS_NOT_FROM_SURVEY(HttpStatus.NOT_FOUND, "선택지가 질문에 존재하지 않습니다."),
+    INVALID_QUESTION_CONTENT(HttpStatus.BAD_REQUEST, "질문 내용에 적합하지 않은 내용이 포함되어 있습니다."),
 
     //선택지 에러
     OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 선택지입니다."),
