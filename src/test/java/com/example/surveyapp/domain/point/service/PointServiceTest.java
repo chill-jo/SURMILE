@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.mockito.Mockito.*;
 
-@DisplayName("서비스 : 포인트 테스트")
+@DisplayName("Service: Point 테스트")
 @ExtendWith(MockitoExtension.class)
 public class PointServiceTest {
 
@@ -54,6 +54,7 @@ public class PointServiceTest {
 
 
     @Test
+    @DisplayName("기능_테스트_출제자_포인트를_충전한다")
     void 출제자_포인트를_충전한다(){
         // given
         Long userId = 1L;
@@ -76,6 +77,7 @@ public class PointServiceTest {
     }
 
     @Test
+    @DisplayName("예외_테스트_출제자_포인트_충전_요청_값이_5000원_미만인_경우_POINT_INVALID_AMOUNT_커스템_예외_발생")
     void 출제자_포인트_충전_요청_값이_5000원_미만인_경우_POINT_INVALID_AMOUNT_커스템_예외_발생(){
         // given
         Long userId = 1L;
@@ -97,6 +99,7 @@ public class PointServiceTest {
     }
 
     @Test
+    @DisplayName("예외_테스트_출제자_포인트_충전_요청_값이_null인_경우_POINT_INVALID_AMOUNT_커스템_예외_발생")
     void 출제자_포인트_충전_요청_값이_null인_경우_POINT_INVALID_AMOUNT_커스템_예외_발생(){
         // given
         Long userId = 1L;
@@ -119,6 +122,7 @@ public class PointServiceTest {
     }
 
     @Test
+    @DisplayName("기능_테스트_출제자_설문생성시_포인트가_차감된다")
     void 출제자_설문생성시_포인트가_차감된다() {
         // given
         Long userId = 1L;
@@ -142,6 +146,7 @@ public class PointServiceTest {
 
 
     @Test
+    @DisplayName("예외_테스트_출제자_설문생성시_차감_포인트보다_부족한_경우_예외_발생")
     void 출제자_설문생성시_차감_포인트보다_부족한_경우_예외_발생() {
         // given
         Long userId = 1L;
@@ -163,6 +168,7 @@ public class PointServiceTest {
     }
 
     @Test
+    @DisplayName("기능_테스트_출제자_포인트_내역_조회를_성공한다")
     void 출제자_포인트_내역_조회를_성공한다() {
         //given
         Long userId = 1L;
@@ -188,8 +194,8 @@ public class PointServiceTest {
         assertThat(result.getContent()).hasSize(2);
 
     }
-
     @Test
+    @DisplayName("예외_테스트_출제자_포인트_내역_조회를_실패한다")
     void 출제자_포인트_내역_조회를_실패한다() {
         // given
         Long userId = 1L;
@@ -204,6 +210,7 @@ public class PointServiceTest {
     }
 
     @Test
+    @DisplayName("기능_테스트_참여자_설문_응답시_포인트를_지급받는다")
     void 참여자_설문_응답시_포인트를_지급받는다() {
         // given
         Long userId = 1L;
@@ -225,6 +232,7 @@ public class PointServiceTest {
     }
 
     @Test
+    @DisplayName("기능_테스트_참여자_상점_상품_교환시_상품_가격만큼_포인트가_차감된다")
     void 참여자_상점_상품_교환시_상품_가격만큼_포인트가_차감된다() {
         // given
         Long userId = 1L;
@@ -246,7 +254,9 @@ public class PointServiceTest {
         verify(pointHistoryRepository, times(1)).save(any(PointHistory.class));
     }
 
+
     @Test
+    @DisplayName("예외_테스트_참여자_상점_상품_교환시_보유_포인트가_부족한_경우_POINT_NOT_ENOUGH_커스텀_예외_발생")
     void 참여자_상점_상품_교환시_보유_포인트가_부족한_경우_POINT_NOT_ENOUGH_커스텀_예외_발생() {
         // given
         Long userId = 1L;
