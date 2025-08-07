@@ -14,9 +14,9 @@ public interface SurveyMapper {
     SurveyResponseDto toResponseDto(Survey survey);
 
     @BeanMapping(ignoreByDefault = true)
-    default Survey createSurveyEntity(SurveyCreateRequestDto dto, User user){
+    default Survey createSurveyEntity(SurveyCreateRequestDto dto, Long userId){
         return new Survey(
-                user,
+                userId,
                 dto.getTitle(),
                 dto.getDescription(),
                 dto.getMaxSurveyee(),
