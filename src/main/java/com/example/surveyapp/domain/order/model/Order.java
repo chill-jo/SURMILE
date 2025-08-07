@@ -24,8 +24,8 @@ public class Order extends BaseEntity {
    @JoinColumn(name = "user_id", nullable = false)
     private Long userId;
 
-   @OneToMany(cascade ={CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @ElementCollection
+    @CollectionTable(name = "order_items", joinColumns = @JoinColumn(name = "order_id"))
     private final List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(nullable = false)

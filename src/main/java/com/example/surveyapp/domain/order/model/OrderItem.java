@@ -8,16 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Entity
+@Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
 
     /**
      * 주문 당시 상품 정보
      */
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(nullable = false)
     private Long productId;
 
