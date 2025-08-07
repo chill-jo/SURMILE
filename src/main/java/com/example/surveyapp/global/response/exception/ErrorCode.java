@@ -35,6 +35,7 @@ public enum ErrorCode {
     NOT_FOUND_ORDER(HttpStatus.UNAUTHORIZED,"해당 주문을 찾을 수 없습니다." ),
     NOT_YOUR_ORDER(HttpStatus.UNAUTHORIZED,"본인 주문만 확인 할 수 있습니다." ),
     NOT_SAME_ORDER_USER(HttpStatus.BAD_REQUEST,"본인이 주문한 주문만 삭제할 수 있습니다." ),
+    ONE_ORDER_ONE_PRODUCT(HttpStatus.BAD_REQUEST, "한개의 상품만 있어야 주문이 가능합니다." ),
     //설문 에러
     SURVEY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 설문입니다."),
     SURVEY_ALREADY_DELETED(HttpStatus.GONE, "이미 삭제된 설문입니다."),
