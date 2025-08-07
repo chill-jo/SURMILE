@@ -4,8 +4,8 @@ import com.example.surveyapp.global.config.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -22,14 +22,9 @@ public class Order extends BaseEntity {
    @JoinColumn(name = "user_id", nullable = false)
     private Long userId;
 
-    @JoinColumn(name = "product_id", nullable = false)
-    private Long productId;
-
-    @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false)
-    private Long price;
+   @OneToMany(cascade ={CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private final List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean isDeleted = false;
@@ -39,22 +34,18 @@ public class Order extends BaseEntity {
     }
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Order(OrderNumber orderNumber, Long userId, Long productId, String title, Long price) {
+    private Order(OrderNumber orderNumber, Long userId, List<OrderItem> orderItems) {
         this.orderNumber = orderNumber;
         this.userId = userId;
-        this.productId = productId;
-        this.title = title;
-        this.price = price;
+        this.orderItems.addAll(orderItems);
     }
 
-    public static Order create(Long userId, Long productId, String title, Long price) {
+    public static Order create(Long userId, List<OrderItem> orderItems) {
 
         return Order.builder()
                 .userId(userId)
                 .orderNumber(OrderNumber.generator())
-                .productId(productId)
-                .title(title)
-                .price(price)
+                .orderItems(orderItems)
                 .build();
     }
 
