@@ -1,6 +1,8 @@
 package com.example.surveyapp.domain.order.model;
 
 import com.example.surveyapp.global.config.entity.BaseEntity;
+import com.example.surveyapp.global.response.exception.CustomException;
+import com.example.surveyapp.global.response.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,6 +31,14 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     private boolean isDeleted = false;
 
+    public OrderItem onlyOneOrderItem(){
+        if (orderItems.size() != 1) {
+            throw new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT);
+        }
+        return orderItems.stream().findFirst()
+                .orElseThrow(() -> new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT));
+    }
+
     public void delete(){
         this.isDeleted = true;
     }
@@ -41,14 +51,14 @@ public class Order extends BaseEntity {
     }
 
     public static Order create(Long userId, List<OrderItem> orderItems) {
-
+        if (orderItems == null || orderItems.size() != 1){
+            throw new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT);
+        }
         return Order.builder()
                 .userId(userId)
                 .orderNumber(OrderNumber.generator())
                 .orderItems(orderItems)
                 .build();
     }
-
-
 
 }
