@@ -29,7 +29,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private void writeErrorResponse(HttpServletResponse response, ErrorResponseDto error) throws IOException {
         response.setStatus(HttpStatus.FORBIDDEN.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setContentType("application/json;charset=UTF-8");
         objectMapper.writeValue(response.getWriter(), ApiResponse.fail(error.getMessage(), error));
     }
 }
