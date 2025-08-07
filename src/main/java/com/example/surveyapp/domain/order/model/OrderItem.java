@@ -3,8 +3,11 @@ package com.example.surveyapp.domain.order.model;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
@@ -24,13 +27,19 @@ public class OrderItem {
     @Column(nullable = false)
     private Long price;
 
+    @Builder(access = AccessLevel.PRIVATE)
     private OrderItem(Long productId, String title, Long price) {
         this.productId = productId;
         this.title = title;
         this.price = price;
     }
 
+    //추후 재고 및 확장 할 수 있는 예정이 있어서 코딩 해둠
     public static OrderItem create(Long productId, String title, Long price) {
-        return new OrderItem(productId,title,price);
+        return OrderItem.builder()
+                .productId(productId)
+                .title(title)
+                .price(price)
+                .build();
     }
 }
