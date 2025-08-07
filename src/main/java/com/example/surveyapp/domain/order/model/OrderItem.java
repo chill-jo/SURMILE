@@ -31,7 +31,6 @@ public class OrderItem {
         this.price = price;
     }
 
-    //추후 재고 및 확장 할 수 있는 예정이 있어서 코딩 해둠
     public static OrderItem create(Long productId, String title, Long price) {
         return OrderItem.builder()
                 .productId(productId)

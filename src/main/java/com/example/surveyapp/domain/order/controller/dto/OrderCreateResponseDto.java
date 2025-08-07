@@ -22,13 +22,13 @@ public class OrderCreateResponseDto {
 
     private Long price;
 
-    public static OrderCreateResponseDto from(Order order, String productStatus) {
+    public static OrderCreateResponseDto from(Order order, String status) {
         OrderItem orderItem = order.onlyOneOrderItem();
         return new OrderCreateResponseDto(
                 order.getUserId(),
                 order.getOrderNumber().getValue(),
                 orderItem.getTitle(),
-                productStatus,
+                status,
                 orderItem.getPrice());
     }
 }
