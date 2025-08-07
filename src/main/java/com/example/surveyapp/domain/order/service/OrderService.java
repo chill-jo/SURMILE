@@ -3,7 +3,7 @@ package com.example.surveyapp.domain.order.service;
 import com.example.surveyapp.domain.order.controller.dto.OrderCreateRequestDto;
 import com.example.surveyapp.domain.order.controller.dto.OrderCreateResponseDto;
 import com.example.surveyapp.domain.order.controller.dto.OrderResponseDto;
-import com.example.surveyapp.domain.order.facade.PointFacade;
+import com.example.surveyapp.domain.order.event.OrderCreateEvent;
 import com.example.surveyapp.domain.order.facade.ProductFacade;
 import com.example.surveyapp.domain.order.model.Order;
 import com.example.surveyapp.domain.order.model.OrderItem;
@@ -95,7 +95,7 @@ public class OrderService {
     public List<OrderResponseDto> readMyOrderList(int page, int size, Long userId) {
         userReader.validateUserIdOrThrow(userId);
         Pageable pageable = PageRequest.of(page,size);
-        Page<Order> orders = orderRepository.findByUser(userId,pageable);
+        Page<Order> orders = orderRepository.findByUserId(userId,pageable);
 
         return orders.stream()
                 .map(order -> {

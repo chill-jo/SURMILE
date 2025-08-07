@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.product.infrastructure;
+package com.example.surveyapp.domain.product.infra;
 
 import com.example.surveyapp.domain.order.facade.ProductFacade;
 import com.example.surveyapp.domain.product.controller.dto.ProductInfoDto;
