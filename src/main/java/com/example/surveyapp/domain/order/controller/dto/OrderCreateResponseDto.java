@@ -5,6 +5,8 @@ import com.example.surveyapp.domain.product.domain.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.awt.*;
+
 @Getter
 @AllArgsConstructor
 public class OrderCreateResponseDto {
@@ -15,16 +17,16 @@ public class OrderCreateResponseDto {
 
     private String title;
 
-    private Status status;
+    private String status;
 
     private Long price;
 
-    public static OrderCreateResponseDto from(Order order) {
+    public static OrderCreateResponseDto from(Order order, String productStatus) {
         return new OrderCreateResponseDto(
-                order.getUser().getId(),
-                order.getOrderNumber(),
+                order.getUserId(),
+                order.getOrderNumber().getValue(),
                 order.getTitle(),
-                order.getProduct().getStatus(),
+                productStatus,
                 order.getPrice());
     }
 }
