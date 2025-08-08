@@ -3,10 +3,12 @@ package com.example.surveyapp.domain.survey.controller.dto.request;
 import com.example.surveyapp.domain.survey.domain.model.enums.QuestionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class QuestionUpdateRequestDto {
 
     private Long number;
