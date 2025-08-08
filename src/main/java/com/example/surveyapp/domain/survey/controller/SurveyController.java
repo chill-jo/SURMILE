@@ -56,7 +56,7 @@ public class SurveyController {
             @Valid @RequestBody SurveyUpdateRequestDto requestDto
     ){
         Long userId = userDetails.getId();
-        SurveyResponseDto responseDto = surveyService.updateSurvey(userId, surveyId, requestDto);
+        SurveyResponseDto responseDto = surveyService.updateSurveyInfo(userId, surveyId, requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -133,11 +133,11 @@ public class SurveyController {
     // 참여자 본인 설문 참여 내역 조회
     @PreAuthorize("hasAnyRole('SURVEYEE')")
     @GetMapping("/surveyee")
-    public ResponseEntity<ApiResponse<SurveyeeSurveyListDto>> getSurveyeeSurveyList(
+    public ResponseEntity<ApiResponse<SurveyeeSurveyListDto>> getUserSurveyAnswerHistory(
             @AuthenticationPrincipal CustomUserDetails user
     ) {
 
-        return ResponseEntity.ok(ApiResponse.success("참여한 설문조사 내역 조회가 성공하였습니다.", surveyService.getSurveyeeSurveyList(user.getId())));
+        return ResponseEntity.ok(ApiResponse.success("참여한 설문조사 내역 조회가 성공하였습니다.", surveyService.getUserSurveyAnswerHistory(user.getId())));
     }
 
 
