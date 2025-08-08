@@ -1,5 +1,7 @@
 package com.example.surveyapp.domain.survey.service;
 
+import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
 import com.example.surveyapp.domain.survey.controller.dto.request.OptionCreateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.OptionUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.OptionResponseDto;
@@ -28,6 +30,7 @@ public class OptionsService {
     private final SurveyRepository surveyRepository;
     private final QuestionRepository questionRepository;
     private final UserFacade userFacade;
+    private final ModerationService moderationService;
 
     @Transactional
     public OptionResponseDto createOption(Long userId, Long surveyId, Long questionId, OptionCreateRequestDto requestDto){
@@ -47,6 +50,7 @@ public class OptionsService {
         currentUserMatchesSurveyCreatorOrAdmin(user, survey);
         isSurveyNotStarted(survey);
         isQuestionFromSurvey(survey, question);
+        validateOptionsModeration(requestDto.getContent());
 
         Options option = new Options(question, requestDto.getNumber(), requestDto.getContent());
 
@@ -98,6 +102,7 @@ public class OptionsService {
         isSurveyNotStarted(survey);
         isQuestionFromSurvey(survey, question);
         isOptionFromQuestion(question, option);
+        validateOptionsModeration(requestDto.getContent());
 
         if(requestDto.getNumber() != null){
             option.changeNumber(requestDto.getNumber());
@@ -166,6 +171,15 @@ public class OptionsService {
     public void isOptionFromQuestion(Question question, Options option){
         if(!option.isFromQuestion(question)){
             throw new CustomException(ErrorCode.OPTIONS_NOT_FROM_SURVEY);
+        }
+    }
+
+    // 선택지 내용 적절성 검사
+    private void validateOptionsModeration(String content) {
+        ModerationResultStatusEnum titleStatus = moderationService.moderate("content", content);
+
+        if(titleStatus == ModerationResultStatusEnum.DENIED){
+            throw new CustomException(ErrorCode.INVALID_OPTION_CONTENT);
         }
     }
 }

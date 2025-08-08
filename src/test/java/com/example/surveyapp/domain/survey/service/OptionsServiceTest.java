@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
 import com.example.surveyapp.domain.survey.controller.dto.request.OptionCreateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.OptionUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.OptionResponseDto;
@@ -44,6 +46,9 @@ public class OptionsServiceTest {
     @Mock
     private UserFacade userFacade;
 
+    @Mock
+    private ModerationService moderationService;
+
     @InjectMocks
     private OptionsService optionsService;
 
@@ -74,6 +79,7 @@ public class OptionsServiceTest {
         when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
         when(surveyMock.isNotStarted()).thenReturn(true);
         when(questionMock.isFromSurvey(surveyMock)).thenReturn(true);
+        when(moderationService.moderate("content", content)).thenReturn(ModerationResultStatusEnum.APPROVED);
 
         when(optionsRepository.save(any(Options.class))).thenAnswer(invocation -> {
             Options o = invocation.getArgument(0);
@@ -178,6 +184,7 @@ public class OptionsServiceTest {
         when(surveyMock.isNotStarted()).thenReturn(true);
         when(questionMock.isFromSurvey(surveyMock)).thenReturn(true);
         when(optionMock.isFromQuestion(questionMock)).thenReturn(true);
+        when(moderationService.moderate("content", content)).thenReturn(ModerationResultStatusEnum.APPROVED);
 
         doNothing().when(optionMock).changeNumber(number);
         doNothing().when(optionMock).changeContent(content);

@@ -1,8 +1,7 @@
 package com.example.surveyapp.domain.user.service;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationResponseDto;
-import com.example.surveyapp.domain.ai.moderation.service.NicknameModerationService;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
 import com.example.surveyapp.domain.user.controller.dto.UserRequestDto;
 import com.example.surveyapp.domain.user.controller.dto.UserResponseDto;
 import com.example.surveyapp.domain.user.domain.model.User;
@@ -36,7 +35,7 @@ public class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private NicknameModerationService nicknameModerationService;
+    private ModerationService moderationService;
 
     @Test
     @DisplayName("기능_테스트_회원_정보를_조회한다")
@@ -65,11 +64,8 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(requestDto.getEmail())).thenReturn(false);
         when(userRepository.existsByNickname(requestDto.getNickname())).thenReturn(false);
         when(passwordEncoder.encode(requestDto.getPassword())).thenReturn("encodedPw123!");
-        when(nicknameModerationService.moderate(any()))
-                .thenReturn(new NicknameModerationResponseDto(
-                        ModerationResultStatusEnum.APPROVED,
-                        "적합한 닉네임입니다."
-                ));
+        when(moderationService.moderate(eq("nickname"), eq("newNickname")))
+                .thenReturn(ModerationResultStatusEnum.APPROVED);
 
         // When
         UserResponseDto updatedUser = userService.updateMyInfo(ID, requestDto);
