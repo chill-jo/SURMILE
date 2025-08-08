@@ -41,7 +41,6 @@ jobs:
       - name: Docker Compose 파일 생성
         run: |
           cat > ./survey-app/docker-compose.yml << 'EOL'
-          version: '3'
           services:
             app:
               build: .
