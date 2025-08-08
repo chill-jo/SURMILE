@@ -28,6 +28,33 @@ jobs:
       - name: ENV 파일 생성
         run: echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
 
+      - name: Dockerfile 생성
+        run: |
+          cat > ./survey-app/Dockerfile << 'EOL'
+          FROM openjdk:17-jdk-slim
+          WORKDIR /app
+          COPY app.jar app.jar
+          COPY .env .env
+          ENTRYPOINT ["java", "-jar", "app.jar"]
+          EOL
+
+      - name: Docker Compose 파일 생성
+        run: |
+          cat > ./survey-app/docker-compose.yml << 'EOL'
+          services:
+            app:
+              build: .
+              ports:
+                - "8080:8080"
+              restart: always
+              container_name: survey-app
+          EOL
+
+      - name: 파일 생성 확인
+        run: |
+          echo "===== 파일 목록 확인 ====="
+          ls -la ./survey-app/
+
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:
@@ -67,3 +94,4 @@ jobs:
             
             # 배포 후 임시 파일 정리
             rm -rf /home/ec2-user/deploy
+            mkdir /home/ec2-user/deploy
