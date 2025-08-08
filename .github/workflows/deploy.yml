@@ -1,0 +1,98 @@
+name: Spring Boot Application Deploy
+on:
+  push:
+    branches: [ "dev-v2" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git repository checkout
+        uses: actions/checkout@v4
+
+      - name: JDK 17 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 파일 전송을 위한 디렉토리 생성
+        run: mkdir ./survey-app
+
+      - name: Gradle build
+        run: ./gradlew clean build
+
+      - name: Archive 파일명 변경
+        run: mv ./build/libs/*SNAPSHOT.jar ./survey-app/app.jar
+
+      - name: ENV 파일 생성
+        run: echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
+
+      - name: Dockerfile 생성
+        run: |
+          cat > ./survey-app/Dockerfile << 'EOL'
+          FROM openjdk:17-jdk-slim
+          WORKDIR /app
+          COPY app.jar app.jar
+          COPY .env .env
+          ENTRYPOINT ["java", "-jar", "app.jar"]
+          EOL
+
+      - name: Docker Compose 파일 생성
+        run: |
+          cat > ./survey-app/docker-compose.yml << 'EOL'
+          version: '3'
+          services:
+            app:
+              build: .
+              ports:
+                - "8080:8080"
+              restart: always
+              container_name: survey-app
+          EOL
+
+      - name: 파일 생성 확인
+        run: |
+          echo "===== 파일 목록 확인 ====="
+          ls -la ./survey-app/
+
+      - name: SCP로 EC2에 파일 전송
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PEM_KEY }}
+          source: ./survey-app
+          target: /home/ec2-user/deploy
+
+      - name: SSH를 통해 EC2에 접속 후 Docker Compose로 서비스 재시작
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PEM_KEY }}
+          script: |
+            # 롤백 디렉토리 생성 및 이전 버전 백업
+            rm -rf /home/ec2-user/rollback
+            mkdir /home/ec2-user/rollback
+            
+            # 기존 서비스 중지하고 백업
+            if [ -d "/home/ec2-user/survey-app" ]; then
+              cd /home/ec2-user/survey-app
+              docker-compose down || true
+              mv /home/ec2-user/survey-app /home/ec2-user/rollback
+            fi
+            
+            # 새 버전 배포 준비
+            rm -rf /home/ec2-user/survey-app
+            mkdir /home/ec2-user/survey-app
+            mv /home/ec2-user/deploy/survey_app/* /home/ec2-user/survey-app/
+            
+            # Docker Compose로 서비스 시작
+            cd /home/ec2-user/survey-app
+            docker-compose build --no-cache
+            docker-compose up -d
+            
+            # 배포 후 임시 파일 정리
+            rm -rf /home/ec2-user/deploy
+            mkdir /home/ec2-user/deploy
