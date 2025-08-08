@@ -13,7 +13,7 @@ import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.point.service.PointService;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
-import com.example.surveyapp.domain.product.domain.model.repository.ProductRepository;
+import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
@@ -24,7 +24,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -208,7 +207,7 @@ class OrderServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         // When
         //실행할 행동
-        OrderResponseDto responseDto = orderService.readOneMyOrder(order.getId(), order.getUser().getId());
+        OrderResponseDto responseDto = orderService.readOneMyOrder(order.getId(), order.getUserId());
 
         // Then
         //검증 사항
