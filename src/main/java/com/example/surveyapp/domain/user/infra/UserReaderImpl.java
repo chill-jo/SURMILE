@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.user.infrastructure;
+package com.example.surveyapp.domain.user.infra;
 
 import com.example.surveyapp.domain.admin.domain.repository.BlackListRepository;
 import com.example.surveyapp.domain.user.domain.model.User;
