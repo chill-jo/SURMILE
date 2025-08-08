@@ -19,25 +19,21 @@ public class SurveyAnswer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "survey_id", nullable = false)
-    private Survey surveyId;
+    private Long surveyId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+    private Long userId;
 
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private SurveyAnswer(Survey surveyId, User userId) {
+    private SurveyAnswer(Long surveyId, Long userId) {
         this.surveyId = surveyId;
         this.userId = userId;
     }
 
-    public static SurveyAnswer of(Survey surveyId, User userId) {
+    public static SurveyAnswer of(Long surveyId, Long userId) {
         return SurveyAnswer.builder()
                 .surveyId(surveyId)
                 .userId(userId)
