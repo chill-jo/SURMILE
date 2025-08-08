@@ -29,5 +29,6 @@ public class SurveyUpdateRequestDto {
 
     @Range(min = 1, max = 120, message = "예상 소요시간은 1분 이상, 120분 이하여야 합니다.")
     private Long expectedTime;
+
 }
 

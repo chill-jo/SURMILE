@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface SurveyAnswerRepository extends JpaRepository<SurveyAnswer, Long> {
 
-    List<SurveyAnswer> findAllByUserIdOrderByCreatedAtDesc(User userId);
+    List<SurveyAnswer> findAllByUserIdOrderByCreatedAtDesc(Long userId);
 
-    boolean existsBySurveyIdAndUserId(Survey surveyId, User userId);
+    boolean existsBySurveyIdAndUserId(Long surveyId, Long userId);
 
-    Long countBySurveyId(Survey surveyId);
+    Long countBySurveyId(Long surveyId);
 
 }

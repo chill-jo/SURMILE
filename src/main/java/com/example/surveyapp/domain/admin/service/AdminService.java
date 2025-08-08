@@ -74,7 +74,7 @@ public class AdminService {
             throw new CustomException(ErrorCode.IS_BLACKLIST);
         }
 
-        blackListRepository.save(new BlackList(user));
+        blackListRepository.save(new BlackList(userId));
 
         return user;
     }

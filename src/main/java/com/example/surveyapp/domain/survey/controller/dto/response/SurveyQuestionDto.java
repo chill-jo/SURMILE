@@ -36,13 +36,13 @@ public class SurveyQuestionDto {
     public static SurveyQuestionDto of(Survey survey) {
         return new SurveyQuestionDto(
                 survey.getId(),
-                survey.getTitle(),
-                survey.getDescription(),
-                survey.getMaxSurveyee(),
-                survey.getPointPerPerson(),
-                survey.getTotalPoint(),
-                survey.getDeadline(),
-                survey.getExpectedTime(),
+                survey.getSurveyInfo().getTitle(),
+                survey.getSurveyInfo().getDescription(),
+                survey.getSurveyInfo().getMaxSurveyee(),
+                survey.getSurveyInfo().getPointPerPerson(),
+                survey.getSurveyInfo().getTotalPoint(),
+                survey.getSurveyInfo().getDeadline(),
+                survey.getSurveyInfo().getExpectedTime(),
                 new ArrayList<>()
         );
     }

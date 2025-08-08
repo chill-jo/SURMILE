@@ -1,34 +1,34 @@
 package com.example.surveyapp.domain.survey.service;
 
-import com.example.surveyapp.domain.point.service.PointService;
-import com.example.surveyapp.domain.user.domain.model.User;
-import com.example.surveyapp.domain.survey.controller.dto.SurveyMapper;
+import com.example.surveyapp.domain.survey.domain.SurveyQuestionQueryService;
+import com.example.surveyapp.domain.survey.domain.SurveyValidator;
+import com.example.surveyapp.domain.survey.service.mapper.SurveyAnswerMapper;
+import com.example.surveyapp.domain.survey.service.mapper.SurveyMapper;
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyAnswerRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyCreateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyStatusUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.*;
-import com.example.surveyapp.domain.survey.domain.model.entity.Question;
-import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.survey.domain.model.entity.SurveyAnswer;
+import com.example.surveyapp.domain.survey.domain.model.entity.*;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
-import com.example.surveyapp.domain.survey.facade.UserFacade;
-import com.example.surveyapp.domain.survey.domain.repository.OptionsRepository;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
-import com.example.surveyapp.domain.survey.service.strategy.SurveyQuestionStrategy;
+import com.example.surveyapp.domain.survey.event.SurveyAnswerEvent;
+import com.example.surveyapp.domain.survey.event.SurveyCreateEvent;
+import com.example.surveyapp.domain.survey.domain.strategy.SurveyQuestionStrategy;
+import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
+import com.example.surveyapp.global.reader.UserReader;
 import com.example.surveyapp.global.response.exception.CustomException;
 import com.example.surveyapp.global.response.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,23 +38,30 @@ public class SurveyService {
     private final SurveyRepository surveyRepository;
     private final SurveyMapper surveyMapper;
     private final QuestionRepository questionRepository;
-    private final OptionsRepository optionsRepository;
     private final SurveyAnswerRepository surveyAnswerRepository;
-    private final UserFacade userFacade;
-    private final PointService pointService;
     private final List<SurveyQuestionStrategy> surveyQuestionStrategies;
+    private final UserReader userReader;
+    private final SurveyQuestionQueryService surveyQuestionQueryService;
+    private final SurveyValidator surveyValidator;
+    private final ApplicationEventPublisher eventPublisher;
+    private final SurveyAnswerMapper surveyAnswerMapper;
 
     @Transactional
     public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
 
-        User user = userFacade.findUser(userId);
+        userReader.validateUserIdOrThrow(userId);
 
-        Survey survey = surveyMapper.createSurveyEntity(requestDto, user);
+        SurveyInfo surveyInfo = surveyMapper.toSurveyInfo(requestDto);
 
+        Survey survey = Survey.of(userId, surveyInfo);
         Survey saved = surveyRepository.save(survey);
 
-        if(user.isUserRoleSurveyor()){
-            pointService.surveyorRedeem(userId, saved.getTotalPoint(), saved.getId());
+        if(userReader.validateUserRole(userId, UserRoleEnum.SURVEYOR)){
+            /// /////////// 이벤트 처리될 부분
+
+            eventPublisher.publishEvent(new SurveyCreateEvent(saved, userId));
+            //pointService.surveyorRedeem(userId, saved.getSurveyInfo().getTotalPoint(), saved.getId());
+            /// ///////////
         }
 
         return surveyMapper.toResponseDto(saved);
@@ -73,17 +80,13 @@ public class SurveyService {
     }
 
     @Transactional
-    public SurveyResponseDto updateSurvey(Long userId, Long surveyId, SurveyUpdateRequestDto requestDto) {
+    public SurveyResponseDto updateSurveyInfo(Long userId, Long surveyId, SurveyUpdateRequestDto requestDto) {
 
-        User user = userFacade.findUser(userId);
-        Survey survey = surveyRepository.findByIdAndIsDeletedFalse(surveyId).orElseThrow(
-                () -> new CustomException(ErrorCode.SURVEY_NOT_FOUND)
-        );
+        userReader.validateUserIdOrThrow(userId);
+        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+        surveyValidator.validateUpdatable(userId, survey);
 
-        currentUserMatchesSurveyCreatorOrAdmin(user, survey);
-        isSurveyNotStarted(survey);
-
-        surveyMapper.updateSurvey(requestDto, survey);
+        survey.updateSurveyInfo(requestDto);
 
         return surveyMapper.toResponseDto(survey);
     }
@@ -92,16 +95,11 @@ public class SurveyService {
     //설문 상태 변경(NOT_STARTED -> IN_PROGRESS, IN_PROGRESS -> PAUSED, PAUSED -> IN_PROGRESS, IN_PROGRESS -> DONE)
     public SurveyStatusResponseDto updateSurveyStatus(Long userId, Long surveyId, SurveyStatusUpdateRequestDto requestDto) {
 
-        User user = userFacade.findUser(userId);
-        Survey survey = surveyRepository.findByIdAndIsDeletedFalse(surveyId).orElseThrow(
-                () -> new CustomException(ErrorCode.SURVEY_NOT_FOUND)
-        );
+        userReader.validateUserIdOrThrow(userId);
+        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+        surveyValidator.validateStatusUpdatable(userId, survey);
 
-        currentUserMatchesSurveyCreatorOrAdmin(user, survey);
-
-        SurveyStatus newStatus = requestDto.getStatus();
-
-        survey.changeSurveyStatus(newStatus);
+        survey.changeSurveyStatus(requestDto.getStatus());
 
         return new SurveyStatusResponseDto(survey.getStatus());
     }
@@ -109,43 +107,22 @@ public class SurveyService {
     @Transactional
     public void deleteSurvey(Long userId, Long surveyId) {
 
-        User user = userFacade.findUser(userId);
+        userReader.validateUserIdOrThrow(userId);
 
-        Survey survey = surveyRepository.findById(surveyId).orElseThrow(
-                () -> new CustomException(ErrorCode.SURVEY_NOT_FOUND, "존재하지 않는 설문입니다.")
-        );
-
-        currentUserMatchesSurveyCreatorOrAdmin(user, survey);
-
-        if (survey.isDeleted()) {
-            throw new CustomException(ErrorCode.SURVEY_ALREADY_DELETED);
-        }
-        if (survey.isInProgress()) {
-            throw new CustomException(ErrorCode.SURVEY_CANNOT_BE_DELETED);
-        }
-
-        List<Question> questions = questionRepository.findAllBySurvey(survey);
-
-        for(Question q : questions){
-            optionsRepository.deleteAllByQuestion(q);
-        }
-
-        questionRepository.deleteAllBySurvey(survey);
+        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+        surveyValidator.validateDeletable(userId, survey);
 
         survey.deleteSurvey();
     }
-
 
     // 참여자 API
     // 삭제 되지 않은 설문만 설문 상세 조회
     @Transactional
     public SurveyResponseDto getSurvey(Long surveyId) {
 
-        Survey survey = surveyRepository.findByIdAndIsDeletedFalse(surveyId)
-                .orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
-
+        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
         SurveyResponseDto responseDto = surveyMapper.toResponseDto(survey);
-        responseDto.changeSurveyeeCount(surveyAnswerRepository.countBySurveyId(survey));
+        responseDto.changeSurveyeeCount(surveyAnswerRepository.countBySurveyId(surveyId));
 
         return responseDto;
     }
@@ -153,51 +130,29 @@ public class SurveyService {
     // 설문 시작
     @Transactional(readOnly = true)
     public SurveyQuestionDto startSurvey(Long userId, Long surveyId) {
+        userReader.validateUserIdOrThrow(userId);
 
-        Survey survey = surveyRepository.findByIdAndIsDeletedFalse(surveyId)
+        Survey survey = surveyRepository.findSurveyWithQuestionsAndOptions(surveyId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
 
-        if (!survey.getStatus().equals(SurveyStatus.IN_PROGRESS) || survey.getDeadline().isBefore(LocalDateTime.now())) {
-            throw new CustomException(ErrorCode.SURVEY_NOT_IN_PROGRESS);
-        }
+        surveyValidator.validateStartable(survey);
+        surveyValidator.validateNotParticipated(userId, surveyId);
 
-        User user = userFacade.findUser(userId);
-
-        if (surveyAnswerRepository.existsBySurveyIdAndUserId(survey, user)) {
-            throw new CustomException(ErrorCode.SURVEY_ALREADY_PARTICIPATED);
-        };
-
-        SurveyQuestionDto surveyQuestionDto = SurveyQuestionDto.of(survey);
-
-        List<Question> questions = questionRepository.findAllBySurveyIdOrderByNumberASC(surveyId);
-
-        questions.forEach(question -> {
-            List<OptionResponseDto> options = optionsRepository.findAllByQuestionIdOrderByNumberAsc(question.getId());
-            QuestionOptionsDto questionOptionsDto = QuestionOptionsDto.of(question, options);
-
-            surveyQuestionDto.addQuestion(questionOptionsDto);
-        });
-
+        SurveyQuestionDto surveyQuestionDto = surveyAnswerMapper.toSurveyQuestionDto(survey);
 
         return surveyQuestionDto;
     }
 
     @Transactional
     public void saveSurveyAnswer(Long surveyId, SurveyAnswerRequestDto requestDto, Long userId) {
-        Survey survey = surveyRepository.findByIdAndIsDeletedFalse(surveyId)
-                .orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
 
-        if (!survey.getStatus().equals(SurveyStatus.IN_PROGRESS) || survey.getDeadline().isBefore(LocalDateTime.now())) {
-            throw new CustomException(ErrorCode.SURVEY_NOT_IN_PROGRESS);
-        }
+        userReader.validateUserIdOrThrow(userId);
 
-        User user = userFacade.findUser(userId);
+        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+        surveyValidator.validateStartable(survey);
+        surveyValidator.validateNotParticipated(userId, surveyId);
 
-        if (surveyAnswerRepository.existsBySurveyIdAndUserId(survey, user)) {
-            throw new CustomException(ErrorCode.SURVEY_ALREADY_PARTICIPATED);
-        };
-
-        SurveyAnswer surveyAnswer = surveyAnswerRepository.save(SurveyAnswer.of(survey, user));
+        SurveyAnswer surveyAnswer = surveyAnswerRepository.save(SurveyAnswer.of(surveyId, userId));
 
         requestDto.getAnswers().forEach(questionAnswer -> {
             Question question = questionRepository.findById(questionAnswer.getNumber()).orElseThrow(
@@ -212,50 +167,23 @@ public class SurveyService {
                     .doSave(questionAnswer, surveyAnswer, question);
         });
 
-        pointService.earn(user.getId(), survey.getPointPerPerson(), surveyAnswer.getId());
+        eventPublisher.publishEvent(new SurveyAnswerEvent(userId, surveyId, surveyAnswer.getId()));
 
-        if (surveyAnswerRepository.countBySurveyId(survey) >= survey.getMaxSurveyee()) {
+        /// ////이부분을 이벤트로 처리할수는 없나?
+        if (surveyAnswerRepository.countBySurveyId(surveyId) >= survey.getSurveyInfo().getMaxSurveyee()) {
             survey.changeSurveyStatus(SurveyStatus.DONE);
         }
+        /// ////
     }
 
     @Transactional(readOnly = true)
-    public SurveyeeSurveyListDto getSurveyeeSurveyList(Long userId) {
+    public SurveyeeSurveyListDto getUserSurveyAnswerHistory(Long userId) {
 
-        User user = userFacade.findUser(userId);
+        userReader.validateUserIdOrThrow(userId);
 
-        List<SurveyAnswer> surveyAnswerList = surveyAnswerRepository.findAllByUserIdOrderByCreatedAtDesc(user);
+        List<SurveyAnswer> surveyAnswerList = surveyAnswerRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
 
-        SurveyeeSurveyListDto surveyListDto = SurveyeeSurveyListDto.of();
-
-        surveyAnswerList.forEach(surveyAnswer -> {
-            SurveyeeSurveyDto surveyeeSurveyDto = SurveyeeSurveyDto.of(surveyAnswer);
-
-            surveyListDto.addSurveyeeSurveyDto(surveyeeSurveyDto);
-        });
-
-        return surveyListDto;
-    }
-
-    //유저가 참여자 권한일 때 예외
-    public void isCurrentUserSurveyee(User user) {
-        if (user.isUserRoleSurveyee()) {
-            throw new CustomException(ErrorCode.SURVEYEE_NOT_ALLOWED);
-        }
-    }
-
-    //해당 설문 출제자가 아니거나 관리자가 아닐 시 예외
-    public void currentUserMatchesSurveyCreatorOrAdmin(User user, Survey survey) {
-        if (!survey.isUserSurveyCreator(user) && user.isUserRoleNotAdmin()) {
-            throw new CustomException(ErrorCode.NOT_SURVEY_CREATOR);
-        }
-    }
-
-    //설문이 진행 전 상태가 아닐 때 예외
-    public void isSurveyNotStarted(Survey survey) {
-        if (!survey.isNotStarted()) {
-            throw new CustomException(ErrorCode.SURVEY_STARTED);
-        }
+        return surveyAnswerMapper.toSurveyListDto(surveyAnswerList);
     }
 
 }

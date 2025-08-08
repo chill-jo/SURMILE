@@ -35,4 +35,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
                OR u.nickname LIKE CONCAT('%', :searchText, '%'))
     """)
     Page<UserDto> findAllBySearch(@Param("searchText") String search, Pageable pageable);
+
+
 }
