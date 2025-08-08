@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.survey.domain;
+package com.example.surveyapp.domain.survey.service.mapper;
 
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyCreateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.SurveyResponseDto;
