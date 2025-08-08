@@ -28,6 +28,12 @@ jobs:
       - name: ENV 파일 생성
         run: echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
 
+      - name: Dockerfile 생성
+        run: mv ./Dockerfile ./survey-app/Dockerfile
+
+      - name: Docker Compose 파일 생성
+        run: mv ./docker-compose.yml ./survey-app/docker-compose.yml
+
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:
