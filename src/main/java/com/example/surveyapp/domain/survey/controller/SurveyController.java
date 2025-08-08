@@ -141,4 +141,15 @@ public class SurveyController {
     }
 
 
+    // 테스트용
+    @PostMapping("/{surveyId}/answerTest")
+    public ResponseEntity<ApiResponse<Void>> answerSurveyTest(
+            @PathVariable Long surveyId,
+            @RequestBody @Valid SurveyAnswerRequestDto requestDto
+    ) {
+
+        surveyService.saveSurveyAnswerTest(surveyId, requestDto);
+
+        return ResponseEntity.ok(ApiResponse.success("설문이 완료되었습니다.", null));
+    }
 }

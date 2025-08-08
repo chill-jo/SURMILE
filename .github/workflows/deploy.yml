@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "===== 파일 목록 확인 ====="
           ls -la ./survey-app/
-
+          
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:

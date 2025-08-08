@@ -4,11 +4,12 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.example.surveyapp.config.generator.UserFixtureGenerator;
+import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
 import com.example.surveyapp.domain.point.service.PointService;
 import com.example.surveyapp.domain.survey.controller.dto.SurveyMapper;
 import com.example.surveyapp.domain.survey.controller.dto.request.*;
 import com.example.surveyapp.domain.survey.controller.dto.response.*;
-import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.SurveyAnswer;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
@@ -66,6 +67,9 @@ public class SurveyServiceTest {
     @Mock
     private List<SurveyQuestionStrategy> surveyQuestionStrategies;
 
+    @Mock
+    private ModerationService moderationService;
+
     @InjectMocks
     private SurveyService surveyService;
 
@@ -91,6 +95,8 @@ public class SurveyServiceTest {
         Survey saved = SurveyFixtureGenerator.generateSurveyFixture();
 
         when(userFacade.findUser(userId)).thenReturn(userMock);
+        when(moderationService.moderate("title", title)).thenReturn(ModerationResultStatusEnum.APPROVED);
+        when(moderationService.moderate("description", description)).thenReturn(ModerationResultStatusEnum.APPROVED);
 
         when(surveyMapper.createSurveyEntity(surveyCreateRequestDto, userMock))
                 .thenReturn(surveyMock);
@@ -215,6 +221,9 @@ public class SurveyServiceTest {
 
         when(userFacade.findUser(userId)).thenReturn(userMock);
         when(surveyRepository.findByIdAndIsDeletedFalse(id)).thenReturn(Optional.of(surveyMock));
+
+        when(moderationService.moderate("title", title)).thenReturn(ModerationResultStatusEnum.APPROVED);
+        when(moderationService.moderate("description", description)).thenReturn(ModerationResultStatusEnum.APPROVED);
 
         when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
         when(surveyMock.isNotStarted()).thenReturn(true);

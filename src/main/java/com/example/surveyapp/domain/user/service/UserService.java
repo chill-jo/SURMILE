@@ -1,9 +1,7 @@
 package com.example.surveyapp.domain.user.service;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationRequestDto;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationResponseDto;
-import com.example.surveyapp.domain.ai.moderation.service.NicknameModerationService;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
 import com.example.surveyapp.domain.point.domain.model.entity.Point;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.user.controller.dto.*;
@@ -13,7 +11,6 @@ import com.example.surveyapp.domain.user.controller.dto.UserResponseDto;
 import com.example.surveyapp.domain.user.domain.model.CategoryEnum;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserBaseData;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.domain.user.domain.repository.UserBaseDataRepository;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
 import com.example.surveyapp.global.response.exception.CustomException;
@@ -35,7 +32,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final PointRepository pointRepository;
     private final UserBaseDataRepository userBaseDataRepository;
-    private final NicknameModerationService nicknameModerationService;
+    private final ModerationService moderationService;
 
     @Transactional
     public void register(RegisterRequestDto requestDto) {
@@ -117,6 +114,7 @@ public class UserService {
         return UserResponseDto.from(user);
     }
 
+    // 유저 정보 중복 여부 검사
     private void validateDuplicatedUser(UserRequestDto userRequestDto) {
         if (userRepository.existsByEmail(userRequestDto.getEmail())) {
             throw new CustomException(ErrorCode.EXISTS_EMAIL);
@@ -127,15 +125,16 @@ public class UserService {
         }
     }
 
-    private void validateNicknameModeration(String nicknmae){
-        NicknameModerationRequestDto nicknameModerationRequest = new NicknameModerationRequestDto(nicknmae);
-        NicknameModerationResponseDto nicknameModerationResult = nicknameModerationService.moderate(nicknameModerationRequest);
+    // 닉네임 적절성 검사
+    private void validateNicknameModeration(String nickname){
+        ModerationResultStatusEnum status = moderationService.moderate("nickname", nickname);
 
-        if(nicknameModerationResult.getStatus() == ModerationResultStatusEnum.DENIED){
+        if(status == ModerationResultStatusEnum.DENIED){
             throw new CustomException(ErrorCode.INVALID_NICKNAME);
         }
     }
 
+    // ID로 유저 찾기
     private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
