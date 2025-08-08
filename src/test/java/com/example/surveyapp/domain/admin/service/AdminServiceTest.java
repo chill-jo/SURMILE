@@ -161,7 +161,7 @@ class AdminServiceTest {
         // given
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(blackListRepository.findByUserId(user)).thenReturn(Optional.of(blackList));
+        when(blackListRepository.findByUserId(userId)).thenReturn(Optional.of(blackList));
 
         // when & then
         Assertions.assertThatThrownBy(() -> adminService.addBlackList(userId))
@@ -178,7 +178,7 @@ class AdminServiceTest {
         // given
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(blackListRepository.findByUserId(user)).thenReturn(Optional.of(blackList));
+        when(blackListRepository.findByUserId(userId)).thenReturn(Optional.of(blackList));
 
         // when
         User result = adminService.deleteBlackList(userId);

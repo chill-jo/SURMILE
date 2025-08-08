@@ -37,8 +37,10 @@ public class OrderService {
 
     @Transactional
     public OrderCreateResponseDto createOrder(OrderCreateRequestDto requestDto, Long userId) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
         Point point = pointRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POINT));
 

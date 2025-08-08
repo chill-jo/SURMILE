@@ -72,7 +72,7 @@ public class OptionsServiceTest {
 
         when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
         when(surveyMock.isNotStarted()).thenReturn(true);
-        when(questionMock.isFromSurvey(surveyMock)).thenReturn(true);
+        when(questionMock.isFromSurvey(surveyId)).thenReturn(true);
 
         when(optionsRepository.save(any(Options.class))).thenAnswer(invocation -> {
             Options o = invocation.getArgument(0);
@@ -87,7 +87,7 @@ public class OptionsServiceTest {
 
         verify(optionsRepository).save(optionsCaptor.capture());
         Options savedOption = optionsCaptor.getValue();
-        assertThat(savedOption.getQuestion()).isSameAs(questionMock);
+        assertThat(savedOption.getQuestionId()).isSameAs(questionId);
         assertThat(responseDto.getNumber()).isEqualTo(number);
         assertThat(responseDto.getContent()).isEqualTo(content);
 
@@ -173,8 +173,8 @@ public class OptionsServiceTest {
 
         when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
         when(surveyMock.isNotStarted()).thenReturn(true);
-        when(questionMock.isFromSurvey(surveyMock)).thenReturn(true);
-        when(optionMock.isFromQuestion(questionMock)).thenReturn(true);
+        when(questionMock.isFromSurvey(surveyId)).thenReturn(true);
+        when(optionMock.isFromQuestion(questionId)).thenReturn(true);
 
         doNothing().when(optionMock).changeNumber(number);
         doNothing().when(optionMock).changeContent(content);
@@ -197,8 +197,8 @@ public class OptionsServiceTest {
         verify(optionsRepository).findById(optionId);
         verify(surveyMock).isUserSurveyCreator(userMock);
         verify(surveyMock).isNotStarted();
-        verify(questionMock).isFromSurvey(surveyMock);
-        verify(optionMock).isFromQuestion(questionMock);
+        verify(questionMock).isFromSurvey(surveyId);
+        verify(optionMock).isFromQuestion(questionId);
         verify(optionMock).changeNumber(number);
         verify(optionMock).changeContent(content);
     }
@@ -222,8 +222,8 @@ public class OptionsServiceTest {
 
         when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
         when(surveyMock.isNotStarted()).thenReturn(true);
-        when(questionMock.isFromSurvey(surveyMock)).thenReturn(true);
-        when(optionMock.isFromQuestion(questionMock)).thenReturn(true);
+        when(questionMock.isFromSurvey(surveyId)).thenReturn(true);
+        when(optionMock.isFromQuestion(questionId)).thenReturn(true);
 
         doNothing().when(optionsRepository).delete(optionMock);
 
@@ -237,7 +237,7 @@ public class OptionsServiceTest {
         verify(optionsRepository).findById(optionId);
         verify(surveyMock).isUserSurveyCreator(userMock);
         verify(surveyMock).isNotStarted();
-        verify(questionMock).isFromSurvey(surveyMock);
+        verify(questionMock).isFromSurvey(surveyId);
         verify(optionsRepository).delete(optionMock);
     }
 }

@@ -5,10 +5,9 @@ import static org.mockito.Mockito.*;
 
 import com.example.surveyapp.config.generator.UserFixtureGenerator;
 import com.example.surveyapp.domain.point.service.PointService;
-import com.example.surveyapp.domain.survey.controller.dto.SurveyMapper;
+import com.example.surveyapp.domain.survey.service.mapper.SurveyMapper;
 import com.example.surveyapp.domain.survey.controller.dto.request.*;
 import com.example.surveyapp.domain.survey.controller.dto.response.*;
-import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.SurveyAnswer;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
@@ -16,7 +15,7 @@ import com.example.surveyapp.domain.survey.domain.repository.OptionsRepository;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.survey.facade.UserFacade;
-import com.example.surveyapp.domain.survey.service.strategy.SurveyQuestionStrategy;
+import com.example.surveyapp.domain.survey.domain.strategy.SurveyQuestionStrategy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -355,7 +354,7 @@ public class SurveyServiceTest {
                         )
                 );
 
-        when(surveyAnswerRepository.countBySurveyId(survey)).thenReturn(surveyeeCount);
+        when(surveyAnswerRepository.countBySurveyId(surveyId)).thenReturn(surveyeeCount);
 
         //when
         SurveyResponseDto result = surveyService.getSurvey(surveyId);
@@ -386,7 +385,7 @@ public class SurveyServiceTest {
 
         when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(survey));
         when(userFacade.findUser(userId)).thenReturn(user);
-        when(surveyAnswerRepository.existsBySurveyIdAndUserId(survey, user)).thenReturn(false);
+        when(surveyAnswerRepository.existsBySurveyIdAndUserId(surveyId, userId)).thenReturn(false);
         when(questionRepository.findAllBySurveyIdOrderByNumberASC(surveyId)).thenReturn(questionList);
         when(optionsRepository.findAllByQuestionIdOrderByNumberAsc(question.getId())).thenReturn(optionsList);
 
@@ -425,10 +424,10 @@ public class SurveyServiceTest {
 
         when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(survey));
         when(userFacade.findUser(userId)).thenReturn(user);
-        when(surveyAnswerRepository.existsBySurveyIdAndUserId(survey, user)).thenReturn(false);
+        when(surveyAnswerRepository.existsBySurveyIdAndUserId(surveyId, userId)).thenReturn(false);
         when(surveyAnswerRepository.save(any(SurveyAnswer.class))).thenReturn(mock(SurveyAnswer.class));
         when(questionRepository.findById(questionAnswerRequestDto.getNumber())).thenReturn(Optional.of(question));
-        when(surveyAnswerRepository.countBySurveyId(survey)).thenReturn(survey.getMaxSurveyee()-1);
+        when(surveyAnswerRepository.countBySurveyId(surveyId)).thenReturn(survey.getMaxSurveyee()-1);
 
         //when
         surveyService.saveSurveyAnswer(surveyId, surveyAnswerRequestDto, userId);
@@ -436,10 +435,10 @@ public class SurveyServiceTest {
         //then
         verify(surveyRepository).findByIdAndIsDeletedFalse(surveyId);
         verify(userFacade).findUser(userId);
-        verify(surveyAnswerRepository).existsBySurveyIdAndUserId(survey, user);
+        verify(surveyAnswerRepository).existsBySurveyIdAndUserId(surveyId, userId);
         verify(surveyAnswerRepository).save(any(SurveyAnswer.class));
         verify(questionRepository).findById(questionAnswerRequestDto.getNumber());
-        verify(surveyAnswerRepository).countBySurveyId(survey);
+        verify(surveyAnswerRepository).countBySurveyId(surveyId);
 
     }
 
@@ -453,13 +452,13 @@ public class SurveyServiceTest {
         Survey survey = SurveyFixtureGenerator.generateSurveyFixture();
         SurveyAnswer surveyAnswer = mock(SurveyAnswer.class);
 
-        when(surveyAnswer.getSurveyId()).thenReturn(survey);
+        //when(surveyAnswer.getSurveyId()).thenReturn(survey);
 
         when(userFacade.findUser(userId)).thenReturn(user);
-        when(surveyAnswerRepository.findAllByUserIdOrderByCreatedAtDesc(user)).thenReturn(List.of(surveyAnswer));
+        when(surveyAnswerRepository.findAllByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(surveyAnswer));
 
         // when
-        SurveyeeSurveyListDto result = surveyService.getSurveyeeSurveyList(userId);
+        SurveyeeSurveyListDto result = surveyService.getUserSurveyAnswerHistory(userId);
 
         // then
         assertThat(result).isNotNull();

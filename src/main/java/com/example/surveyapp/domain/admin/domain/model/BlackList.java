@@ -20,15 +20,17 @@ public class BlackList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User userId;
+
+    private Long userId;
 
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    public BlackList(User userId) {
+    public BlackList(Long userId) {
         this.userId = userId;
     }
 

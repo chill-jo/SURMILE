@@ -89,7 +89,7 @@ public class QuestionServiceTest {
         verify(questionRepository).save(questionCaptor.capture());
 
         Question savedQuestion = questionCaptor.getValue();
-        assertThat(savedQuestion.getSurvey()).isSameAs(surveyMock);
+        assertThat(savedQuestion.getSurveyId()).isSameAs(surveyId);
 
         assertThat(responseDto.getId()).isEqualTo(questionId);
         assertThat(responseDto.getNumber()).isEqualTo(number);
@@ -120,7 +120,7 @@ public class QuestionServiceTest {
         when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(surveyMock));
         when(questionRepository.findById(questionId)).thenReturn(Optional.of(questionMock));
 
-        when(questionMock.isFromSurvey(surveyMock)).thenReturn(true);
+        when(questionMock.isFromSurvey(surveyId)).thenReturn(true);
 
         when(surveyMock.isInProgress()).thenReturn(false);
         when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
@@ -140,7 +140,7 @@ public class QuestionServiceTest {
 
         verify(surveyRepository).findByIdAndIsDeletedFalse(surveyId);
         verify(questionRepository).findById(questionId);
-        verify(questionMock).isFromSurvey(surveyMock);
+        verify(questionMock).isFromSurvey(surveyId);
         verify(surveyMock).isInProgress();
         verify(surveyMock).isUserSurveyCreator(userMock);
 
@@ -217,7 +217,7 @@ public class QuestionServiceTest {
         User userMock = mock(User.class);
         Survey surveyMock = mock(Survey.class);
         Question questionMock = mock(Question.class);
-        ReflectionTestUtils.setField(questionMock, "survey", surveyMock);
+        ReflectionTestUtils.setField(questionMock, "surveyId", surveyId);
 
         QuestionUpdateRequestDto requestDto = new QuestionUpdateRequestDto(number, content, type);
 
@@ -229,7 +229,7 @@ public class QuestionServiceTest {
         when(userMock.isUserRoleNotAdmin()).thenReturn(false);
         when(surveyMock.isNotStarted()).thenReturn(true);
         when(questionMock.isSubjective()).thenReturn(true);
-        when(questionMock.isFromSurvey(surveyMock)).thenReturn(true);
+        when(questionMock.isFromSurvey(surveyId)).thenReturn(true);
 
         when(questionMock.getId()).thenReturn(questionId);
         when(questionMock.getNumber()).thenReturn(number);
@@ -265,7 +265,7 @@ public class QuestionServiceTest {
         User userMock = mock(User.class);
         Survey surveyMock = mock(Survey.class);
         Question questionMock = mock(Question.class);
-        ReflectionTestUtils.setField(questionMock, "survey", surveyMock);
+        ReflectionTestUtils.setField(questionMock, "surveyId", surveyId);
 
         when(userFacade.findUser(userId)).thenReturn(userMock);
         when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(surveyMock));
@@ -273,7 +273,7 @@ public class QuestionServiceTest {
 
         when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
         when(surveyMock.isNotStarted()).thenReturn(true);
-        when(questionMock.isFromSurvey(surveyMock)).thenReturn(true);
+        when(questionMock.isFromSurvey(surveyId)).thenReturn(true);
 
         doNothing().when(questionRepository).delete(questionMock);
 
