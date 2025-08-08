@@ -70,11 +70,11 @@ public class AdminService {
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
-        if (blackListRepository.findByUserId(user).isPresent()) {
+        if (blackListRepository.findByUserId(userId).isPresent()) {
             throw new CustomException(ErrorCode.IS_BLACKLIST);
         }
 
-        blackListRepository.save(new BlackList(user));
+        blackListRepository.save(new BlackList(userId));
 
         return user;
     }
@@ -87,7 +87,7 @@ public class AdminService {
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
-        BlackList blackList = blackListRepository.findByUserId(user).orElseThrow(
+        BlackList blackList = blackListRepository.findByUserId(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.IS_NOT_BLACKLIST)
         );
 

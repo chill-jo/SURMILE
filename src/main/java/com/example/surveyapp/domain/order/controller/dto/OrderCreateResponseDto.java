@@ -1,9 +1,12 @@
 package com.example.surveyapp.domain.order.controller.dto;
 
 import com.example.surveyapp.domain.order.model.Order;
+import com.example.surveyapp.domain.order.model.OrderItem;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.awt.*;
 
 @Getter
 @AllArgsConstructor
@@ -15,16 +18,17 @@ public class OrderCreateResponseDto {
 
     private String title;
 
-    private Status status;
+    private String status;
 
     private Long price;
 
-    public static OrderCreateResponseDto from(Order order) {
+    public static OrderCreateResponseDto from(Order order, String status) {
+        OrderItem orderItem = order.getOneOrderItemOrThrow();
         return new OrderCreateResponseDto(
-                order.getUser().getId(),
-                order.getOrderNumber(),
-                order.getTitle(),
-                order.getProduct().getStatus(),
-                order.getPrice());
+                order.getUserId(),
+                order.getOrderNumber().getValue(),
+                orderItem.getTitle(),
+                status,
+                orderItem.getPrice());
     }
 }

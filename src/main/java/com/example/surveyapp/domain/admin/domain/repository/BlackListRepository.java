@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface BlackListRepository extends JpaRepository<BlackList, Long> {
 
-    Optional<BlackList> findByUserId(User userId);
-
+    Optional<BlackList> findByUserId(Long userId);
+    boolean existsByUserId(Long userId);
 }

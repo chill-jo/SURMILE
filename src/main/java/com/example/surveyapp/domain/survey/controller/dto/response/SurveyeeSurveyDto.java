@@ -20,7 +20,7 @@ public class SurveyeeSurveyDto {
 
     public static SurveyeeSurveyDto of(SurveyAnswer surveyAnswer){
         return SurveyeeSurveyDto.builder()
-                .surveyId(surveyAnswer.getSurveyId().getId())
+                .surveyId(surveyAnswer.getSurveyId())
                 .title(surveyAnswer.getSurveyId().getTitle())
                 .date(surveyAnswer.getCreatedAt())
                 .build();

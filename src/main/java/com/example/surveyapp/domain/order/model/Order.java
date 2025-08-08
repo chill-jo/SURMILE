@@ -1,14 +1,13 @@
 package com.example.surveyapp.domain.order.model;
 
-import com.example.surveyapp.domain.product.domain.model.Product;
-import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.global.config.entity.BaseEntity;
+import com.example.surveyapp.global.response.exception.CustomException;
+import com.example.surveyapp.global.response.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -19,54 +18,52 @@ public class Order extends BaseEntity {
     @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "order_number", nullable = false, unique = true, length = 36)
-    private String orderNumber;
+    @Embedded
+    private OrderNumber orderNumber;
 
-   @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private Long userId;
 
-  @JoinColumn(name = "product_id", nullable = false)
-    private Long productId;
-
-    @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false)
-    private Long price;
+    @ElementCollection
+    @CollectionTable(name = "order_items", joinColumns = @JoinColumn(name = "order_id"))
+    private final List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean isDeleted = false;
 
+    public OrderItem getOneOrderItemOrThrow(){
+        if (orderItems.size() != 1) {
+            throw new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT);
+        }
+        return orderItems.stream().findFirst()
+                .orElseThrow(() -> new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT));
+    }
+
+    public void validateOrderer(Long userId){
+        if (!this.getUserId().equals(userId)){
+            throw new CustomException(ErrorCode.NOT_YOUR_ORDER);
+        }
+    }
     public void delete(){
         this.isDeleted = true;
     }
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Order(String orderNumber, Long userId, Long productId, String title, Long price) {
+    private Order(OrderNumber orderNumber, Long userId, List<OrderItem> orderItems) {
         this.orderNumber = orderNumber;
         this.userId = userId;
-        this.productId = productId;
-        this.title = title;
-        this.price = price;
+        this.orderItems.addAll(orderItems);
     }
 
-    public static Order create(Long userId, Long productId, String title, Long price) {
-
-        String orderNumber = orderNumberGenerator();
+    public static Order create(Long userId, List<OrderItem> orderItems) {
+        if (orderItems == null || orderItems.size() != 1){
+            throw new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT);
+        }
         return Order.builder()
                 .userId(userId)
-                .orderNumber(orderNumber)
-                .productId(productId)
-                .title(title)
-                .price(price)
+                .orderNumber(OrderNumber.generator())
+                .orderItems(orderItems)
                 .build();
     }
 
-
-    //UUID 날짜 + 랜덤 숫자 8개를 만들기 위한 generator
-    private static String orderNumberGenerator() {
-        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        int randoNum = (int) ((Math.random() * 90000000) + 10000000); //8자리 랜덤 숫자 만들기
-        return date + randoNum;
-    }
 }

@@ -20,47 +20,37 @@ public class Point  extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", unique = true, nullable = false)
-    private User user;
+    @JoinColumn(name = "user_id", nullable = false)
+    private Long userId;
 
-    @Column(nullable = false)
-    private Long pointBalance;
+    @Embedded
+    private PointBalance pointBalance;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Point(User user){
-        this.user=user;
-        this.pointBalance=0L;
+    private Point(Long userId){
+        this.userId=userId;
+        this.pointBalance= new PointBalance(0L);
     }
 
-    public static Point of(User user){
+    public static Point of(Long userId){
         return Point.builder()
-                .user(user)
+                .userId(userId)
                 .build();
     }
 
     public void pointCharge(Long amount) {
-        if(amount==null || amount<5000){
+        if(amount == null || amount < 5000){
             throw new CustomException(ErrorCode.POINT_INVALID_AMOUNT);
         }
-        this.pointBalance+=amount;
+        this.pointBalance = this.pointBalance.add(amount);
     }
 
     public void earn(Long amount) {
-        if(amount==null || amount<0){
-            throw new CustomException(ErrorCode.POINT_EARN_FAILED);
-        }
-        this.pointBalance+=amount;
+        this.pointBalance = pointBalance.add(amount);
     }
 
     public void redeem(Long amount){
-        if(amount==null || amount<0){
-            throw new CustomException(ErrorCode.POINT_MINIMUM_AMOUNT);
-        }
-        if(pointBalance<amount){
-            throw new CustomException(ErrorCode.POINT_NOT_ENOUGH);
-        }
-        this.pointBalance-=amount;
+        this.pointBalance = pointBalance.minus(amount);
     }
 
 }

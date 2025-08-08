@@ -8,6 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PointHistoryRepository extends JpaRepository<PointHistory, Long> {
-    Page<PointHistory> findPointHistoryByUser (User user, Pageable pageable);
+    Page<PointHistory> findPointHistoryByUserId (Long userId, Pageable pageable);
 
 }

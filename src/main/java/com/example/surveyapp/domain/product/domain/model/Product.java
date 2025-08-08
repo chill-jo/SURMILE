@@ -1,6 +1,8 @@
 package com.example.surveyapp.domain.product.domain.model;
 
 import com.example.surveyapp.global.config.entity.BaseEntity;
+import com.example.surveyapp.global.response.exception.CustomException;
+import com.example.surveyapp.global.response.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -47,7 +49,27 @@ public class Product extends BaseEntity {
                 .build();
     }
 
+    /**
+     *
+     * @param newStatus
+     */
+    public void changeStatus(Status newStatus) {
+        if (this.status == newStatus) return;
+
+         if (this.status == Status.STOPPED_SALE && newStatus == Status.ON_SALE){
+            if (price == 0) {
+                throw new CustomException(ErrorCode.NOT_PRODUCT_PRICE_ZERO);
+            }
+        }
+        this.status = newStatus;
+    }
+
     public void delete() {
+
+        if (this.status == Status.ON_SALE) {
+            throw new CustomException(ErrorCode.NOT_DELETE_ON_SALE_PRODUCT);
+        }
+
         this.isDeleted = true;
     }
 

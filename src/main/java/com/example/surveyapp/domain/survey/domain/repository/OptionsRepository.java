@@ -15,17 +15,17 @@ public interface OptionsRepository extends JpaRepository<Options, Long> {
     @Query("SELECT o FROM Options o WHERE o.question.id = :questionId")
     List<Options> findAllByQuestionId(@Param("questionId") Long questionId);
 
-    @Query("""
-            SELECT new com.example.surveyapp.domain.survey.controller.dto.response.OptionResponseDto (
-                      o.id,
-                      o.number,
-                      o.content
-                  )
-            FROM Options o
-            WHERE o.question.id = :questionId
-            ORDER BY o.number ASC
-    """)
-    List<OptionResponseDto> findAllByQuestionIdOrderByNumberAsc(@Param("questionId") Long questionId);
+//    @Query("""
+//            SELECT new com.example.surveyapp.domain.survey.controller.dto.response.OptionResponseDto (
+//                      o.id,
+//                      o.number,
+//                      o.content
+//                  )
+//            FROM Options o
+//            WHERE o.question_id = :questionId
+//            ORDER BY o.number ASC
+//    """)
+//    List<OptionResponseDto> findAllByQuestionIdOrderByNumberAsc(@Param("questionId") Long questionId);
 
     void deleteAllByQuestion(Question question);
 }
