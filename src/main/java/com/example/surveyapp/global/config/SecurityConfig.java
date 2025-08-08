@@ -47,7 +47,8 @@ public class SecurityConfig {
                                 "/api/login",
                                 "/api/logout",
                                 "/api/refresh",
-                                "/error"
+                                "/error",
+                                "/api/survey/{surveyId}/answerTest"
                         ).permitAll()
 
                         // 관리자 권한 필요
