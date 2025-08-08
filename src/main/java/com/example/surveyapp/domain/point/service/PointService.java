@@ -42,7 +42,7 @@ public class PointService {
         Point point = getPoint(userId);
 
         //충전 전 금액
-        Long currentBalance=point.getPointBalance();
+        Long currentBalance=point.getPointBalance().getValue();
 
         //포인트 충전. (dirty checking)
         point.pointCharge(price);
@@ -58,7 +58,7 @@ public class PointService {
         PointHistory history = PointHistory.of(
                 currentBalance,
                 price,
-                point.getPointBalance(),
+                point.getPointBalance().getValue(),
                 PointType.CHARGE,
                 Target.PAYMENTS,
                 payment.getId(),
@@ -82,7 +82,7 @@ public class PointService {
         Point point = getPoint(userId);
 
         //적립 전 포인트
-        Long currentBalance=point.getPointBalance();
+        Long currentBalance=point.getPointBalance().getValue();
 
         //포인트 적립 (dirty checking)
         point.earn(amount);
@@ -91,7 +91,7 @@ public class PointService {
         PointHistory history = PointHistory.of(
                 currentBalance,
                 amount,
-                point.getPointBalance(),
+                point.getPointBalance().getValue(),
                 PointType.EARN,
                 Target.SURVEY,
                 surveyAnswerId,
@@ -140,14 +140,14 @@ public class PointService {
         User user = getUser(userId);
         Point point = getPoint(userId);
 
-        Long currentBalance = point.getPointBalance();
+        Long currentBalance = point.getPointBalance().getValue();
 
         point.redeem(amount);
 
         PointHistory history = PointHistory.of(
                 currentBalance,
                 amount,
-                point.getPointBalance(),
+                point.getPointBalance().getValue(),
                 PointType.USAGE,
                 Target.SURVEY,
                 surveyId,
