@@ -38,7 +38,6 @@ public class PointService {
         //요청받은 금액
         Long price=dto.getPrice();
 
-        User user = getUser(userId);
         Point point = getPoint(userId);
 
         //충전 전 금액
@@ -63,7 +62,7 @@ public class PointService {
                 Target.PAYMENTS,
                 payment.getId(),
                 "포인트 충전",
-                user,
+                userId,
                 point
         );
 
@@ -78,7 +77,6 @@ public class PointService {
     @Transactional
     public void earn(Long userId, Long amount, Long surveyAnswerId){
 
-        User user = getUser(userId);
         Point point = getPoint(userId);
 
         //적립 전 포인트
@@ -96,7 +94,7 @@ public class PointService {
                 Target.SURVEY,
                 surveyAnswerId,
                 "설문 응답 포인트 적립",
-                user,
+                userId,
                 point
         );
 
@@ -104,40 +102,10 @@ public class PointService {
     }
 
 
-    // 상점에서 상품 교환하는 경우 차감
-    @PreAuthorize("hasAnyRole('SURVEYEE')")
-    @Transactional
-    public void redeem(Long userId, Long amount, Long orderId){
-
-        User user = getUser(userId);
-        Point point = getPoint(userId);
-
-        //차감 전 포인트
-        Long currentBalance=point.getPointBalance();
-
-        //포인트 차감 (dirty checking)
-        point.redeem(amount);
-
-        //포인트 내역 기록
-        PointHistory history = PointHistory.of(
-                currentBalance,
-                amount,
-                point.getPointBalance(),
-                PointType.USAGE,
-                Target.ORDER,
-                orderId,
-                "상품 교환 포인트 차감",
-                user,
-                point
-        );
-
-        pointHistoryRepository.save(history);
-    }
     @PreAuthorize("hasAnyRole('SURVEYOR')")
     @Transactional
     public void surveyorRedeem(Long userId, Long amount, Long surveyId){
 
-        User user = getUser(userId);
         Point point = getPoint(userId);
 
         Long currentBalance = point.getPointBalance().getValue();
@@ -152,7 +120,7 @@ public class PointService {
                 Target.SURVEY,
                 surveyId,
                 "설문 생성 포인트 차감",
-                user,
+                userId,
                 point
         );
 
@@ -162,25 +130,10 @@ public class PointService {
 
     @Transactional(readOnly = true)
     public Page<PointHistoryResponseDto> getHistories(Long userId, Pageable pageable){
-        User user = getUser(userId);
 
-        return pointHistoryRepository.findPointHistoryByUser(user, pageable)
+        return pointHistoryRepository.findPointHistoryByUserId(userId, pageable)
                 .map(PointHistoryResponseDto::from);
     }
-
-    /**
-     * 공통되는 로직을 메서드로 분리
-     * 해당하는 userId로 회원을 조회한다.
-     * 조회하지 못하는 경우 CustomException 발생
-     * @param userId
-     * @return
-     */
-
-    private User getUser(Long userId){
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-    }
-
 
     /**
      * 공통되는 로직을 메서드로 분리

@@ -27,14 +27,14 @@ public class Point  extends BaseEntity {
     private PointBalance pointBalance;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Point(User user){
-        this.user=user;
-        this.pointBalance=0L;
+    private Point(Long userId){
+        this.userId=userId;
+        this.pointBalance= new PointBalance(0L);
     }
 
-    public static Point of(User user){
+    public static Point of(Long userId){
         return Point.builder()
-                .user(user)
+                .userId(userId)
                 .build();
     }
 
