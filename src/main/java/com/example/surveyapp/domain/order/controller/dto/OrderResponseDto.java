@@ -1,8 +1,8 @@
 package com.example.surveyapp.domain.order.controller.dto;
 
 import com.example.surveyapp.domain.order.model.Order;
+import com.example.surveyapp.domain.order.model.OrderItem;
 import com.example.surveyapp.domain.product.domain.model.Status;
-import com.example.surveyapp.domain.user.domain.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,24 +20,28 @@ public class OrderResponseDto {
 
     private String username;
 
+    private Long productId;
+
     private String title;
 
     private Long price;
 
-    private Status status;
+    private String status;
 
     private LocalDateTime createAt;
 
 
-    public static OrderResponseDto from(Order order) {
-    return new OrderResponseDto(
+    public static OrderResponseDto from(Order order, String username, String status) {
+        OrderItem orderItem = order.getOneOrderItemOrThrow();
+        return new OrderResponseDto(
             order.getId(),
-            order.getOrderNumber(),
-            order.getUser().getId(),
-            order.getUser().getName(),
-            order.getTitle(),
-            order.getPrice(),
-            order.getProduct().getStatus(),
+            order.getOrderNumber().getValue(),
+            order.getUserId(),
+            username,
+            orderItem.getProductId(),
+            orderItem.getTitle(),
+            orderItem.getPrice(),
+            status,
             order.getCreatedAt()
 
     );

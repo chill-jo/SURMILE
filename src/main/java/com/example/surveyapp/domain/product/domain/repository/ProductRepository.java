@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.product.domain.model.repository;
+package com.example.surveyapp.domain.product.domain.repository;
 
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
