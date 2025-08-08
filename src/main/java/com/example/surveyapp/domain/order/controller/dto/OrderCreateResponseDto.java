@@ -23,7 +23,7 @@ public class OrderCreateResponseDto {
     private Long price;
 
     public static OrderCreateResponseDto from(Order order, String status) {
-        OrderItem orderItem = order.onlyOneOrderItem();
+        OrderItem orderItem = order.getOneOrderItemOrThrow();
         return new OrderCreateResponseDto(
                 order.getUserId(),
                 order.getOrderNumber().getValue(),

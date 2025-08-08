@@ -67,7 +67,7 @@ public class OrderService {
 
         return ordersList.stream()
                 .map(order -> {
-                    OrderItem item = order.onlyOneOrderItem();
+                    OrderItem item = order.getOneOrderItemOrThrow();
                     String username = userReader.usernameById(order.getUserId());
                     ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
                     String status = product.getStatusName();
@@ -85,7 +85,7 @@ public class OrderService {
         String username = userReader.usernameById(order.getUserId());
 
         //상품정보 조회
-        OrderItem item = order.onlyOneOrderItem();
+        OrderItem item = order.getOneOrderItemOrThrow();
         ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
         String status = product.getStatusName();
 
@@ -115,9 +115,7 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ORDER));
 
-        if (!order.getUserId().equals(userId)){
-            throw new CustomException(ErrorCode.NOT_YOUR_ORDER);
-        }
+        order.validateOrderer(userId);
 
         OrderItem item = order.getOneOrderItemOrThrow();
         String username = userReader.usernameById(order.getUserId());

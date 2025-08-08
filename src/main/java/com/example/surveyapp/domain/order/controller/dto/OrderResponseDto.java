@@ -32,7 +32,7 @@ public class OrderResponseDto {
 
 
     public static OrderResponseDto from(Order order, String username, String status) {
-        OrderItem orderItem = order.onlyOneOrderItem();
+        OrderItem orderItem = order.getOneOrderItemOrThrow();
         return new OrderResponseDto(
             order.getId(),
             order.getOrderNumber().getValue(),
