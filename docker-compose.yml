@@ -1,16 +1,8 @@
+version: '3'
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: survey-mysql
-    restart: always
+  app:
+    build: .
     ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: root-password
-      MYSQL_DATABASE: survey_app
-      MYSQL_USER: dev-user
-      MYSQL_PASSWORD: dev-password
-    command: >
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-      --lower_case_table_names=1
+      - "8080:8080"
+    restart: always
+    container_name: survey-app
