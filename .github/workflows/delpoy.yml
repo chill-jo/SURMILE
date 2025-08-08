@@ -1,7 +1,7 @@
 name: Spring Boot Application Deploy
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev-v2" ]
 
 jobs:
   deploy:
@@ -17,7 +17,7 @@ jobs:
           java-version: '17'
 
       - name: 파일 전송을 위한 디렉토리 생성
-        run: mkdir ./survey-app #.env, app.jar
+        run: mkdir ./survey-app
 
       - name: Gradle build
         run: ./gradlew clean build
@@ -28,31 +28,65 @@ jobs:
       - name: ENV 파일 생성
         run: echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
 
-      - name: SCP로 EC2에 jar 파일 전송
+      - name: Dockerfile 생성
+        run: |
+          cat > ./survey-app/Dockerfile << 'EOL'
+          FROM openjdk:17-jdk-slim
+          WORKDIR /app
+          COPY app.jar app.jar
+          COPY .env .env
+          ENTRYPOINT ["java", "-jar", "app.jar"]
+          EOL
+
+      - name: Docker Compose 파일 생성
+        run: |
+          cat > ./survey-app/docker-compose.yml << 'EOL'
+          version: '3'
+          services:
+            app:
+              build: .
+              ports:
+                - "8080:8080"
+              restart: always
+              container_name: survey-app
+          EOL
+
+      - name: 파일 생성 확인
+        run: |
+          echo "===== 파일 목록 확인 ====="
+          ls -la ./survey-app/
+
+      - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PEM_KEY }}
-          source: ./survey-app # 전송 대상
-          target: /home/ec2-user/deploy # 전송 경로
+          source: ./survey-app
+          target: /home/ec2-user/deploy
 
-      - name: SSH를 통해 EC2에 접속 후 서비스 재 시작
+      - name: SSH를 통해 EC2에 접속 후 Docker Compose로 서비스 재시작
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
+            ls -la /home/ec2-user/deploy/survey_app
             rm -rf /home/ec2-user/rollback
             mkdir /home/ec2-user/rollback
-            mv /home/ec2-user/survey-app /home/ec2-user/rollback # 이전 버전 보관
+            
+            if [ -d "/home/ec2-user/survey-app" ]; then
+              cd /home/ec2-user/survey-app
+              docker-compose down || true
+              mv /home/ec2-user/survey-app /home/ec2-user/rollback
+            fi
             
             rm -rf /home/ec2-user/survey-app
             mkdir /home/ec2-user/survey-app
-            mv /home/ec2-user/deploy/survey-app /home/ec2-user # 새 버전 적용
+            mv /home/ec2-user/deploy/survey_app /home/ec2-user
             
             cd /home/ec2-user/survey-app
-            sudo fuser -k -n tcp 8080 || true # 기존 서비스 종료
-            nohup java -jar /home/ec2-user/survey-app/app.jar > application-log 2>&1 & # 신규 서비스 시작
-            rm -rf /home/ec2-user/deploy
+            docker-compose build --no-cache
+            docker-compose up -d
+            
