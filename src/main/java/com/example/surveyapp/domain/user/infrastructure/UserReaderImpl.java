@@ -26,12 +26,12 @@ public class UserReaderImpl implements UserReader {
         }
     }
 
-    public boolean isSurveyor(Long userId){
+    public boolean validateUserRole(Long userId, UserRoleEnum userRole){
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(
                         () -> new CustomException(ErrorCode.NOT_FOUND_USER)
                 );
 
-        return user.isUserRoleSurveyor();
+        return user.hasRole(userRole);
     }
 }
