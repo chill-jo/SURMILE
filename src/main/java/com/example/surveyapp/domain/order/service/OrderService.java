@@ -52,9 +52,10 @@ public class OrderService {
 
         Order saveOrder = orderRepository.save(order);
 
+        //이벤트발행
         eventPublisher.publishEvent(new OrderCreateEvent(saveOrder,userId));
 
-        return OrderCreateResponseDto.from(saveOrder,status);
+       return OrderCreateResponseDto.from(saveOrder,status);
     }
 
     public List<OrderResponseDto> readAllOrder(int page, int size) {
@@ -99,7 +100,7 @@ public class OrderService {
 
         return orders.stream()
                 .map(order -> {
-                    OrderItem item = order.onlyOneOrderItem();
+                    OrderItem item = order.getOneOrderItemOrThrow();
                     String username = userReader.usernameById(order.getUserId());
                     ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
                     String status = product.getStatusName();
@@ -118,7 +119,7 @@ public class OrderService {
             throw new CustomException(ErrorCode.NOT_YOUR_ORDER);
         }
 
-        OrderItem item = order.onlyOneOrderItem();
+        OrderItem item = order.getOneOrderItemOrThrow();
         String username = userReader.usernameById(order.getUserId());
         ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
         String status = product.getStatusName();

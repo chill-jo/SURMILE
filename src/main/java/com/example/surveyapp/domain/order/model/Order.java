@@ -21,7 +21,7 @@ public class Order extends BaseEntity {
     @Embedded
     private OrderNumber orderNumber;
 
-   @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private Long userId;
 
     @ElementCollection
@@ -31,7 +31,7 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     private boolean isDeleted = false;
 
-    public OrderItem onlyOneOrderItem(){
+    public OrderItem getOneOrderItemOrThrow(){
         if (orderItems.size() != 1) {
             throw new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT);
         }
@@ -39,6 +39,11 @@ public class Order extends BaseEntity {
                 .orElseThrow(() -> new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT));
     }
 
+    public void validateOrderer(Long userId){
+        if (!this.getUserId().equals(userId)){
+            throw new CustomException(ErrorCode.NOT_YOUR_ORDER);
+        }
+    }
     public void delete(){
         this.isDeleted = true;
     }

@@ -16,7 +16,8 @@ public class OrderPointEventListener {
     @Async
     @EventListener
     public void handleOrderCreateEvent(OrderCreateEvent event) {
-        pointFacade.redeem(event.getUserId(),
-                event.getOrder().onlyOneOrderItem().getPrice());
+        pointFacade.decreasePoint(event.getUserId(),
+                event.getOrder().getOneOrderItemOrThrow().getPrice(),
+                event.getOrder().getId());
     }
 }
