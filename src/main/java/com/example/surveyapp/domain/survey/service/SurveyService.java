@@ -258,4 +258,38 @@ public class SurveyService {
         }
     }
 
+
+    //테스트용
+    @Transactional
+    public void saveSurveyAnswerTest(Long surveyId, SurveyAnswerRequestDto requestDto) {
+
+        Long userId = 1L;
+        Survey survey = surveyRepository.findByIdAndIsDeletedFalseWithPessimisticLock(surveyId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
+
+        if (!survey.getStatus().equals(SurveyStatus.IN_PROGRESS) || survey.getDeadline().isBefore(LocalDateTime.now())) {
+            throw new CustomException(ErrorCode.SURVEY_NOT_IN_PROGRESS);
+        }
+
+        User user = userFacade.findUser(userId);
+
+        SurveyAnswer surveyAnswer = surveyAnswerRepository.save(SurveyAnswer.of(survey, user));
+
+        requestDto.getAnswers().forEach(questionAnswer -> {
+            Question question = questionRepository.findById(questionAnswer.getNumber()).orElseThrow(
+                    () -> new CustomException(ErrorCode.QUESTION_NOT_FOUND)
+            );
+
+            // TODO 질문 타입에 따라 각 질문 응답을 처리할 수 있는 전략을 별도로 구성해서 처리하면 어떨까
+            surveyQuestionStrategies.stream()
+                    .filter(it -> it.isSupport(question.getType()))
+                    .findFirst()
+                    .orElseThrow()
+                    .doSave(questionAnswer, surveyAnswer, question);
+        });
+
+        if (surveyAnswerRepository.countBySurveyId(survey) >= survey.getMaxSurveyee()) {
+            survey.changeSurveyStatus(SurveyStatus.DONE);
+        }
+    }
 }
