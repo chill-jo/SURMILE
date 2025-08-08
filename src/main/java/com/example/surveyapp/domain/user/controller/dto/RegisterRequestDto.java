@@ -8,10 +8,12 @@ import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class RegisterRequestDto {
     @NotBlank
     @Email(message = "이메일 형식이 올바르지 않습니다.")

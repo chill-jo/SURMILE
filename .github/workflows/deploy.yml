@@ -87,7 +87,7 @@ jobs:
             rm -rf /home/ec2-user/survey-app
             mkdir /home/ec2-user/survey-app
             mv /home/ec2-user/deploy/survey_app/* /home/ec2-user/survey-app/
-            
+
             # Docker Compose로 서비스 시작
             cd /home/ec2-user/survey-app
             docker-compose build --no-cache
