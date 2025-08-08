@@ -75,7 +75,7 @@ jobs:
             ls -la /home/ec2-user/deploy/survey_app
             rm -rf /home/ec2-user/rollback
             mkdir /home/ec2-user/rollback
-            
+
             if [ -d "/home/ec2-user/survey-app" ]; then
               cd /home/ec2-user/survey-app
               docker-compose down || true
@@ -85,8 +85,7 @@ jobs:
             rm -rf /home/ec2-user/survey-app
             mkdir /home/ec2-user/survey-app
             mv /home/ec2-user/deploy/survey_app /home/ec2-user
-            
+
             cd /home/ec2-user/survey-app
             docker-compose build --no-cache
             docker-compose up -d
-            
