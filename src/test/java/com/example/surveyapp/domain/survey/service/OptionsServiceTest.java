@@ -51,6 +51,7 @@ public class OptionsServiceTest {
     ArgumentCaptor<Options> optionsCaptor;
 
     @Test
+    @DisplayName("기능_선택지 생성을 성공한다")
     void 선택지를_생성한다(){
         Long userId = 1L;
         Long surveyId = 1L;
@@ -98,6 +99,7 @@ public class OptionsServiceTest {
     }
 
     @Test
+    @DisplayName("기능_선택지 목록 조회를 성공한다")
     void 선택지_목록을_조회한다(){
         Long userId = 1L;
         Long surveyId = 1L;
@@ -150,6 +152,7 @@ public class OptionsServiceTest {
     }
 
     @Test
+    @DisplayName("기능_선택지 내용 수정을 성공한다")
     void 선택지를_수정한다(){
         Long userId = 1L;
         Long surveyId = 1L;
@@ -204,6 +207,7 @@ public class OptionsServiceTest {
     }
 
     @Test
+    @DisplayName("기능_선택지 삭제를 성공한다")
     void 선택지를_삭제한다(){
         Long userId = 1L;
         Long surveyId = 1L;

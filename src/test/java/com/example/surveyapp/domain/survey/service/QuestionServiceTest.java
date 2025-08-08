@@ -49,9 +49,12 @@ public class QuestionServiceTest {
 
     @InjectMocks
     private QuestionService questionService;
+
     @Captor
     ArgumentCaptor<Question> questionCaptor;
+
     @Test
+    @DisplayName("기능_질문 생성을 성공한다")
     void 질문을_생성한다(){
         Long questionId = 1L;
         Long userId = 1L;
@@ -103,6 +106,7 @@ public class QuestionServiceTest {
 
 
     @Test
+    @DisplayName("기능_설문 진행전 단건 조회를 성공한다")
     void 질문이_진행중이_아닐때_설문출제자가_단건_조회한다(){
         Long userId = 1L;
         Long surveyId = 1L;
@@ -147,6 +151,7 @@ public class QuestionServiceTest {
     }
 
     @Test
+    @DisplayName("기능_질문 목록 조회를 성공한다")
     void 질문_목록을_조회한다(){
         Long userId = 1L;
         Long surveyId = 1L;
@@ -205,6 +210,7 @@ public class QuestionServiceTest {
     }
 
     @Test
+    @DisplayName("기능_질문 종류 변경을 성공한다")
     void 관리자가_질문을_주관식으로_수정한다(){
 
         Long userId = 1L;
@@ -257,6 +263,7 @@ public class QuestionServiceTest {
     }
 
     @Test
+    @DisplayName("기능_질문 삭제를 성공한다")
     void 해당설문_출제자가_질문을_삭제한다(){
         Long userId = 1L;
         Long surveyId = 1L;

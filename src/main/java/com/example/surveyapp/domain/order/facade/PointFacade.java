@@ -6,5 +6,6 @@ public interface PointFacade {
     //Point findPoint(Long id);
 
     //포인트 차감
-    void decreasePoint(Long userId, Long price, Long orderId);
+    void decreasePoint (Long userId, Long amount, Long orderId);
+
 }

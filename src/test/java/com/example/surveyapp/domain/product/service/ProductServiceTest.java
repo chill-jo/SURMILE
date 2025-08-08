@@ -7,7 +7,7 @@ import com.example.surveyapp.domain.product.controller.dto.ProductResponseDto;
 import com.example.surveyapp.domain.product.controller.dto.ProductUpdateRequestDto;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
-import com.example.surveyapp.domain.product.domain.model.repository.ProductRepository;
+import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
 import com.example.surveyapp.domain.product.service.dto.ProductUpdateResponseDto;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
@@ -141,7 +141,7 @@ class ProductServiceTest {
         // Then
         //검증 사항
         assertThatThrownBy(() -> productService.createProduct(requestDto,adminUser.getId())).isInstanceOf(CustomException.class)
-                .hasMessageContaining(ErrorCode.NOT_SAME_PRODUCT_TITLE.getMessage());
+                .hasMessageContaining(ErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE.getMessage());
 
     }
 

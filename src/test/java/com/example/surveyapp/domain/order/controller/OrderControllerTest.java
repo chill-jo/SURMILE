@@ -8,6 +8,7 @@ import com.example.surveyapp.domain.order.controller.dto.OrderCreateRequestDto;
 import com.example.surveyapp.domain.order.controller.dto.OrderCreateResponseDto;
 import com.example.surveyapp.domain.order.controller.dto.OrderResponseDto;
 import com.example.surveyapp.domain.order.model.Order;
+import com.example.surveyapp.domain.order.model.OrderItem;
 import com.example.surveyapp.domain.order.service.OrderService;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
@@ -63,11 +64,14 @@ public class OrderControllerTest {
         ReflectionTestUtils.setField(user, "id" , 1L);
         Product product = ProductFixtureGenerator.generateProductFixture();
         Order order = OrderFixtureGenerator.generateOrderFixture(user,product);
+
+        OrderItem orderItems = order.getOneOrderItemOrThrow();
+
         OrderCreateRequestDto requestDto = new OrderCreateRequestDto(product.getId());
         OrderCreateResponseDto responseDto = new OrderCreateResponseDto(order.getId(),
-                order.getOrderNumber(),
-                product.getTitle(),
-                product.getStatus(),
+                order.getOrderNumber().getValue(),
+                orderItems.getTitle(),
+                reques,
                 product.getPrice()
                 );
         // When
