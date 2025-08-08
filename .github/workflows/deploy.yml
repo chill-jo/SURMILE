@@ -29,16 +29,33 @@ jobs:
         run: echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
 
       - name: Dockerfile 생성
-        run: mv ./Dockerfile ./survey-app/Dockerfile
+        run: |
+          cat > ./survey-app/Dockerfile << 'EOL'
+          FROM openjdk:17-jdk-slim
+          WORKDIR /app
+          COPY app.jar app.jar
+          COPY .env .env
+          ENTRYPOINT ["java", "-jar", "app.jar"]
+          EOL
 
       - name: Docker Compose 파일 생성
-        run: mv ./docker-compose.yml ./survey-app/docker-compose.yml
+        run: |
+          cat > ./survey-app/docker-compose.yml << 'EOL'
+          version: '3'
+          services:
+            app:
+              build: .
+              ports:
+                - "8080:8080"
+              restart: always
+              container_name: survey-app
+          EOL
 
       - name: 파일 생성 확인
         run: |
           echo "===== 파일 목록 확인 ====="
           ls -la ./survey-app/
-          
+
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:
@@ -60,13 +77,17 @@ jobs:
             mkdir /home/ec2-user/rollback
             
             # 기존 서비스 중지하고 백업
-            docker-compose down || true
-            mv /home/ec2-user/survey-app /home/ec2-user/rollback
+            if [ -d "/home/ec2-user/survey-app" ]; then
+              cd /home/ec2-user/survey-app
+              docker-compose down || true
+              mv /home/ec2-user/survey-app /home/ec2-user/rollback
+            fi
             
             # 새 버전 배포 준비
             rm -rf /home/ec2-user/survey-app
-            mv /home/ec2-user/deploy/survey_app /home/ec2-user
-            
+            mkdir /home/ec2-user/survey-app
+            mv /home/ec2-user/deploy/survey_app/* /home/ec2-user/survey-app/
+
             # Docker Compose로 서비스 시작
             cd /home/ec2-user/survey-app
             docker-compose build --no-cache
@@ -74,3 +95,4 @@ jobs:
             
             # 배포 후 임시 파일 정리
             rm -rf /home/ec2-user/deploy
+            mkdir /home/ec2-user/deploy
