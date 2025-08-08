@@ -1,9 +1,9 @@
 package com.example.surveyapp.domain.ai.moderation.prompt;
 
-public class NicknameModerationPromptTemplate {
+public class ModerationPromptTemplate {
     public static final String promptTemplate = """
             You are a content moderation assistant.
-            Determine if the following nickname is inappropriate.
+            Determine if the following {targetType} is inappropriate.
 
             Inappropriate examples include:
             - profanity
@@ -14,6 +14,6 @@ public class NicknameModerationPromptTemplate {
 
             Respond with one word only: APPROVED or DENIED
 
-            Nickname: {nickname}
+            Content: {content}
         """;
 }

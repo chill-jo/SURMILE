@@ -1,6 +1,9 @@
 package com.example.surveyapp.domain.survey.service;
 
 import static org.assertj.core.api.Assertions.*;
+
+import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
 import com.example.surveyapp.domain.survey.controller.dto.request.QuestionCreateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.QuestionUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.PageQuestionResponseDto;
@@ -47,6 +50,9 @@ public class QuestionServiceTest {
     @Mock
     private SurveyRepository surveyRepository;
 
+    @Mock
+    private ModerationService moderationService;
+
     @InjectMocks
     private QuestionService questionService;
 
@@ -73,6 +79,8 @@ public class QuestionServiceTest {
 
         when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
         when(surveyMock.isNotStarted()).thenReturn(true);
+
+        when(moderationService.moderate("content", content)).thenReturn(ModerationResultStatusEnum.APPROVED);
 
         // question을 생성자로 만들어서 저장하고 있기 때문에
         // fixture를 전달해 줄 수 없어서 fixture generator 사용할 수 없다

@@ -2,10 +2,12 @@ package com.example.surveyapp.domain.survey.controller.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class OptionUpdateRequestDto {
 
     private Long number;

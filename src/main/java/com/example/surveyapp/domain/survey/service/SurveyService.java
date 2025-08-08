@@ -1,5 +1,7 @@
 package com.example.surveyapp.domain.survey.service;
 
+import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
 import com.example.surveyapp.domain.point.service.PointService;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.survey.controller.dto.SurveyMapper;
@@ -28,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -42,12 +43,15 @@ public class SurveyService {
     private final SurveyAnswerRepository surveyAnswerRepository;
     private final UserFacade userFacade;
     private final PointService pointService;
+    private final ModerationService moderationService;
     private final List<SurveyQuestionStrategy> surveyQuestionStrategies;
 
     @Transactional
     public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
 
         User user = userFacade.findUser(userId);
+
+        validateSurveyModeration(requestDto.getTitle(), requestDto.getDescription());
 
         Survey survey = surveyMapper.createSurveyEntity(requestDto, user);
 
@@ -82,6 +86,7 @@ public class SurveyService {
 
         currentUserMatchesSurveyCreatorOrAdmin(user, survey);
         isSurveyNotStarted(survey);
+        validateSurveyModeration(requestDto.getTitle(), requestDto.getDescription());
 
         surveyMapper.updateSurvey(requestDto, survey);
 
@@ -258,4 +263,52 @@ public class SurveyService {
         }
     }
 
+    // 설문 제목 적절성 검사
+    private void validateSurveyModeration(String title, String description) {
+        ModerationResultStatusEnum titleStatus = moderationService.moderate("title", title);
+        ModerationResultStatusEnum descriptionStatus = moderationService.moderate("description", description);
+
+        if(titleStatus == ModerationResultStatusEnum.DENIED){
+            throw new CustomException(ErrorCode.INVALID_TITLE);
+        }
+
+        if(descriptionStatus == ModerationResultStatusEnum.DENIED){
+            throw new CustomException(ErrorCode.INVALID_DESCRIPTION);
+        }
+    }
+
+
+    //테스트용
+    @Transactional
+    public void saveSurveyAnswerTest(Long surveyId, SurveyAnswerRequestDto requestDto) {
+
+        Long userId = 1L;
+        Survey survey = surveyRepository.findByIdAndIsDeletedFalseWithPessimisticLock(surveyId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
+
+        if (!survey.getStatus().equals(SurveyStatus.IN_PROGRESS) || survey.getDeadline().isBefore(LocalDateTime.now())) {
+            throw new CustomException(ErrorCode.SURVEY_NOT_IN_PROGRESS);
+        }
+
+        User user = userFacade.findUser(userId);
+
+        SurveyAnswer surveyAnswer = surveyAnswerRepository.save(SurveyAnswer.of(survey, user));
+
+        requestDto.getAnswers().forEach(questionAnswer -> {
+            Question question = questionRepository.findById(questionAnswer.getNumber()).orElseThrow(
+                    () -> new CustomException(ErrorCode.QUESTION_NOT_FOUND)
+            );
+
+            // TODO 질문 타입에 따라 각 질문 응답을 처리할 수 있는 전략을 별도로 구성해서 처리하면 어떨까
+            surveyQuestionStrategies.stream()
+                    .filter(it -> it.isSupport(question.getType()))
+                    .findFirst()
+                    .orElseThrow()
+                    .doSave(questionAnswer, surveyAnswer, question);
+        });
+
+        if (surveyAnswerRepository.countBySurveyId(survey) >= survey.getMaxSurveyee()) {
+            survey.changeSurveyStatus(SurveyStatus.DONE);
+        }
+    }
 }
