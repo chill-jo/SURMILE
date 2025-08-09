@@ -35,7 +35,7 @@ jobs:
           WORKDIR /app
           COPY app.jar app.jar
           COPY .env .env
-          ENTRYPOINT ["java", "-jar", "app.jar"]
+          ENTRYPOINT ["java", "-jar", "app.jar", "--spring.config.import=optional:file:.env[.properties]"]
           EOL
 
       - name: Docker Compose 파일 생성
@@ -48,6 +48,8 @@ jobs:
                 - "8080:8080"
               restart: always
               container_name: survey-app
+              env_file:
+                - .env
           EOL
 
       - name: 파일 생성 확인
@@ -71,6 +73,9 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
+            # 파일 전송 확인
+            ls -la /home/ec2-user/deploy
+            
             # 롤백 디렉토리 생성 및 이전 버전 백업
             rm -rf /home/ec2-user/rollback
             mkdir /home/ec2-user/rollback
@@ -79,8 +84,8 @@ jobs:
             if [ -d "/home/ec2-user/survey-app" ]; then
               cd /home/ec2-user/survey-app
               docker-compose down || true
-              mv /home/ec2-user/survey-app /home/ec2-user/rollback
             fi
+            mv /home/ec2-user/survey-app /home/ec2-user/rollback
             
             # 새 버전 배포 준비
             rm -rf /home/ec2-user/survey-app
