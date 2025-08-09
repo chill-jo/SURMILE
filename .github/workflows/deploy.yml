@@ -74,7 +74,7 @@ jobs:
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
             # 파일 전송 확인
-            ls -la /home/ec2-user/deploy
+            ls -la /home/ec2-user/deploy/survey-app
             
             # 롤백 디렉토리 생성 및 이전 버전 백업
             rm -rf /home/ec2-user/rollback
