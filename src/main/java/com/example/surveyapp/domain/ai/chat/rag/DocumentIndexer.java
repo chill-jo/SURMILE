@@ -13,8 +13,8 @@ import java.util.Map;
 public class DocumentIndexer {
     private final VectorStore vectorStore;
 
-    public void indexText(String content, Map<String, Object> metadata) {
-        Document doc = new Document(content, metadata);
+    public void indexText(String content) {
+        Document doc = new Document(content);
         vectorStore.add(List.of(doc));
     }
 }

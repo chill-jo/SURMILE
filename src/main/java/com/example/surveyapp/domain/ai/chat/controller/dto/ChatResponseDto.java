@@ -7,4 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ChatResponseDto {
     private String answer;
+
+    public static ChatResponseDto of(String answer) {
+        return new ChatResponseDto(answer);
+    }
 }
