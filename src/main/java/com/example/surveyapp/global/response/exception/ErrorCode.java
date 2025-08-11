@@ -45,7 +45,7 @@ public enum ErrorCode {
     SURVEY_CANNOT_BE_MODIFIED(HttpStatus.CONFLICT, "설문 상세정보를 수정할 수 없습니다."),
     SURVEYEE_NOT_ALLOWED(HttpStatus.UNAUTHORIZED, "참여자 권한으로는 요청이 불가합니다."),
     SURVEY_STARTED(HttpStatus.FORBIDDEN, "설문 참여가 시작되었을 때는 요청이 불가합니다."),
-
+    INVALID_SURVEY_POINT(HttpStatus.BAD_REQUEST, "설문 지급 포인트가 잘못되었습니다."),
 
     //질문 에러
     QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 질문입니다."),
