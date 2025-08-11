@@ -8,6 +8,7 @@ import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
+import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import com.example.surveyapp.global.reader.UserReader;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class QuestionService {
     private final UserReader userReader;
     private final SurveyValidator surveyValidator;
     private final SurveyQuestionQueryService surveyQuestionQueryService;
+    private final SurveyQuestionService surveyQuestionService;
 
     @Transactional
     public QuestionResponseDto createQuestion(Long userId, Long surveyId, QuestionCreateRequestDto requestDto){
@@ -35,7 +37,7 @@ public class QuestionService {
 
         Question question = Question.from(requestDto);
 
-        survey.addQuestion(question);
+        surveyQuestionService.addQuestion(survey, question);
 
         return new QuestionResponseDto(
                 question.getId(),
@@ -54,7 +56,7 @@ public class QuestionService {
         Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
         surveyValidator.validateQuestionAccess(userId, survey);
 
-        Question question = survey.getQuestionById(questionId);
+        Question question = surveyQuestionService.getQuestionById(survey, questionId);
 
         return new QuestionResponseDto(
                 question.getId(),
@@ -95,7 +97,8 @@ public class QuestionService {
         Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId,survey);
 
-        Question question = survey.updateQuestion(
+        Question question = surveyQuestionService.updateQuestion(
+                survey,
                 questionId,
                 requestDto.getNumber(),
                 requestDto.getContent(),
@@ -118,8 +121,6 @@ public class QuestionService {
         Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
         surveyValidator.validateDeletable(userId, survey);
 
-        Question question = survey.getQuestionById(questionId);
-
-        questionRepository.delete(question);
+        surveyQuestionService.deleteQuestionById(survey, questionId);
     }
 }

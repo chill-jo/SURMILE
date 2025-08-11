@@ -3,7 +3,7 @@ package com.example.surveyapp.domain.survey.controller;
 import com.example.surveyapp.domain.survey.controller.dto.request.OptionCreateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.OptionUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.OptionResponseDto;
-import com.example.surveyapp.domain.survey.service.OptionsService;
+import com.example.surveyapp.domain.survey.application.OptionsService;
 import com.example.surveyapp.global.response.ApiResponse;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;

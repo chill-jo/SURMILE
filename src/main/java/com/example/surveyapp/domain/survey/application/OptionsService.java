@@ -7,7 +7,7 @@ import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.survey.domain.repository.OptionsRepository;
+import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import com.example.surveyapp.global.reader.UserReader;
 
 import lombok.RequiredArgsConstructor;
@@ -21,17 +21,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OptionsService {
 
-    private final OptionsRepository optionsRepository;
     private final UserReader userReader;
     private final SurveyValidator surveyValidator;
     private final SurveyQuestionQueryService surveyQuestionQueryService;
+    private final SurveyQuestionService surveyQuestionService;
 
     @Transactional
     public OptionResponseDto createOption(Long userId, Long surveyId, Long questionId, OptionCreateRequestDto requestDto){
 
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
-        Question question = survey.getQuestionById(questionId);
+        Question question = surveyQuestionService.getQuestionById(survey, questionId);
 
         surveyValidator.validateUpdatable(userId, survey);
 
@@ -52,7 +52,7 @@ public class OptionsService {
         userReader.validateUserIdOrThrow(userId);
 
         Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
-        Question question = survey.getQuestionById(questionId);
+        Question question = surveyQuestionService.getQuestionById(survey, questionId);
 
         surveyValidator.validateQuestionAccess(userId, survey);
 
@@ -73,7 +73,7 @@ public class OptionsService {
         userReader.validateUserIdOrThrow(userId);
 
         Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
-        Question question = survey.getQuestionById(questionId);
+        Question question = surveyQuestionService.getQuestionById(survey, questionId);
         surveyValidator.validateUpdatable(userId, survey);
 
         Options option = question.updateOption(optionId, requestDto.getNumber(), requestDto.getContent());
@@ -90,11 +90,10 @@ public class OptionsService {
         userReader.validateUserIdOrThrow(userId);
 
         Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
-        Question question = survey.getQuestionById(questionId);
-        Options option = question.getOptionById(optionId);
+        Question question = surveyQuestionService.getQuestionById(survey, questionId);
 
         surveyValidator.validateDeletable(userId, survey);
 
-        optionsRepository.delete(option);
+        question.deleteOptionById(optionId);
     }
 }

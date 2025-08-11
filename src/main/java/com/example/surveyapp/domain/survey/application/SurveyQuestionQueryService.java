@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.survey.application;
 
+import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
 import com.example.surveyapp.global.response.exception.CustomException;
@@ -17,6 +18,11 @@ public class SurveyQuestionQueryService {
 
     public Survey findSurvey(Long surveyId){
         return surveyRepository.findByIdAndIsDeletedFalse(surveyId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
+    }
+
+    public Survey findSurveyWithQuestionsAndOptions(Long surveyId){
+        return surveyRepository.findSurveyWithQuestionsAndOptions(surveyId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
     }
 }

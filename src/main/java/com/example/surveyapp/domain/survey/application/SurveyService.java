@@ -1,27 +1,21 @@
 package com.example.surveyapp.domain.survey.application;
 
+import com.example.surveyapp.domain.survey.domain.SurveyStatusUpdatePolicy;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
-import com.example.surveyapp.domain.survey.application.mapper.SurveyAnswerMapper;
 import com.example.surveyapp.domain.survey.application.mapper.SurveyMapper;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.request.SurveyAnswerRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyCreateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyStatusUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.*;
 import com.example.surveyapp.domain.survey.domain.model.entity.*;
-import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
-import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
-import com.example.surveyapp.domain.survey.domain.repository.SurveyAnswerRepository;
+import com.example.surveyapp.domain.survey.controller.dto.response.SurveyQuestionDto;
+import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
+import com.example.surveyapp.domain.survey.domain.model.vo.SurveyPoints;
+import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
-import com.example.surveyapp.domain.survey.event.SurveyAnswerEvent;
 import com.example.surveyapp.domain.survey.event.SurveyCreateEvent;
-import com.example.surveyapp.domain.survey.domain.strategy.SurveyQuestionStrategy;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyQuestionDto;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyeeSurveyListDto;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -30,22 +24,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class SurveyService {
 
+
     private final SurveyRepository surveyRepository;
     private final SurveyMapper surveyMapper;
-    private final QuestionRepository questionRepository;
     private final SurveyAnswerRepository surveyAnswerRepository;
-    private final List<SurveyQuestionStrategy> surveyQuestionStrategies;
-    private final UserReader userReader;
+    private final SurveyStatusUpdatePolicy statusUpdatePolicy;
     private final SurveyQuestionQueryService surveyQuestionQueryService;
     private final SurveyValidator surveyValidator;
+    private final UserReader userReader;
     private final ApplicationEventPublisher eventPublisher;
-    private final SurveyAnswerMapper surveyAnswerMapper;
 
     @Transactional
     public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
@@ -59,9 +50,7 @@ public class SurveyService {
 
         if(userReader.validateUserRole(userId, UserRoleEnum.SURVEYOR)){
             /// /////////// 이벤트 처리될 부분
-
             eventPublisher.publishEvent(new SurveyCreateEvent(saved, userId));
-            //pointService.surveyorRedeem(userId, saved.getSurveyInfo().getTotalPoint(), saved.getId());
             /// ///////////
         }
 
@@ -87,7 +76,10 @@ public class SurveyService {
         Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
 
-        survey.updateSurveyInfo(requestDto);
+        SurveyInfo oldSurveyInfo = survey.getSurveyInfo();
+        SurveyInfo newSurveyInfo = requestDto.toNewSurveyInfo(oldSurveyInfo);
+
+        survey.updateSurveyInfo(newSurveyInfo);
 
         return surveyMapper.toResponseDto(survey);
     }
@@ -98,7 +90,9 @@ public class SurveyService {
 
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+
         surveyValidator.validateStatusUpdatable(userId, survey);
+        statusUpdatePolicy.validateStatus(survey.getStatus(), requestDto.getStatus());
 
         survey.changeSurveyStatus(requestDto.getStatus());
 
@@ -133,47 +127,11 @@ public class SurveyService {
     public SurveyQuestionDto startSurvey(Long userId, Long surveyId) {
         userReader.validateUserIdOrThrow(userId);
 
-        Survey survey = surveyRepository.findSurveyWithQuestionsAndOptions(surveyId)
-                .orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
-
+        Survey survey = surveyQuestionQueryService.findSurveyWithQuestionsAndOptions(surveyId);
         surveyValidator.validateStartable(survey);
         surveyValidator.validateNotParticipated(userId, surveyId);
 
-        SurveyQuestionDto surveyQuestionDto = surveyAnswerMapper.toSurveyQuestionDto(survey);
-
-        return surveyQuestionDto;
-    }
-
-    @Transactional
-    public void saveSurveyAnswer(Long surveyId, SurveyAnswerRequestDto requestDto, Long userId) {
-
-        userReader.validateUserIdOrThrow(userId);
-
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
-        surveyValidator.validateStartable(survey);
-        surveyValidator.validateNotParticipated(userId, surveyId);
-
-        SurveyAnswer surveyAnswer = surveyAnswerRepository.save(SurveyAnswer.of(surveyId, userId));
-
-
-
-        eventPublisher.publishEvent(new SurveyAnswerEvent(userId, surveyId, surveyAnswer.getId()));
-
-        /// ////이부분을 이벤트로 처리할수는 없나?
-        if (surveyAnswerRepository.countBySurveyId(surveyId) >= survey.getSurveyInfo().getMaxSurveyee()) {
-            survey.changeSurveyStatus(SurveyStatus.DONE);
-        }
-        /// ////
-    }
-
-    @Transactional(readOnly = true)
-    public SurveyeeSurveyListDto getUserSurveyAnswerHistory(Long userId) {
-
-        userReader.validateUserIdOrThrow(userId);
-
-        List<SurveyAnswer> surveyAnswerList = surveyAnswerRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
-
-        return surveyAnswerMapper.toSurveyListDto(surveyAnswerList);
+        return surveyMapper.toSurveyQuestionDto(survey);
     }
 
 }

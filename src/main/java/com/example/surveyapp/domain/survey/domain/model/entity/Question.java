@@ -94,4 +94,8 @@ public class Question extends BaseEntity {
                 .collect(Collectors.toList());
     }
 
+    public void deleteOptionById(Long optionId){
+        options.removeIf(o -> o.getId().equals(optionId));
+    }
+
 }
