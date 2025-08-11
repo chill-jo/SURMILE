@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.surveyanswer.application.factory;
 
-import com.example.surveyapp.domain.survey.application.SurveyQuestionQueryService;
+import com.example.surveyapp.domain.survey.application.SurveyQueryService;
 import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyeeSurveyDto;
 import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyeeSurveyListDto;
 import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SurveyAnswerFactory {
 
-    private final SurveyQuestionQueryService surveyQuestionQueryService;
+    private final SurveyQueryService surveyQuestionQueryService;
 
     public SurveyeeSurveyListDto createParticipatedSurveyListDto(List<SurveyAnswer> surveyAnswerList){
 

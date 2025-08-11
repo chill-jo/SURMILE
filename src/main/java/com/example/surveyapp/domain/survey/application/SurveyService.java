@@ -10,7 +10,6 @@ import com.example.surveyapp.domain.survey.controller.dto.response.*;
 import com.example.surveyapp.domain.survey.domain.model.entity.*;
 import com.example.surveyapp.domain.survey.controller.dto.response.SurveyQuestionDto;
 import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
-import com.example.surveyapp.domain.survey.domain.model.vo.SurveyPoints;
 import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
 import com.example.surveyapp.domain.survey.event.SurveyCreateEvent;
@@ -33,7 +32,7 @@ public class SurveyService {
     private final SurveyMapper surveyMapper;
     private final SurveyAnswerRepository surveyAnswerRepository;
     private final SurveyStatusUpdatePolicy statusUpdatePolicy;
-    private final SurveyQuestionQueryService surveyQuestionQueryService;
+    private final SurveyQueryService surveyQuestionQueryService;
     private final SurveyValidator surveyValidator;
     private final UserReader userReader;
     private final ApplicationEventPublisher eventPublisher;

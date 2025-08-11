@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.surveyanswer.application;
 
-import com.example.surveyapp.domain.survey.application.SurveyQuestionQueryService;
+import com.example.surveyapp.domain.survey.application.SurveyQueryService;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
@@ -26,7 +26,7 @@ import java.util.List;
 public class SurveyAnswerService {
 
     private final UserReader userReader;
-    private final SurveyQuestionQueryService surveyQuestionQueryService;
+    private final SurveyQueryService surveyQuestionQueryService;
     private final SurveyValidator surveyValidator;
     private final ApplicationEventPublisher eventPublisher;
     private final List<SurveyQuestionStrategy> surveyQuestionStrategies;

@@ -44,16 +44,4 @@ public class SurveyInfo {
         this.expectedTime = expectedTime;
     }
 
-    public SurveyInfo updateSurveyInfo(SurveyUpdateRequestDto requestDto){
-
-        return new SurveyInfo(
-            requestDto.getTitle() != null ? requestDto.getTitle() : this.title,
-            requestDto.getDescription() != null ? requestDto.getDescription() : this.description,
-            requestDto.getMaxSurveyee() != null ? requestDto.getMaxSurveyee() : this.maxSurveyee,
-            requestDto.getPointPerPerson() != null ? requestDto.getPointPerPerson() : this.pointPerPerson,
-            requestDto.getDeadline() != null ? requestDto.getDeadline() : this.deadline,
-            requestDto.getExpectedTime() != null ? requestDto.getExpectedTime() : this.expectedTime
-        );
-    }
-
 }

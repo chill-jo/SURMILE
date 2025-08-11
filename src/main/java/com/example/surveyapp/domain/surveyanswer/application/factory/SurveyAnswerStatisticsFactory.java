@@ -27,8 +27,8 @@ public class SurveyAnswerStatisticsFactory {
                 survey.getSurveyInfo().getTitle(),
                 survey.getSurveyInfo().getDescription(),
                 survey.getSurveyInfo().getMaxSurveyee(),
-                survey.getSurveyInfo().getPointPerPerson(),
-                survey.getSurveyInfo().getTotalPoint(),
+                survey.getSurveyInfo().getPointPerPerson().getValue(),
+                survey.getSurveyInfo().getTotalPoint().getValue(),
                 survey.getSurveyInfo().getDeadline(),
                 survey.getSurveyInfo().getExpectedTime(),
                 surveyAnswerRepository.countBySurveyId(survey.getId())

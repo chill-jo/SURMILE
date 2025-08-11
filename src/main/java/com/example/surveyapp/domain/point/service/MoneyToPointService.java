@@ -1,7 +1,7 @@
 package com.example.surveyapp.domain.point.service;
 
 import com.example.surveyapp.domain.point.domain.model.entity.Money;
-import com.example.surveyapp.domain.point.domain.model.entity.Points;
+import com.example.surveyapp.domain.point.domain.model.entity.PointPoints;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MoneyToPointService {
 
-    public Points convert(Money money){
+    public PointPoints convert(Money money){
 
-        return Points.of(money.getValue());
+        return PointPoints.create(money.getValue());
     }
 }

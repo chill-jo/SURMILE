@@ -1,6 +1,5 @@
 package com.example.surveyapp.domain.survey.application;
 
-import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
 import com.example.surveyapp.global.response.exception.CustomException;
@@ -12,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Component
-public class SurveyQuestionQueryService {
+public class SurveyQueryService {
 
     private final SurveyRepository surveyRepository;
 

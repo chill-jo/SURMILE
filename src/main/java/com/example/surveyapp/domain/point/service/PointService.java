@@ -34,12 +34,12 @@ public class PointService {
 
         Money amount = Money.krw(dto.getPrice());
 
-        Points price = moneyToPointService.convert(amount);
+        PointPoints price = moneyToPointService.convert(amount);
 
         Point point = getPoint(userId);
 
         //충전 전 금액
-        Points currentBalance = point.getPoints();
+        PointPoints currentBalance = point.getPoints();
 
         //포인트 충전. (dirty checking)
         point.pointCharge(price);
@@ -71,12 +71,12 @@ public class PointService {
     // 설문 응답하는 경우 적립
     @PreAuthorize("hasAnyRole('SURVEYEE')")
     @Transactional
-    public void earn(Long userId, Points amount, Long surveyAnswerId){
+    public void earn(Long userId, PointPoints amount, Long surveyAnswerId){
 
         Point point = getPoint(userId);
 
         //적립 전 포인트
-        Points currentBalance = point.getPoints();
+        PointPoints currentBalance = point.getPoints();
 
         //포인트 적립 (dirty checking)
         point.earn(amount);
@@ -100,11 +100,11 @@ public class PointService {
 
     @PreAuthorize("hasAnyRole('SURVEYOR')")
     @Transactional
-    public void surveyorRedeem(Long userId, Points amount, Long surveyId){
+    public void surveyorRedeem(Long userId, PointPoints amount, Long surveyId){
 
         Point point = getPoint(userId);
 
-        Points currentBalance = point.getPoints();
+        PointPoints currentBalance = point.getPoints();
 
         point.redeem(amount);
 

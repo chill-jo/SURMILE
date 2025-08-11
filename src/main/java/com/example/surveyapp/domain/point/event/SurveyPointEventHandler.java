@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.point.event;
 
-import com.example.surveyapp.domain.point.domain.model.entity.Points;
+import com.example.surveyapp.domain.point.domain.model.entity.PointPoints;
 import com.example.surveyapp.domain.survey.event.SurveyCreateEvent;
 import com.example.surveyapp.domain.survey.facade.SurveyPointFacade;
 import com.example.surveyapp.domain.surveyanswer.event.SurveyAnswerEvent;
@@ -23,7 +23,7 @@ public class SurveyPointEventHandler {
     public void handleSurveyCreateEvent(SurveyCreateEvent event){
         surveyPointFacade.decreaseSurveyorPoint(
                 event.getUserId(),
-                Points.of(event.getSurvey().getSurveyInfo().getTotalPoint().getValue()),
+                PointPoints.create(event.getSurvey().getSurveyInfo().getTotalPoint().getValue()),
                 event.getSurvey().getId());
 
     }
@@ -33,7 +33,7 @@ public class SurveyPointEventHandler {
     public void handleSurveyAnswerEvent(SurveyAnswerEvent event){
         surveyAnswerPointFacade.increaseSurveyeePoint(
                 event.getUserId(),
-                Points.of(event.getSurvey().getSurveyInfo().getTotalPoint().getValue()),
+                PointPoints.create(event.getSurvey().getSurveyInfo().getTotalPoint().getValue()),
                 event.getSurveyAnswerId());
     }
 }

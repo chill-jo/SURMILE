@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/example/surveyapp/domain/surveyanswer/domain/strategy/SingleChoiceAnswerStrategy.java
 package com.example.surveyapp.domain.surveyanswer.domain.strategy;
-========
-package com.example.surveyapp.domain.survey.domain.strategy;
->>>>>>>> dev-v2-DDD:src/main/java/com/example/surveyapp/domain/survey/domain/strategy/SingleChoiceAnswerStrategy.java
 
 import com.example.surveyapp.domain.surveyanswer.controller.dto.request.QuestionAnswerRequestDto;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
@@ -21,7 +17,7 @@ public class SingleChoiceAnswerStrategy implements SurveyQuestionStrategy {
     @Override
     public void doSave(QuestionAnswerRequestDto questionAnswer, SurveyAnswer surveyAnswer, Long questionId) {
         Number answer = (Number) questionAnswer.getAnswer();
-        surveyOptionsAnswerRepository.save(new SurveyOptionsAnswer(surveyAnswer, questionId, answer.longValue()));
+        surveyOptionsAnswerRepository.save(new SurveyOptionsAnswer(surveyAnswer.getId(), questionId, answer.longValue()));
     }
 
     @Override

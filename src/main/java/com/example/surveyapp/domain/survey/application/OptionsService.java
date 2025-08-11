@@ -23,7 +23,7 @@ public class OptionsService {
 
     private final UserReader userReader;
     private final SurveyValidator surveyValidator;
-    private final SurveyQuestionQueryService surveyQuestionQueryService;
+    private final SurveyQueryService surveyQuestionQueryService;
     private final SurveyQuestionService surveyQuestionService;
 
     @Transactional

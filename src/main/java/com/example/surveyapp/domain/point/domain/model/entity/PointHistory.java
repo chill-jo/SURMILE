@@ -21,13 +21,13 @@ public class PointHistory extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Points currentBalance;
+    private PointPoints currentBalance;
 
     @Column(nullable = false)
-    private Points amount;
+    private PointPoints amount;
 
     @Column(nullable = false)
-    private Points afterBalance;
+    private PointPoints afterBalance;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -51,7 +51,7 @@ public class PointHistory extends BaseEntity {
 
 
     @Builder(access = AccessLevel.PRIVATE)
-    private PointHistory (Points currentBalance, Points amount, Points afterBalance, PointType type, Target target, Long targetId, String description, Long userId, Point point){
+    private PointHistory (PointPoints currentBalance, PointPoints amount, PointPoints afterBalance, PointType type, Target target, Long targetId, String description, Long userId, Point point){
         this.currentBalance=currentBalance;
         this.amount=amount;
         this.afterBalance=afterBalance;
@@ -63,7 +63,7 @@ public class PointHistory extends BaseEntity {
         this.point=point;
     }
 
-    public static PointHistory of(Points currentBalance, Points amount, Points afterBalance, PointType type, Target target, Long targetId, String description, Long userId, Point point){
+    public static PointHistory of(PointPoints currentBalance, PointPoints amount, PointPoints afterBalance, PointType type, Target target, Long targetId, String description, Long userId, Point point){
         return PointHistory.builder()
                 .currentBalance(currentBalance)
                 .amount(amount)

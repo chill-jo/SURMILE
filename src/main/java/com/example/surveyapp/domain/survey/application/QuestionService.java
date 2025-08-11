@@ -9,6 +9,7 @@ import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
+import com.example.surveyapp.domain.survey.infra.QuestionReadEntity;
 import com.example.surveyapp.global.reader.UserReader;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final UserReader userReader;
     private final SurveyValidator surveyValidator;
-    private final SurveyQuestionQueryService surveyQuestionQueryService;
+    private final SurveyQueryService surveyQuestionQueryService;
     private final SurveyQuestionService surveyQuestionService;
 
     @Transactional
@@ -76,7 +77,8 @@ public class QuestionService {
         surveyValidator.validateQuestionAccess(userId, survey);
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Question> questionPage = questionRepository.findAllBySurveyId(surveyId, pageable);
+        Page<QuestionReadEntity> questionReadEntityPage = questionRepository.findAllBySurveyId(surveyId, pageable);
+        Page<Question> questionPage = questionReadEntityPage.map(QuestionReadEntity::toQuestion);
 
         Page<QuestionResponseDto> questionResponseDtoPage = questionPage.map(question -> new QuestionResponseDto(
                 question.getId(),

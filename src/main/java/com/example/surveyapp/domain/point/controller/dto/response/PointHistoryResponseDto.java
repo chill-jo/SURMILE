@@ -22,7 +22,7 @@ public class PointHistoryResponseDto {
     public static PointHistoryResponseDto from(PointHistory history){
         return new PointHistoryResponseDto(
                 history.getType(),
-                history.getAmount(),
+                history.getAmount().getValue(),
                 history.getCreatedAt()
         );
     }
