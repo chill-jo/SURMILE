@@ -1,14 +1,20 @@
 package com.example.surveyapp.domain.order.event;
 
-import com.example.surveyapp.domain.order.model.Order;
+import com.example.surveyapp.global.config.event.Event;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEvent;
 
 @Getter
-@RequiredArgsConstructor
-public class OrderCreateEvent  {
-    private final Order order;
+public class OrderCreateEvent extends Event {
+    private final Long orderId;
 
     private final Long userId;
+
+    private final Long totalAmount;
+
+    public OrderCreateEvent(Long orderId, Long userId, Long totalAmount) {
+        super();
+        this.orderId = orderId;
+        this.userId = userId;
+        this.totalAmount = totalAmount;
+    }
 }
