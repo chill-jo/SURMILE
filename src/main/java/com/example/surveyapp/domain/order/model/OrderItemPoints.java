@@ -1,6 +1,5 @@
 package com.example.surveyapp.domain.order.model;
 
-import com.example.surveyapp.domain.product.domain.model.ProductPoints;
 import com.example.surveyapp.global.response.exception.CustomException;
 import com.example.surveyapp.global.response.exception.ErrorCode;
 import jakarta.persistence.Column;
@@ -30,6 +29,7 @@ public class OrderItemPoints {
 
     public OrderItemPoints minus(OrderItemPoints amount) {
         OrderItemPoints points = new OrderItemPoints(this.value - amount.value);
+        validatePriceOrThrow(points.getValue());
         return points;
     }
 
@@ -38,9 +38,10 @@ public class OrderItemPoints {
     }
 
     private Long validatePriceOrThrow(Long value) {
-        if (value == null || value < 0) {
+        if (value == null || value <= 0) {
             throw new CustomException(ErrorCode.INVALID_PRICE_ORDERITEM);
         }
         return value;
     }
 }
+

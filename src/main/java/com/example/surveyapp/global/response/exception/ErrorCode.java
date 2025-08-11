@@ -26,7 +26,8 @@ public enum ErrorCode {
     NOT_FOUND_PRODUCT_STATUS(HttpStatus.UNAUTHORIZED,"판매중인  상품이 아닙니다." ),
     NOT_SAME_CREATE_PRODUCT_TITLE(HttpStatus.BAD_REQUEST,"동일한 상품명으로 등록이 불가능합니다." ),
     NOT_DELETE_ON_SALE_PRODUCT(HttpStatus.BAD_REQUEST,"판매중인 상품은 삭제 할 수 없습니다." ),
-    NOT_PRODUCT_PRICE_ZERO(HttpStatus.BAD_REQUEST,"상품가격이 0원일 수 없습니다." ),
+    NOT_PRODUCT_PRICE_ZERO(HttpStatus.BAD_REQUEST,"상품가격이 0원일 수 없습니다."),
+    INVALID_PRICE_PRODUCT(HttpStatus.BAD_REQUEST, "유효 하지 않는 상품 금액입니다."),
     //주문
     NOT_ORDER_USER(HttpStatus.UNAUTHORIZED,"주문이 불가한 계정입니다."),
     NOT_FOUND_POINT(HttpStatus.UNAUTHORIZED,"포인트가 존재하지 않습니다."),
@@ -37,6 +38,7 @@ public enum ErrorCode {
     NOT_YOUR_ORDER(HttpStatus.UNAUTHORIZED,"본인 주문만 확인 할 수 있습니다." ),
     NOT_SAME_ORDER_USER(HttpStatus.BAD_REQUEST,"본인이 주문한 주문만 삭제할 수 있습니다." ),
     ONE_ORDER_ONE_PRODUCT(HttpStatus.BAD_REQUEST, "한개의 상품만 있어야 주문이 가능합니다." ),
+    INVALID_PRICE_ORDERITEM(HttpStatus.BAD_REQUEST, "유효 하지 않는 상품 금액입니다." ),
     //설문 에러
     SURVEY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 설문입니다."),
     SURVEY_ALREADY_DELETED(HttpStatus.GONE, "이미 삭제된 설문입니다."),
@@ -79,7 +81,7 @@ public enum ErrorCode {
     //관리자
     NOT_ADMIN_USER_ERROR(HttpStatus.UNAUTHORIZED,"관리자 계정으로 로그인하세요."),
     IS_BLACKLIST(HttpStatus.BAD_REQUEST, "해당 회원은 이미 블랙입니다."),
-    IS_NOT_BLACKLIST(HttpStatus.BAD_REQUEST, "해당 회원은 블랙이 아닙니다.") ;
+    IS_NOT_BLACKLIST(HttpStatus.BAD_REQUEST, "해당 회원은 블랙이 아닙니다.");
 
     private final HttpStatus status;
     private final String message;

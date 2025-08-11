@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.mockito.Mockito.*;
 
-@DisplayName("Service: Point 테스트")
+@DisplayName("Service: Points 테스트")
 @ExtendWith(MockitoExtension.class)
 public class PointServiceTest {
 

@@ -3,17 +3,16 @@ package com.example.surveyapp.domain.order.service;
 import com.example.surveyapp.domain.order.controller.dto.OrderCreateRequestDto;
 import com.example.surveyapp.domain.order.controller.dto.OrderCreateResponseDto;
 import com.example.surveyapp.domain.order.controller.dto.OrderResponseDto;
-import com.example.surveyapp.domain.order.event.OrderCreateEvent;
 import com.example.surveyapp.domain.order.facade.ProductFacade;
 import com.example.surveyapp.domain.order.model.Order;
 import com.example.surveyapp.domain.order.model.OrderItem;
+import com.example.surveyapp.domain.order.model.OrderItemPoints;
 import com.example.surveyapp.domain.order.model.repository.OrderRepository;;
 import com.example.surveyapp.domain.product.controller.dto.ProductInfoDto;
 import com.example.surveyapp.global.reader.UserReader;
 import com.example.surveyapp.global.response.exception.CustomException;
 import com.example.surveyapp.global.response.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +29,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserReader userReader;
     private final ProductFacade productFacade;
-    private final ApplicationEventPublisher eventPublisher;
-
 
     @Transactional
     public OrderCreateResponseDto createOrder(OrderCreateRequestDto requestDto, Long userId) {
@@ -41,7 +38,7 @@ public class OrderService {
 
         OrderItem item = OrderItem.create(requestDto.getProductId(),
                 product.getTitle(),
-                product.getPrice());
+                OrderItemPoints.create(product.getPrice()));
 
         Order order = Order.create(
                 userId,
@@ -51,9 +48,6 @@ public class OrderService {
         String status = product.getStatusName();
 
         Order saveOrder = orderRepository.save(order);
-
-        //이벤트발행
-        eventPublisher.publishEvent(new OrderCreateEvent(saveOrder,userId));
 
        return OrderCreateResponseDto.from(saveOrder,status);
     }

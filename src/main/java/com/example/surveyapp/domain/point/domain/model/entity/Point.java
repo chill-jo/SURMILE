@@ -23,12 +23,12 @@ public class Point extends BaseEntity {
     private Long userId;
 
     @Embedded
-    private Points points;
+    private PointPoints points;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Point(Long userId){
+    private Point(Long userId, PointPoints points){
         this.userId=userId;
-        this.points = new Points(0L);
+        this.points = points;
     }
 
     public static Point of(Long userId){
@@ -37,18 +37,18 @@ public class Point extends BaseEntity {
                 .build();
     }
 
-    public void pointCharge(Points amount) {
-        if(amount.getValue() == null || amount.getValue() < 5000){
+    public void pointCharge(PointPoints amount) {
+        if(amount == null || amount.getValue() < 5000){
             throw new CustomException(ErrorCode.POINT_INVALID_AMOUNT);
         }
         this.points = this.points.add(amount);
     }
 
-    public void earn(Points amount) {
+    public void earn(PointPoints amount) {
         this.points = points.add(amount);
     }
 
-    public void redeem(Points amount){
+    public void redeem(PointPoints amount){
         this.points = points.minus(amount);
     }
 

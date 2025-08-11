@@ -63,11 +63,11 @@ class ProductControllerTest {
         Product product = ProductFixtureGenerator.generateProductFixture();
         ProductCreateRequestDto requestDto = new ProductCreateRequestDto(product.getTitle(),
                 product.getContent(),
-                product.getPrice(),
+                product.getPrice().getValue(),
                 product.getStatus());
         ProductCreateResponseDto responseDto = new ProductCreateResponseDto(product.getId(),
                 product.getTitle(),
-                product.getPrice(),
+                product.getPrice().getValue(),
                 product.getStatus());
 
         when(productService.createProduct(any(ProductCreateRequestDto.class), eq(1L))).thenReturn(responseDto);
@@ -153,7 +153,7 @@ class ProductControllerTest {
         // Given
         //테스트 전제 조건 및 환경 설정
         Product product = ProductFixtureGenerator.generateProductFixture();
-        ProductResponseDto productResponseDto = new ProductResponseDto(product.getId(), product.getTitle(), product.getPrice(), product.getStatus());
+        ProductResponseDto productResponseDto = new ProductResponseDto(product.getId(), product.getTitle(), product.getPrice().getValue(), product.getStatus());
         when(productService.readOneProduct(product.getId())).thenReturn(productResponseDto);
 
         // When

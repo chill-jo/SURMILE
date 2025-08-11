@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/example/surveyapp/domain/surveyanswer/domain/strategy/SingleChoiceAnswerStrategy.java
 package com.example.surveyapp.domain.surveyanswer.domain.strategy;
+========
+package com.example.surveyapp.domain.survey.domain.strategy;
+>>>>>>>> dev-v2-DDD:src/main/java/com/example/surveyapp/domain/survey/domain/strategy/SingleChoiceAnswerStrategy.java
 
 import com.example.surveyapp.domain.surveyanswer.controller.dto.request.QuestionAnswerRequestDto;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
