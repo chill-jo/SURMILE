@@ -21,17 +21,17 @@ public class OrderItem {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private Long price;
+    @Embedded
+    private OrderItemPoints price;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private OrderItem(Long productId, String title, Long price) {
+    private OrderItem(Long productId, String title, OrderItemPoints price) {
         this.productId = productId;
         this.title = title;
         this.price = price;
     }
 
-    public static OrderItem create(Long productId, String title, Long price) {
+    public static OrderItem create(Long productId, String title, OrderItemPoints price) {
         return OrderItem.builder()
                 .productId(productId)
                 .title(title)

@@ -1,6 +1,7 @@
 package com.example.surveyapp.domain.order.controller;
 
 import com.example.surveyapp.config.generator.OrderFixtureGenerator;
+import com.example.surveyapp.config.generator.OrderItemFixtureGenerator;
 import com.example.surveyapp.config.generator.ProductFixtureGenerator;
 import com.example.surveyapp.config.generator.UserFixtureGenerator;
 import com.example.surveyapp.config.custommockuser.WithCustomMockUser;
@@ -10,9 +11,7 @@ import com.example.surveyapp.domain.order.controller.dto.OrderResponseDto;
 import com.example.surveyapp.domain.order.model.Order;
 import com.example.surveyapp.domain.order.model.OrderItem;
 import com.example.surveyapp.domain.order.service.OrderService;
-import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
-import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.filter.JwtFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,9 +23,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -34,6 +33,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpHeaders.LOCATION;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -60,23 +66,20 @@ public class OrderControllerTest {
     void 주문_생성() throws Exception {
         // Given
         //테스트 전제 조건 및 환경 설정
-        User user = UserFixtureGenerator.generateUserFixture();
-        ReflectionTestUtils.setField(user, "id" , 1L);
-        Product product = ProductFixtureGenerator.generateProductFixture();
-        Order order = OrderFixtureGenerator.generateOrderFixture(user,product);
+        Long userId= 1L;
+        Order order = OrderFixtureGenerator.generateOrderFixture(userId);
+        OrderItem item = order.getOneOrderItemOrThrow();
 
-        OrderItem orderItems = order.getOneOrderItemOrThrow();
-
-        OrderCreateRequestDto requestDto = new OrderCreateRequestDto(product.getId());
+        OrderCreateRequestDto requestDto = new OrderCreateRequestDto(item.getProductId());
         OrderCreateResponseDto responseDto = new OrderCreateResponseDto(order.getId(),
                 order.getOrderNumber().getValue(),
-                orderItems.getTitle(),
-                reques,
-                product.getPrice()
+                item.getTitle(),
+                Status.ON_SALE.getStatus(),
+                order.orderAmount()
                 );
         // When
         //실행할 행동
-        when(orderService.createOrder(any(OrderCreateRequestDto.class), eq(user.getId()))).thenReturn(responseDto);
+        when(orderService.createOrder(any(OrderCreateRequestDto.class), eq(userId))).thenReturn(responseDto);
 
         ResultActions actions = mockMvc.perform(post("/api/orders")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -84,13 +87,23 @@ public class OrderControllerTest {
 
         // Then
         //검증 사항
-        verify(orderService, times(1)).createOrder(any(OrderCreateRequestDto.class),eq(user.getId()));
+        verify(orderService, times(1)).createOrder(any(OrderCreateRequestDto.class),eq(userId));
         actions.andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.title").value(order.getTitle()))
-                .andExpect(jsonPath("$.data.title").value(product.getTitle()))
-                .andExpect(jsonPath("$.data.orderNumber").value(order.getOrderNumber()));
-
+                .andExpect(jsonPath("$.data.orderNumber").value(order.getOrderNumber()))
+                .andExpect(jsonPath("$.data.title").value(item.getTitle()))
+                .andExpect(jsonPath("$.data.orderNumber").value(order.getOrderNumber()))
+                .andDo(document("[POST: 201] 주문 생성 API",
+                        responseHeaders(
+                                headerWithName(LOCATION).description("생성된 주문 위치")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("주문 ID"),
+                                fieldWithPath("orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("주문 상품 제목"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("주문 상품 상태"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 생성일"))));
 
     }
 
@@ -101,8 +114,8 @@ public class OrderControllerTest {
         // Given
         //테스트 전제 조건 및 환경 설정
         List<OrderResponseDto> orderList = List.of(
-                new OrderResponseDto(1L, "uuid1", 1L,"dohan1", "치킨",2500L,Status.ON_SALE, LocalDateTime.now()),
-                new OrderResponseDto(2L, "uuid2", 2L,"dohan2", "피자",3500L,Status.ON_SALE, LocalDateTime.now())
+                new OrderResponseDto(1L, "uuid1", 1L,"dohan1", 1L,"chicken",2500L,Status.ON_SALE.getStatus(), LocalDateTime.now()),
+                new OrderResponseDto(2L, "uuid1", 3L,"dohan2", 2L,"pizza",3500L,Status.ON_SALE.getStatus(), LocalDateTime.now())
                 );
 
         when(orderService.readAllOrder(0,10)).thenReturn(orderList);
@@ -120,7 +133,24 @@ public class OrderControllerTest {
         actions.andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data[0].username").value("dohan1"))
-            .andExpect(jsonPath("$.data[1].username").value("dohan2"));
+            .andExpect(jsonPath("$.data[1].username").value("dohan2"))
+                .andDo(document("[GET: 200] 관리자 전체 주문 조회 API",
+                       responseHeaders(
+                                headerWithName(LOCATION).description("관리자 전체 주문 조회 위치")
+                        ),
+                        // /api/board?page=1&size=10
+                        queryParameters(
+                                parameterWithName("page").description("페이지 번호").optional(),
+                                parameterWithName("size").description("페이지 크기").optional()
+                                ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("주문 ID"),
+                                fieldWithPath("orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("주문 상품 제목"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("주문 상품 상태"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 생성일"))));
+
 
     }
 
@@ -132,13 +162,12 @@ public class OrderControllerTest {
     void 참여자_주문조회() throws Exception {
         // Given
         //테스트 전제 조건 및 환경 설정
-        User user = UserFixtureGenerator.generateUserFixture();
         List<OrderResponseDto> orderList = List.of(
-                new OrderResponseDto(1L, "uuid1", 3L, "dohan1", "치킨", 2500L, Status.ON_SALE, LocalDateTime.now()),
-                new OrderResponseDto(2L, "uuid2", 3L, "dohan1", "피자", 3500L, Status.ON_SALE, LocalDateTime.now()
-                ));
+                new OrderResponseDto(1L, "uuid1", 3L,"dohan1", 1L,"chicken",2500L,Status.ON_SALE.getStatus(), LocalDateTime.now()),
+                new OrderResponseDto(2L, "uuid1", 3L,"dohan1", 1L,"pizza",3500L,Status.ON_SALE.getStatus(), LocalDateTime.now())
+        );
 
-        when(orderService.readMyOrderList(anyInt(),anyInt(),anyLong())).thenReturn(orderList);
+        when(orderService.readMyOrderList(0,10,3L)).thenReturn(orderList);
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(get("/api/orders/my")
@@ -151,7 +180,23 @@ public class OrderControllerTest {
         actions.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].username").value("dohan1"))
-                .andExpect(jsonPath("$.data[1].username").value("dohan1"));
+                .andExpect(jsonPath("$.data[1].username").value("dohan1"))
+                .andDo(document("[GET: 200] 참여자 본인 주문 목록 조회 API",
+                        responseHeaders(
+                                headerWithName(LOCATION).description("관리자 전체 주문 조회 위치")
+                        ),
+                        // /api/board?page=1&size=10
+                        queryParameters(
+                                parameterWithName("page").description("페이지 번호").optional(),
+                                parameterWithName("size").description("페이지 크기").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("주문 ID"),
+                                fieldWithPath("orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("주문 상품 제목"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("주문 상품 상태"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 생성일"))));
 
     }
 
@@ -162,22 +207,30 @@ public class OrderControllerTest {
     void 주문자_주문내역_삭제() throws Exception {
         // Given
         //테스트 전제 조건 및 환경 설정
-        OrderResponseDto orderResponseDto = new OrderResponseDto(1L, "uuid1", 3L, "dohan1", "치킨", 2500L, Status.ON_SALE, LocalDateTime.now());
+        OrderResponseDto responseDto = new OrderResponseDto(1L, "uuid1", 3L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), LocalDateTime.now());
 
-        doNothing().when(orderService).deleteOrder(orderResponseDto.getOrderId(),orderResponseDto.getUserId());
+        doNothing().when(orderService).deleteOrder(responseDto.getOrderId(), responseDto.getUserId());
         // When
         //실행할 행동
-        ResultActions actions = mockMvc.perform(delete("/api/orders/{id}",orderResponseDto.getOrderId())
+        ResultActions actions = mockMvc.perform(delete("/api/orders/{id}", responseDto.getOrderId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(orderResponseDto)));
+                .content(objectMapper.writeValueAsString(responseDto)));
 
         // Then
         //검증 사항
-        verify(orderService, times(1)).deleteOrder(orderResponseDto.getOrderId(),
-                orderResponseDto.getUserId());
+        verify(orderService, times(1)).deleteOrder(responseDto.getOrderId(),
+                responseDto.getUserId());
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isEmpty());
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andDo(document("[DEL :200] 참여자 본인 주문 내역 삭제",
+                        pathParameters(
+                                parameterWithName("id").description("주문 ID")
+                        ),
+                        responseHeaders(
+                                headerWithName(LOCATION).description("삭제된 주문 위치")
+                        )));
+
     }
 
     @Test
@@ -186,44 +239,72 @@ public class OrderControllerTest {
     void 관리자_주문_단건_조회() throws Exception {
         // Given
         //테스트 전제 조건 및 환경 설정
-        OrderResponseDto orderResponseDto = new OrderResponseDto(1L, "uuid1", 3L, "dohan1", "치킨", 2500L, Status.ON_SALE, LocalDateTime.now());
+        OrderResponseDto responseDto = new OrderResponseDto(1L, "uuid1", 1L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), LocalDateTime.now());
 
-        when(orderService.readOneOrder(orderResponseDto.getOrderId())).thenReturn(orderResponseDto);
+        when(orderService.readOneOrder(responseDto.getOrderId())).thenReturn(responseDto);
         // When
         //실행할 행동
-        ResultActions actions = mockMvc.perform(get("/api/orders/{id}", orderResponseDto.getOrderId())
+        ResultActions actions = mockMvc.perform(get("/api/orders/{id}", responseDto.getOrderId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(orderResponseDto)));
+                .content(objectMapper.writeValueAsString(responseDto)));
 
         // Then
         //검증 사항
-        verify(orderService, times(1)).readOneOrder(orderResponseDto.getOrderId());
+        verify(orderService, times(1)).readOneOrder(responseDto.getOrderId());
 
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.orderNumber").value(orderResponseDto.getOrderNumber()));
+                .andExpect(jsonPath("$.data.orderNumber").value(responseDto.getOrderNumber()))
+                .andDo(document("[GET: 200] 관리자 주문 단건 조회 API",
+                        responseHeaders(
+                                headerWithName(LOCATION).description("관리자 전체 주문 조회 위치")
+                        ),
+                        // /api/board/{id}
+                        pathParameters(
+                                parameterWithName("id").description("주문 ID")),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("주문 ID"),
+                                fieldWithPath("orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("주문 상품 제목"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("주문 상품 상태"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 생성일"))));
     }
 
     @Test
     @DisplayName("기능_테스트_참여자는 자신의 주문 단건을 조회할 수 있다.")
     @WithCustomMockUser(id = 3,role = UserRoleEnum.SURVEYEE)
-    void readOneMyOrder() throws Exception {
+    void 참여자_본인_주문_단건_조회() throws Exception {
         // Given
         //테스트 전제 조건 및 환경 설정
-        OrderResponseDto orderResponseDto = new OrderResponseDto(1L, "uuid1", 3L, "dohan1", "치킨", 2500L, Status.ON_SALE, LocalDateTime.now());
+        OrderResponseDto responseDto = new OrderResponseDto(1L, "uuid1", 3L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), LocalDateTime.now());
 
-        when(orderService.readOneMyOrder(orderResponseDto.getOrderId(),orderResponseDto.getUserId())).thenReturn(orderResponseDto);
+        when(orderService.readOneMyOrder(responseDto.getOrderId(),responseDto.getUserId())).thenReturn(responseDto);
         // When
         //실행할 행동
-        ResultActions actions = mockMvc.perform(get("/api/orders/my/{id}", orderResponseDto.getOrderId())
+        ResultActions actions = mockMvc.perform(get("/api/orders/my/{id}", responseDto.getOrderId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(orderResponseDto)));
+                .content(objectMapper.writeValueAsString(responseDto)));
         // Then
         //검증 사항
-        verify(orderService, times(1)).readOneMyOrder(orderResponseDto.getOrderId(),orderResponseDto.getUserId());
+        verify(orderService, times(1)).readOneMyOrder(responseDto.getOrderId(),responseDto.getUserId());
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.orderNumber").value(orderResponseDto.getOrderNumber()))
-                .andExpect(jsonPath("$.data.userId").value(orderResponseDto.getUserId()));
+                .andExpect(jsonPath("$.data.orderNumber").value(responseDto.getOrderNumber()))
+                .andExpect(jsonPath("$.data.userId").value(responseDto.getUserId()))
+                .andDo(document("[GET: 200] 참여자 본인 주문 단건 조회 API",
+                        responseHeaders(
+                                headerWithName(LOCATION).description("관리자 전체 주문 조회 위치")
+                        ),
+                        // /api/board/{id}
+                        pathParameters(
+                                parameterWithName("id").description("주문 ID")),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("주문 ID"),
+                                fieldWithPath("orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("주문 상품 제목"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("주문 상품 상태"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 생성일"))));
     }
 }

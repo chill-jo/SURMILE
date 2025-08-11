@@ -40,7 +40,7 @@ public class OrderResponseDto {
             username,
             orderItem.getProductId(),
             orderItem.getTitle(),
-            orderItem.getPrice(),
+            orderItem.getPrice().getValue(),
             status,
             order.getCreatedAt()
 

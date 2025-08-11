@@ -2,7 +2,6 @@ package com.example.surveyapp.domain.order.controller.dto;
 
 import com.example.surveyapp.domain.order.model.Order;
 import com.example.surveyapp.domain.order.model.OrderItem;
-import com.example.surveyapp.domain.product.domain.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -29,6 +28,6 @@ public class OrderCreateResponseDto {
                 order.getOrderNumber().getValue(),
                 orderItem.getTitle(),
                 status,
-                orderItem.getPrice());
+                order.orderAmount());
     }
 }

@@ -12,6 +12,7 @@ import com.example.surveyapp.domain.product.service.dto.ProductUpdateResponseDto
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
+import com.example.surveyapp.global.reader.UserReader;
 import com.example.surveyapp.global.response.exception.CustomException;
 import com.example.surveyapp.global.response.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +43,7 @@ class ProductServiceTest {
     private ProductRepository productRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserReader userReader;
 
     @InjectMocks
     private ProductService productService;
@@ -54,19 +55,19 @@ class ProductServiceTest {
         //테스트 전제 조건 및 환경 설정
 
         Product product = ProductFixtureGenerator.generateProductFixture();
-        User adminUser = User.of("test@test.com", "test1234!", "관리자", "도한123", UserRoleEnum.ADMIN);
-        ReflectionTestUtils.setField(adminUser,"id",1L);
+        Long userId = 1L;
 
         ProductCreateRequestDto requestDto = new ProductCreateRequestDto(product.getTitle(),
                 product.getContent(),
-                product.getPrice(),
+                product.getPrice().getValue(),
                 product.getStatus());
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(adminUser));
+        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(userReader).validateUserRole(userId,UserRoleEnum.ADMIN);
         when(productRepository.save(any(Product.class))).thenReturn(product);
         // When
         //실행할 행동
-        ProductCreateResponseDto productCreateResponseDto = productService.createProduct(requestDto, adminUser.getId());
+        ProductCreateResponseDto productCreateResponseDto = productService.createProduct(requestDto, userId);
 
         // Then
         //검증 사항
@@ -83,19 +84,23 @@ class ProductServiceTest {
         // Given
         //테스트 전제 조건 및 환경 설정
         Product product = ProductFixtureGenerator.generateProductFixture();
-        User surveyeeUser = User.of("test@test.com", "test1234!", "참여자", "도한123", UserRoleEnum.SURVEYOR);
-
+        Long userId = 1L;
         ProductCreateRequestDto requestDto = new ProductCreateRequestDto(product.getTitle(),
                 product.getContent(),
-                product.getPrice(),
+                product.getPrice().getValue(),
                 product.getStatus());
         // When
         //실행할 행동
 
-        when(userRepository.findById(surveyeeUser.getId())).thenReturn(Optional.of(surveyeeUser));
+        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doThrow(new CustomException(ErrorCode.NOT_ADMIN_USER_ERROR))
+                .when(userReader)
+                .validateUserRole(userId,UserRoleEnum.ADMIN);
+
         // Then
         //검증 사항
-        assertThatThrownBy(() -> productService.createProduct(requestDto, surveyeeUser.getId())).isInstanceOf(CustomException.class)
+        assertThatThrownBy(() -> productService.createProduct(requestDto, userId))
+                .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.NOT_ADMIN_USER_ERROR.getMessage());
     }
 
@@ -105,19 +110,22 @@ class ProductServiceTest {
         // Given
         //테스트 전제 조건 및 환경 설정
         Product product = ProductFixtureGenerator.generateProductFixture();
-        User surveyorUser = User.of("test@test.com", "test1234!", "출제자", "도한123", UserRoleEnum.SURVEYOR);
+        Long userId = 1L;
 
         ProductCreateRequestDto requestDto = new ProductCreateRequestDto(product.getTitle(),
                 product.getContent(),
-                product.getPrice(),
+                product.getPrice().getValue(),
                 product.getStatus());
         // When
         //실행할 행동
-
-        when(userRepository.findById(surveyorUser.getId())).thenReturn(Optional.of(surveyorUser));
+        doThrow(new CustomException(ErrorCode.NOT_ADMIN_USER_ERROR))
+                .when(userReader)
+                .validateUserRole(userId,UserRoleEnum.ADMIN);
+        doNothing().when(userReader).validateUserIdOrThrow(userId);
         // Then
         //검증 사항
-        assertThatThrownBy(() -> productService.createProduct(requestDto, surveyorUser.getId())).isInstanceOf(CustomException.class)
+        assertThatThrownBy(() -> productService.createProduct(requestDto, userId))
+                .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.NOT_ADMIN_USER_ERROR.getMessage());
     }
 
@@ -127,20 +135,23 @@ class ProductServiceTest {
         // Given
         //테스트 전제 조건 및 환경 설정
         Product product = ProductFixtureGenerator.generateProductFixture();
-        User adminUser = User.of("test@test.com", "test1234!", "관리자", "도한123", UserRoleEnum.ADMIN);
+        Long userId = 1L;
+
         ProductCreateRequestDto requestDto = new ProductCreateRequestDto(product.getTitle(),
                 product.getContent(),
-                product.getPrice(),
+                product.getPrice().getValue(),
                 product.getStatus());
 
         // When
         //실행할 행동
-        when(userRepository.findById(adminUser.getId())).thenReturn(Optional.of(adminUser));
+        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(userReader).validateUserRole(userId,UserRoleEnum.ADMIN);
         when(productRepository.existsByTitleAndIsDeletedFalse(product.getTitle())).thenReturn(true);
 
         // Then
         //검증 사항
-        assertThatThrownBy(() -> productService.createProduct(requestDto,adminUser.getId())).isInstanceOf(CustomException.class)
+        assertThatThrownBy(() -> productService.createProduct(requestDto,userId))
+                .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE.getMessage());
 
     }
@@ -151,7 +162,7 @@ class ProductServiceTest {
         // Given
         //테스트 전제 조건 및 환경 설정
         Product product1 = ProductFixtureGenerator.generateProductFixture();
-        Product product2 = Product.create("상품2",1800L,"설명2",Status.ON_SALE);
+        Product product2 = ProductFixtureGenerator.generateProductFixture();
         List<Product> productList = List.of(product1, product2);
 
         int page = 0;
@@ -168,7 +179,6 @@ class ProductServiceTest {
         // Then
         //검증 사항
         verify(productRepository,  times(1)).findAllByStatusAndIsDeletedFalse(Status.ON_SALE, pageable);
-        assertThat(productService.readAllProduct(page,size));
         assertThat(productResponseDtos.size()).isEqualTo(productList.size());
 
 
@@ -203,9 +213,7 @@ class ProductServiceTest {
         Product product = ProductFixtureGenerator.generateProductFixture();
 
         ProductUpdateRequestDto requestDto = new ProductUpdateRequestDto("변경된상품명", 2500L, "변경된설명", Status.ON_SALE);
-        User adminUser = User.of("test@test.com", "test1234!", "관리자", "도한123", UserRoleEnum.ADMIN);
-        lenient().when(userRepository.findById(adminUser.getId())) //실제 서비스코드에 findById 가 안쓰였으나, leniet stub- 호출 안되고 예외 터지지않게 사용
-                        .thenReturn(Optional.of(adminUser));
+
 
         when(productRepository.findById(id)).thenReturn(Optional.of(product));
         when(productRepository.existsByTitleAndIsDeletedFalse("변경된상품명")).thenReturn(false);
@@ -217,7 +225,6 @@ class ProductServiceTest {
         //검증 사항
         verify(productRepository, times(1)).findById(id);
         assertThat(responseDto.getTitle()).isEqualTo("변경된상품명");
-        assertThat(adminUser.getUserRole()).isEqualTo(UserRoleEnum.ADMIN);
     }
 
 
@@ -226,19 +233,17 @@ class ProductServiceTest {
     void 상품_삭제() {
         // Given
         //테스트 전제 조건 및 환경 설정
-        Long id = 1L;
+        Long userId = 1L;
         Product product = ProductFixtureGenerator.generateProductFixture();
-        User adminUser = User.of("test@test.com", "test1234!", "관리자", "도한123", UserRoleEnum.ADMIN);
 
-        lenient().when(userRepository.findById(adminUser.getId())).thenReturn(Optional.of(adminUser));
-        when(productRepository.findByIdAndIsDeletedFalse(id)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdAndIsDeletedFalse(product.getId())).thenReturn(Optional.of(product));
 
         // When
         //실행할 행동
-        productService.deleteProduct(id,adminUser.getId());
+        productService.deleteProduct(product.getId(),userId);
         // Then
         //검증 사항
         assertThat(product.isDeleted()).isTrue();
-        verify(productRepository,times(1)).findByIdAndIsDeletedFalse(id);
-            }
+        verify(productRepository,times(1)).findByIdAndIsDeletedFalse(product.getId());
+    }
 }
