@@ -4,21 +4,19 @@ spring:
   application:
     name: surveyApp
 
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      username: ${REDIS_USERNAME}
-      password: ${REDIS_PASSWORD}
-
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
     vectorstore:
       redis:
-        initialize-schema: true       # 자동 인덱스 초기화
-        index-name: spring-ai-index   # 인덱스 이름
-        prefix: embedding             # Redis 키 접두사 설정
+        initialize-schema: true
+        index-name: surveyApp-index
+        prefix: embedding
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
   datasource:
     url: ${DB_URL}
