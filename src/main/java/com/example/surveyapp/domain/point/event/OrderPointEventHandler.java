@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.point.listener;
+package com.example.surveyapp.domain.point.event;
 
 import com.example.surveyapp.domain.order.event.OrderCreateEvent;
 import com.example.surveyapp.domain.order.facade.PointFacade;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class OrderPointEventListener {
+public class OrderPointEventHandler {
 
     private final PointFacade pointFacade;
 

@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-
 public class PointHistory extends BaseEntity {
 
     @Id
@@ -22,13 +21,13 @@ public class PointHistory extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Long currentBalance;
+    private Points currentBalance;
 
     @Column(nullable = false)
-    private Long amount;
+    private Points amount;
 
     @Column(nullable = false)
-    private Long afterBalance;
+    private Points afterBalance;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -52,7 +51,7 @@ public class PointHistory extends BaseEntity {
 
 
     @Builder(access = AccessLevel.PRIVATE)
-    private PointHistory (Long currentBalance, Long amount, Long afterBalance, PointType type, Target target, Long targetId, String description, Long userId, Point point){
+    private PointHistory (Points currentBalance, Points amount, Points afterBalance, PointType type, Target target, Long targetId, String description, Long userId, Point point){
         this.currentBalance=currentBalance;
         this.amount=amount;
         this.afterBalance=afterBalance;
@@ -64,7 +63,7 @@ public class PointHistory extends BaseEntity {
         this.point=point;
     }
 
-    public static PointHistory of(Long currentBalance, Long amount, Long afterBalance, PointType type, Target target, Long targetId, String description, Long userId, Point point){
+    public static PointHistory of(Points currentBalance, Points amount, Points afterBalance, PointType type, Target target, Long targetId, String description, Long userId, Point point){
         return PointHistory.builder()
                 .currentBalance(currentBalance)
                 .amount(amount)

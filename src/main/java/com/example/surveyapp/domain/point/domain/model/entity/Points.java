@@ -11,13 +11,17 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PointBalance {
+public class Points {
 
     @Column(name = "point_balance", nullable = false)
     private Long value;
 
-    public PointBalance(Long value) {
+    public Points(Long value) {
         this.value = value;
+    }
+
+    public static Points of(Long value){
+        return new Points(value);
     }
 
     public Long validatePoint(Long value){
@@ -27,16 +31,16 @@ public class PointBalance {
         return value;
     }
 
-    public PointBalance add(Long amount){
-        return new PointBalance(this.value + amount);
+    public Points add(Points amount){
+        return new Points(this.value + amount.value);
     }
 
-    public PointBalance minus(Long amount) {
-        Long validAmount = validatePoint(amount);
+    public Points minus(Points amount) {
+        Long validAmount = validatePoint(amount.getValue());
         if (this.value < validAmount){
             throw new CustomException(ErrorCode.NOT_ENOUGH_POINT);
         }
-        return new PointBalance(this.value - validAmount);
+        return new Points(this.value - validAmount);
     }
 
 }

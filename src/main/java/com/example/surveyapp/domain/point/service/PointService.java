@@ -2,15 +2,11 @@ package com.example.surveyapp.domain.point.service;
 
 import com.example.surveyapp.domain.point.controller.dto.request.PointChargeRequestDto;
 import com.example.surveyapp.domain.point.controller.dto.response.PointHistoryResponseDto;
-import com.example.surveyapp.domain.point.domain.model.entity.Payment;
-import com.example.surveyapp.domain.point.domain.model.entity.Point;
-import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
+import com.example.surveyapp.domain.point.domain.model.entity.*;
 import com.example.surveyapp.domain.point.domain.model.enums.*;
 import com.example.surveyapp.domain.point.domain.repository.PaymentRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointHistoryRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
-import com.example.surveyapp.domain.user.domain.model.User;
-import com.example.surveyapp.domain.user.domain.repository.UserRepository;
 import com.example.surveyapp.global.response.exception.CustomException;
 import com.example.surveyapp.global.response.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -25,29 +21,31 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PointService {
 
+    private final MoneyToPointService moneyToPointService;
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final PaymentRepository paymentRepository;
-    private final UserRepository userRepository;
-
 
     // 충전
     @PreAuthorize("hasAnyRole('SURVEYOR')")
     @Transactional
     public void charge(Long userId, PointChargeRequestDto dto){
         //요청받은 금액
-        Long price=dto.getPrice();
+
+        Money amount = Money.krw(dto.getPrice());
+
+        Points price = moneyToPointService.convert(amount);
 
         Point point = getPoint(userId);
 
         //충전 전 금액
-        Long currentBalance=point.getPointBalance().getValue();
+        Points currentBalance = point.getPoints();
 
         //포인트 충전. (dirty checking)
         point.pointCharge(price);
 
         Payment payment = Payment.of(
-                price,
+                amount,
                 PointStatus.DONE,
                 Method.KAKAO_PAY,
                 TargetType.POINT_CHARGE
@@ -57,7 +55,7 @@ public class PointService {
         PointHistory history = PointHistory.of(
                 currentBalance,
                 price,
-                point.getPointBalance().getValue(),
+                point.getPoints(),
                 PointType.CHARGE,
                 Target.PAYMENTS,
                 payment.getId(),
@@ -67,20 +65,18 @@ public class PointService {
         );
 
         pointHistoryRepository.save(history);
-
-
     }
 
 
     // 설문 응답하는 경우 적립
     @PreAuthorize("hasAnyRole('SURVEYEE')")
     @Transactional
-    public void earn(Long userId, Long amount, Long surveyAnswerId){
+    public void earn(Long userId, Points amount, Long surveyAnswerId){
 
         Point point = getPoint(userId);
 
         //적립 전 포인트
-        Long currentBalance=point.getPointBalance().getValue();
+        Points currentBalance = point.getPoints();
 
         //포인트 적립 (dirty checking)
         point.earn(amount);
@@ -89,7 +85,7 @@ public class PointService {
         PointHistory history = PointHistory.of(
                 currentBalance,
                 amount,
-                point.getPointBalance().getValue(),
+                point.getPoints(),
                 PointType.EARN,
                 Target.SURVEY,
                 surveyAnswerId,
@@ -104,18 +100,18 @@ public class PointService {
 
     @PreAuthorize("hasAnyRole('SURVEYOR')")
     @Transactional
-    public void surveyorRedeem(Long userId, Long amount, Long surveyId){
+    public void surveyorRedeem(Long userId, Points amount, Long surveyId){
 
         Point point = getPoint(userId);
 
-        Long currentBalance = point.getPointBalance().getValue();
+        Points currentBalance = point.getPoints();
 
         point.redeem(amount);
 
         PointHistory history = PointHistory.of(
                 currentBalance,
                 amount,
-                point.getPointBalance().getValue(),
+                point.getPoints(),
                 PointType.USAGE,
                 Target.SURVEY,
                 surveyId,

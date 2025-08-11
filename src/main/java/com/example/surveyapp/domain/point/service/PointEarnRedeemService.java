@@ -3,11 +3,14 @@ package com.example.surveyapp.domain.point.service;
 import com.example.surveyapp.domain.order.facade.PointFacade;
 import com.example.surveyapp.domain.point.domain.model.entity.Point;
 import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
+import com.example.surveyapp.domain.point.domain.model.entity.Points;
 import com.example.surveyapp.domain.point.domain.model.enums.PointType;
 import com.example.surveyapp.domain.point.domain.model.enums.Target;
 import com.example.surveyapp.domain.point.domain.repository.PointHistoryRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
+import com.example.surveyapp.domain.survey.domain.model.vo.SurveyPoints;
 import com.example.surveyapp.domain.survey.facade.SurveyPointFacade;
+import com.example.surveyapp.domain.surveyanswer.facade.SurveyAnswerPointFacade;
 import com.example.surveyapp.global.response.exception.CustomException;
 import com.example.surveyapp.global.response.exception.ErrorCode;
 
@@ -18,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class PointEarnRedeemService implements PointFacade, SurveyPointFacade {
+public class PointEarnRedeemService implements PointFacade, SurveyPointFacade, SurveyAnswerPointFacade {
 
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
@@ -26,13 +29,13 @@ public class PointEarnRedeemService implements PointFacade, SurveyPointFacade {
     @Override
     @PreAuthorize("hasAnyRole('SURVEYEE')")
     @Transactional
-    public void decreasePoint(Long userId, Long amount, Long orderId){
+    public void decreasePoint(Long userId, Points amount, Long orderId){
 
         Point point = pointRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POINT_NOT_FOUND));
 
         //차감 전 포인트
-        Long currentBalance=point.getPointBalance().getValue();
+        Points currentBalance=point.getPoints();
 
         //포인트 차감 (dirty checking)
         point.redeem(amount);
@@ -41,7 +44,7 @@ public class PointEarnRedeemService implements PointFacade, SurveyPointFacade {
         PointHistory history = PointHistory.of(
                 currentBalance,
                 amount,
-                point.getPointBalance().getValue(),
+                point.getPoints(),
                 PointType.USAGE,
                 Target.ORDER,
                 orderId,
@@ -56,19 +59,19 @@ public class PointEarnRedeemService implements PointFacade, SurveyPointFacade {
     @Override
     @PreAuthorize("hasAnyRole('SURVEYOR')")
     @Transactional
-    public void decreaseSurveyorPoint(Long userId, Long amount, Long surveyId) {
+    public void decreaseSurveyorPoint(Long userId, Points amount, Long surveyId) {
 
         Point point = pointRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POINT_NOT_FOUND));
 
-        Long currentBalance = point.getPointBalance().getValue();
+        Points currentBalance = point.getPoints();
 
         point.redeem(amount);
 
         PointHistory history = PointHistory.of(
                 currentBalance,
                 amount,
-                point.getPointBalance().getValue(),
+                point.getPoints(),
                 PointType.USAGE,
                 Target.SURVEY,
                 surveyId,
@@ -84,13 +87,13 @@ public class PointEarnRedeemService implements PointFacade, SurveyPointFacade {
     @Override
     @PreAuthorize("hasAnyRole('SURVEYEE')")
     @Transactional
-    public void increaseSurveyeePoint(Long userId, Long amount, Long surveyAnswerId){
+    public void increaseSurveyeePoint(Long userId, Points amount, Long surveyAnswerId){
 
         Point point = pointRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POINT_NOT_FOUND));
 
         //적립 전 포인트
-        Long currentBalance=point.getPointBalance().getValue();
+        Points currentBalance=point.getPoints();
 
         //포인트 적립 (dirty checking)
         point.earn(amount);
@@ -99,7 +102,7 @@ public class PointEarnRedeemService implements PointFacade, SurveyPointFacade {
         PointHistory history = PointHistory.of(
                 currentBalance,
                 amount,
-                point.getPointBalance().getValue(),
+                point.getPoints(),
                 PointType.EARN,
                 Target.SURVEY,
                 surveyAnswerId,
