@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.order.model;
 
-
+import com.example.surveyapp.domain.point.domain.model.entity.Points;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,21 +17,21 @@ public class OrderItem {
      */
     @Column(nullable = false)
     private Long productId;
-
+,
     @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)
-    private Long price;
+    private Points price;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private OrderItem(Long productId, String title, Long price) {
+    private OrderItem(Long productId, String title, Points price) {
         this.productId = productId;
         this.title = title;
         this.price = price;
     }
 
-    public static OrderItem create(Long productId, String title, Long price) {
+    public static OrderItem create(Long productId, String title, Points price) {
         return OrderItem.builder()
                 .productId(productId)
                 .title(title)

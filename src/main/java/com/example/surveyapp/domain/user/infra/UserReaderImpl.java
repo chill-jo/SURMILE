@@ -2,6 +2,7 @@ package com.example.surveyapp.domain.user.infra;
 
 import com.example.surveyapp.domain.admin.domain.repository.BlackListRepository;
 import com.example.surveyapp.domain.user.domain.model.User;
+import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
 import com.example.surveyapp.global.reader.UserReader;
 import com.example.surveyapp.global.response.exception.CustomException;
@@ -25,13 +26,13 @@ public class UserReaderImpl implements UserReader {
         }
     }
 
-    public boolean isSurveyor(Long userId){
+    public boolean validateUserRole(Long userId, UserRoleEnum userRole){
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(
                         () -> new CustomException(ErrorCode.NOT_FOUND_USER)
                 );
 
-        return user.isUserRoleSurveyor();
+        return user.hasRole(userRole);
     }
 
     @Override
