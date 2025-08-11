@@ -139,7 +139,7 @@ public class PointServiceTest {
         pointService.surveyorRedeem(userId, amount, surveyId);
 
         // then
-        assertThat(point.getPointBalance()).isEqualTo(2000L);
+        assertThat(point.getPoints()).isEqualTo(2000L);
 
         verify(pointHistoryRepository, times(1)).save(any(PointHistory.class));
     }
@@ -227,7 +227,7 @@ public class PointServiceTest {
         pointService.earn(userId, amount, surveyAnswerId);
 
         // then
-        assertThat(point.getPointBalance()).isEqualTo(7000L);
+        assertThat(point.getPoints()).isEqualTo(7000L);
         verify(pointHistoryRepository, times(1)).save(any(PointHistory.class));
     }
 
@@ -250,7 +250,7 @@ public class PointServiceTest {
         pointService.redeem(userId, amount, orderId);
 
         // then
-        assertThat(point.getPointBalance()).isEqualTo(6000L);
+        assertThat(point.getPoints()).isEqualTo(6000L);
         verify(pointHistoryRepository, times(1)).save(any(PointHistory.class));
     }
 

@@ -1,5 +1,7 @@
 package com.example.surveyapp.domain.survey.controller.dto.request;
 
+import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
+import com.example.surveyapp.domain.survey.domain.model.vo.SurveyPoints;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -30,5 +32,15 @@ public class SurveyUpdateRequestDto {
     @Range(min = 1, max = 120, message = "예상 소요시간은 1분 이상, 120분 이하여야 합니다.")
     private Long expectedTime;
 
+    public SurveyInfo toNewSurveyInfo(SurveyInfo currentInfo){
+        return new SurveyInfo(
+            this.title != null ? this.title : currentInfo.getTitle(),
+            this.description != null ? this.description : currentInfo.getDescription(),
+            this.maxSurveyee != null ? this.maxSurveyee : currentInfo.getMaxSurveyee(),
+            this.pointPerPerson != null ? SurveyPoints.of(this.pointPerPerson) : currentInfo.getPointPerPerson(),
+            this.deadline != null ? this.deadline : currentInfo.getDeadline(),
+            this.expectedTime != null ? this.expectedTime : currentInfo.getExpectedTime()
+        );
+    }
 }
 

@@ -1,12 +1,11 @@
 package com.example.surveyapp.domain.survey.controller;
 
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyAnswerRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyCreateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyStatusUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.request.SurveyUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.*;
-import com.example.surveyapp.domain.survey.service.SurveyService;
-import com.example.surveyapp.global.response.ApiResponse;
+import com.example.surveyapp.domain.survey.application.SurveyService;
+import com.example.surveyapp.domain.survey.controller.dto.response.SurveyQuestionDto;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -88,57 +87,24 @@ public class SurveyController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    //설문 통계 조회
-    @GetMapping("/{surveyId}/result")
-    public ResponseEntity<ApiResponse<Void>> getSurveyStatistics(){
-
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(true, "설문 통계를 조회했습니다.", null));
-    }
-
-
     // 참여자 API
     // 설문 상세 조회
     @PreAuthorize("hasAnyRole('SURVEYEE', 'SURVEYOR')")
     @GetMapping("/{surveyId}")
-    public ResponseEntity<ApiResponse<SurveyResponseDto>> getSurvey(@PathVariable Long surveyId) {
+    public ResponseEntity<SurveyResponseDto> getSurvey(@PathVariable Long surveyId) {
 
-        return ResponseEntity.ok(ApiResponse.success("설문 조회하였습니다.", surveyService.getSurvey(surveyId)));
+        return ResponseEntity.status(HttpStatus.OK).body(surveyService.getSurvey(surveyId));
     }
 
     // 설문 시작
     @PreAuthorize("hasAnyRole('SURVEYEE')")
     @GetMapping("/{surveyId}/start")
-    public ResponseEntity<ApiResponse<SurveyQuestionDto>> startSurvey(
+    public ResponseEntity<SurveyQuestionDto> startSurvey(
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long surveyId
     ) {
 
-        return ResponseEntity.ok(ApiResponse.success("설문을 시작합니다.", surveyService.startSurvey(user.getId(), surveyId)));
+        return ResponseEntity.status(HttpStatus.OK).body(surveyService.startSurvey(user.getId(), surveyId));
     }
-
-    // 설문 응답 제출
-    @PreAuthorize("hasAnyRole('SURVEYEE')")
-    @PostMapping("/{surveyId}/answer")
-    public ResponseEntity<ApiResponse<Void>> answerSurvey(
-            @PathVariable Long surveyId,
-            @RequestBody @Valid SurveyAnswerRequestDto requestDto,
-            @AuthenticationPrincipal CustomUserDetails user
-    ) {
-
-        surveyService.saveSurveyAnswer(surveyId, requestDto, user.getId());
-
-        return ResponseEntity.ok(ApiResponse.success("설문이 완료되었습니다.", null));
-    }
-
-    // 참여자 본인 설문 참여 내역 조회
-    @PreAuthorize("hasAnyRole('SURVEYEE')")
-    @GetMapping("/surveyee")
-    public ResponseEntity<ApiResponse<SurveyeeSurveyListDto>> getUserSurveyAnswerHistory(
-            @AuthenticationPrincipal CustomUserDetails user
-    ) {
-
-        return ResponseEntity.ok(ApiResponse.success("참여한 설문조사 내역 조회가 성공하였습니다.", surveyService.getUserSurveyAnswerHistory(user.getId())));
-    }
-
 
 }

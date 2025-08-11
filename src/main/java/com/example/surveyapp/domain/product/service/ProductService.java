@@ -5,6 +5,7 @@ import com.example.surveyapp.domain.product.controller.dto.ProductCreateResponse
 import com.example.surveyapp.domain.product.controller.dto.ProductResponseDto;
 import com.example.surveyapp.domain.product.controller.dto.ProductUpdateRequestDto;
 import com.example.surveyapp.domain.product.domain.model.Product;
+import com.example.surveyapp.domain.product.domain.model.ProductPoints;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
 import com.example.surveyapp.domain.product.service.dto.ProductUpdateResponseDto;
@@ -51,7 +52,7 @@ public class ProductService {
         }
 
         Product product = Product.create(requestDto.getTitle(),
-                requestDto.getPrice(),
+                ProductPoints.create(requestDto.getPrice()),
                 requestDto.getContent(),
                 requestDto.getStatus());
 
@@ -104,7 +105,7 @@ public class ProductService {
         }
          product.update(
                 requestDto.getTitle(),
-                requestDto.getPrice(),
+                ProductPoints.create(requestDto.getPrice()),
                 requestDto.getContent(),
                 requestDto.getStatus());
 
@@ -112,7 +113,7 @@ public class ProductService {
                 product.getId(),
                 product.getTitle(),
                 product.getContent(),
-                product.getPrice(),
+                product.getPrice().getValue(),
                 product.getStatus()
         );
 

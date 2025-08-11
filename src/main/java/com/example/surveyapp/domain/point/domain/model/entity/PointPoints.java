@@ -5,7 +5,6 @@ import com.example.surveyapp.global.response.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +15,6 @@ public class PointPoints {
 
     @Column(name = "point_balance", nullable = false)
     private Long value;
-
 
     private PointPoints(Long value) {
         this.value = value;

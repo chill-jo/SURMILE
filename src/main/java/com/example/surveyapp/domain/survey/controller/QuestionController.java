@@ -4,9 +4,7 @@ import com.example.surveyapp.domain.survey.controller.dto.request.QuestionCreate
 import com.example.surveyapp.domain.survey.controller.dto.request.QuestionUpdateRequestDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.PageQuestionResponseDto;
 import com.example.surveyapp.domain.survey.controller.dto.response.QuestionResponseDto;
-import com.example.surveyapp.domain.survey.domain.model.entity.Question;
-import com.example.surveyapp.domain.survey.service.QuestionService;
-import com.example.surveyapp.domain.user.domain.model.User;
+import com.example.surveyapp.domain.survey.application.QuestionService;
 import com.example.surveyapp.global.response.ApiResponse;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -15,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

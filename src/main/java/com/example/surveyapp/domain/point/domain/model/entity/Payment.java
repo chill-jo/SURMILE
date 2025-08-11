@@ -20,8 +20,8 @@ public class Payment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long amount;
+    @Embedded
+    private Money amount;
 
     @Column(unique = true, nullable = false)
     private UUID paymentKey;
@@ -39,15 +39,15 @@ public class Payment extends BaseEntity {
     private TargetType targetType;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Payment(Long amount, PointStatus pointStatus, Method method, TargetType targetType) {
-        this.amount=amount;
-        this.paymentKey=UUID.randomUUID();
+    private Payment(Money amount, PointStatus pointStatus, Method method, TargetType targetType) {
+        this.amount = amount;
+        this.paymentKey = UUID.randomUUID();
         this.pointStatus = pointStatus;
-        this.method=method;
-        this.targetType=targetType;
+        this.method = method;
+        this.targetType = targetType;
     }
 
-    public static Payment of(Long amount, PointStatus pointStatus, Method method, TargetType targetType){
+    public static Payment of(Money amount, PointStatus pointStatus, Method method, TargetType targetType){
         return Payment.builder()
                 .amount(amount)
                 .pointStatus(pointStatus)

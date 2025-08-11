@@ -21,7 +21,7 @@ public class ProductFacadeImpl implements ProductFacade {
 
         return new ProductInfoDto(
                 product.getTitle(),
-                product.getPrice(),
+                product.getPrice().getValue(),
                 product.getStatus()
         );
     }

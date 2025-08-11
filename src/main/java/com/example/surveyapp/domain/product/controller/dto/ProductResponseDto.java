@@ -21,7 +21,7 @@ public class ProductResponseDto {
         return new ProductResponseDto(
                 product.getId(),
                 product.getTitle(),
-                product.getPrice(),
+                product.getPrice().getValue(),
                 product.getStatus()
         );
     }
