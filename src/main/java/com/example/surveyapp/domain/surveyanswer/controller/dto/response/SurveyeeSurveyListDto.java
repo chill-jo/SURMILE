@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 유저 설문 참여 히스토리 목록 depth 1
+ */
 @Getter
 @NoArgsConstructor
 public class SurveyeeSurveyListDto {

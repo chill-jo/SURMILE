@@ -1,6 +1,5 @@
-package com.example.surveyapp.domain.survey.domain.model.entity;
+package com.example.surveyapp.domain.surveyanswer.domain.model;
 
-import com.example.surveyapp.domain.user.domain.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

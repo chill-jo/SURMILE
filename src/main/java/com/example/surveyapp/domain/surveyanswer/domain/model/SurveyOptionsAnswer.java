@@ -1,5 +1,6 @@
-package com.example.surveyapp.domain.survey.domain.model.entity;
+package com.example.surveyapp.domain.surveyanswer.domain.model;
 
+import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,18 +17,14 @@ public class SurveyOptionsAnswer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "survey_answer_id", nullable = false)
-    private SurveyAnswer surveyAnswerId;
+    private Long surveyAnswerId;
 
-    @ManyToOne
-    @JoinColumn(name = "question_id", nullable = false)
-    private Question questionId;
+    private Long questionId;
 
     @Column(nullable = false)
     private Long number;
 
-    public SurveyOptionsAnswer(SurveyAnswer surveyAnswerId, Question questionId, Long number) {
+    public SurveyOptionsAnswer(Long surveyAnswerId, Long questionId, Long number) {
         this.surveyAnswerId = surveyAnswerId;
         this.questionId = questionId;
         this.number = number;

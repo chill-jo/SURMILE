@@ -1,6 +1,6 @@
-package com.example.surveyapp.domain.survey.event;
+package com.example.surveyapp.domain.surveyanswer.event;
 
-import lombok.AllArgsConstructor;
+import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -8,6 +8,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SurveyAnswerEvent {
     private final Long userId;
-    private final Long surveyId;
+    private final Survey survey;
     private final Long surveyAnswerId;
 }
