@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ChatRequestDto {
-    private String message;
+    private String question;
 }
