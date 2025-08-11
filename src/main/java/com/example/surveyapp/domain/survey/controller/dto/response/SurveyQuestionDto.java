@@ -1,5 +1,6 @@
-package com.example.surveyapp.domain.survey.controller.dto.response;
+package com.example.surveyapp.domain.surveyanswer.controller.dto.response;
 
+import com.example.surveyapp.domain.survey.controller.dto.response.QuestionOptionsDto;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

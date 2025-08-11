@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.survey.domain.strategy;
 
-import com.example.surveyapp.domain.survey.controller.dto.request.QuestionAnswerRequestDto;
+import com.example.surveyapp.domain.surveyanswer.controller.dto.request.QuestionAnswerRequestDto;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.SurveyAnswer;
 import com.example.surveyapp.domain.survey.domain.model.entity.SurveyOptionsAnswer;
