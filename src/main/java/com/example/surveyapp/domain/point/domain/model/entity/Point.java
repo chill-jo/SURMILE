@@ -1,6 +1,5 @@
 package com.example.surveyapp.domain.point.domain.model.entity;
 
-import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.global.config.entity.BaseEntity;
 import com.example.surveyapp.global.response.exception.CustomException;
 import com.example.surveyapp.global.response.exception.ErrorCode;
@@ -24,12 +23,12 @@ public class Point  extends BaseEntity {
     private Long userId;
 
     @Embedded
-    private PointBalance pointBalance;
+    private PointPoints points;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Point(Long userId){
+    private Point(Long userId, PointPoints points){
         this.userId=userId;
-        this.pointBalance= new PointBalance(0L);
+        this.points = points;
     }
 
     public static Point of(Long userId){
@@ -38,19 +37,19 @@ public class Point  extends BaseEntity {
                 .build();
     }
 
-    public void pointCharge(Long amount) {
-        if(amount == null || amount < 5000){
+    public void pointCharge(PointPoints amount) {
+        if(amount == null || amount.getValue() < 5000){
             throw new CustomException(ErrorCode.POINT_INVALID_AMOUNT);
         }
-        this.pointBalance = this.pointBalance.add(amount);
+        this.points = this.points.add(amount);
     }
 
-    public void earn(Long amount) {
-        this.pointBalance = pointBalance.add(amount);
+    public void earn(PointPoints amount) {
+        this.points = points.add(amount);
     }
 
-    public void redeem(Long amount){
-        this.pointBalance = pointBalance.minus(amount);
+    public void redeem(PointPoints amount){
+        this.points = points.minus(amount);
     }
 
 }
