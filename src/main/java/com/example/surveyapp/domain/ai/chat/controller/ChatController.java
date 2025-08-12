@@ -8,6 +8,7 @@ import com.example.surveyapp.domain.ai.chat.service.ChatService;
 import com.example.surveyapp.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +25,7 @@ public class ChatController {
         return ResponseEntity.ok(ApiResponse.success("질의 성공", responseDto));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping(value = "/index")
     public ResponseEntity<ApiResponse<ChatResponseDto>> indexText(@RequestBody IndexRequestDto requestDto) {
         String content = requestDto.getDocument();
