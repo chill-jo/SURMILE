@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.order.model;
+package com.example.surveyapp.domain.order.domain.model.vo;
 
 
 import jakarta.persistence.*;
@@ -31,7 +31,13 @@ public class OrderItem {
         this.price = price;
     }
 
-    public static OrderItem create(Long productId, String title, OrderItemPoints price) {
+    /**
+     * @param productId
+     * @param title
+     * @param price
+     * @return
+     */
+    public static OrderItem of(Long productId, String title, OrderItemPoints price) {
         return OrderItem.builder()
                 .productId(productId)
                 .title(title)

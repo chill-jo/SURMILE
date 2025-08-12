@@ -1,9 +1,9 @@
-package com.example.surveyapp.domain.order.controller;
+package com.example.surveyapp.domain.order.presentation;
 
-import com.example.surveyapp.domain.order.controller.dto.OrderCreateRequestDto;
-import com.example.surveyapp.domain.order.controller.dto.OrderCreateResponseDto;
-import com.example.surveyapp.domain.order.controller.dto.OrderResponseDto;
-import com.example.surveyapp.domain.order.service.OrderService;
+import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto;
+import com.example.surveyapp.domain.order.presentation.dto.OrderCreateResponseDto;
+import com.example.surveyapp.domain.order.presentation.dto.OrderResponseDto;
+import com.example.surveyapp.domain.order.application.OrderService;
 import com.example.surveyapp.global.response.ApiResponse;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;

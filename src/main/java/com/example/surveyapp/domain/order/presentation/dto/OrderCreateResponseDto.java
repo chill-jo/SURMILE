@@ -1,11 +1,9 @@
-package com.example.surveyapp.domain.order.controller.dto;
+package com.example.surveyapp.domain.order.presentation.dto;
 
-import com.example.surveyapp.domain.order.model.Order;
-import com.example.surveyapp.domain.order.model.OrderItem;
+import com.example.surveyapp.domain.order.domain.model.Order;
+import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.awt.*;
 
 @Getter
 @AllArgsConstructor
