@@ -2,8 +2,8 @@ package com.example.surveyapp.domain.survey.application;
 
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
+import com.example.surveyapp.domain.survey.exception.SurveyErrorCode;
+import com.example.surveyapp.domain.survey.exception.SurveyException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +17,11 @@ public class SurveyQueryService {
 
     public Survey findSurvey(Long surveyId){
         return surveyRepository.findByIdAndIsDeletedFalse(surveyId)
-                .orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
+                .orElseThrow(() -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
     }
 
     public Survey findSurveyWithQuestionsAndOptions(Long surveyId){
         return surveyRepository.findSurveyWithQuestionsAndOptions(surveyId)
-                .orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
+                .orElseThrow(() -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
     }
 }

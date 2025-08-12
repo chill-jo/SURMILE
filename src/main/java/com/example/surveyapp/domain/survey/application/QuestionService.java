@@ -1,17 +1,17 @@
 package com.example.surveyapp.domain.survey.application;
 
-import com.example.surveyapp.domain.survey.controller.dto.request.QuestionCreateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.request.QuestionUpdateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.PageQuestionResponseDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.QuestionResponseDto;
+import com.example.surveyapp.domain.survey.domain.repository.QuestionReadRepository;
+import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionCreateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionUpdateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.PageQuestionResponseDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.QuestionResponseDto;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
-import com.example.surveyapp.domain.survey.infra.QuestionReadEntity;
+import com.example.surveyapp.domain.survey.infrastructure.QuestionReadEntity;
+import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,20 +23,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QuestionService {
 
-    private final QuestionRepository questionRepository;
+    private final QuestionReadRepository questionReadRepository;
+    private final SurveyQueryService surveyQueryService;
+    private final SurveyValidator surveyValidator = new SurveyValidator();
+    private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
     private final UserReader userReader;
-    private final SurveyValidator surveyValidator;
-    private final SurveyQueryService surveyQuestionQueryService;
-    private final SurveyQuestionService surveyQuestionService;
 
     @Transactional
     public QuestionResponseDto createQuestion(Long userId, Long surveyId, QuestionCreateRequestDto requestDto){
 
         userReader.validateUserIdOrThrow(userId);
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+        Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
 
-        Question question = Question.from(requestDto);
+        Question question = Question.from(requestDto, surveyId);
 
         surveyQuestionService.addQuestion(survey, question);
 
@@ -48,14 +48,11 @@ public class QuestionService {
         );
     }
 
-    //질문단건조회 (필요한가??)
-    //(inprogress일때는 모두, 다른 상태에는 관리자랑 출제자만 조회가능) - 구현됨
-    //이미 참여한 설문인지 확인해야함. - 응답 도메인 생성 후 수정
     public QuestionResponseDto getQuestion(Long userId, Long surveyId, Long questionId){
 
         userReader.validateUserIdOrThrow(userId);
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
-        surveyValidator.validateQuestionAccess(userId, survey);
+        Survey survey = surveyQueryService.findSurvey(surveyId);
+        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE));
 
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
 
@@ -67,17 +64,14 @@ public class QuestionService {
         );
     }
 
-    //질문목록조회
-    //(inprogress일때는 모두, 다른 상태에는 관리자랑 출제자만 조회가능)- 구현됨,
-    //in progress이고 유저가 참여자권한인 경우 이미 참여했는지 확인해야함. - 응답 도메인 생성 후 수정
     public PageQuestionResponseDto<QuestionResponseDto> getQuestions(int page, int size, Long userId, Long surveyId){
 
         userReader.validateUserIdOrThrow(userId);
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
-        surveyValidator.validateQuestionAccess(userId, survey);
+        Survey survey = surveyQueryService.findSurvey(surveyId);
+        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE));
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<QuestionReadEntity> questionReadEntityPage = questionRepository.findAllBySurveyId(surveyId, pageable);
+        Page<QuestionReadEntity> questionReadEntityPage = questionReadRepository.findAllBySurveyId(surveyId, pageable);
         Page<Question> questionPage = questionReadEntityPage.map(QuestionReadEntity::toQuestion);
 
         Page<QuestionResponseDto> questionResponseDtoPage = questionPage.map(question -> new QuestionResponseDto(
@@ -88,7 +82,6 @@ public class QuestionService {
         ));
 
         return new PageQuestionResponseDto<>(questionResponseDtoPage);
-
     }
 
     @Transactional
@@ -96,8 +89,8 @@ public class QuestionService {
 
         userReader.validateUserIdOrThrow(userId);
 
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
-        surveyValidator.validateUpdatable(userId,survey);
+        Survey survey = surveyQueryService.findSurvey(surveyId);
+        surveyValidator.validateUpdatable(userId, survey);
 
         Question question = surveyQuestionService.updateQuestion(
                 survey,
@@ -112,7 +105,6 @@ public class QuestionService {
                 question.getContent(),
                 question.getType()
         );
-
     }
 
     @Transactional
@@ -120,7 +112,7 @@ public class QuestionService {
 
         userReader.validateUserIdOrThrow(userId);
 
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+        Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateDeletable(userId, survey);
 
         surveyQuestionService.deleteQuestionById(survey, questionId);
