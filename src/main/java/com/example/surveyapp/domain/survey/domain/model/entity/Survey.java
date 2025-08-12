@@ -1,19 +1,17 @@
 package com.example.surveyapp.domain.survey.domain.model.entity;
 
-import com.example.surveyapp.domain.survey.domain.model.enums.QuestionType;
+import com.example.surveyapp.domain.survey.domain.SurveyStatusUpdatePolicy;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
+import com.example.surveyapp.domain.survey.exception.SurveyErrorCode;
+import com.example.surveyapp.domain.survey.exception.SurveyException;
 import com.example.surveyapp.global.config.entity.BaseEntity;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -53,6 +51,8 @@ public class Survey extends BaseEntity {
     }
 
     public void changeSurveyStatus(SurveyStatus newStatus) {
+        SurveyStatusUpdatePolicy policy = new SurveyStatusUpdatePolicy();
+        policy.validateStatus(status, newStatus);
         this.status = newStatus;
     }
 
@@ -62,7 +62,7 @@ public class Survey extends BaseEntity {
 
     public void deleteSurvey(){
         if(isDeleted){
-            throw new CustomException(ErrorCode.SURVEY_ALREADY_DELETED);
+            throw new SurveyException(SurveyErrorCode.SURVEY_ALREADY_DELETED);
         }
         isDeleted = true;
     }
@@ -73,7 +73,6 @@ public class Survey extends BaseEntity {
     public boolean isInProgress(){
         return status.isInProgress();
     }
-
     public boolean isUserSurveyCreator(Long userId){
         return this.userId.equals(userId);
     }
