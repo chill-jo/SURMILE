@@ -1,16 +1,16 @@
-package com.example.surveyapp.domain.admin.service;
+package com.example.surveyapp.domain.admin.application;
 
 import com.example.surveyapp.config.generator.BlackListFixtureGenerator;
-import com.example.surveyapp.config.generator.UserFixtureGenerator;
-import com.example.surveyapp.domain.admin.controller.dto.StatsListDto;
-import com.example.surveyapp.domain.admin.controller.dto.UserDto;
+import com.example.surveyapp.domain.admin.application.facade.UserFacade;
+import com.example.surveyapp.domain.admin.exception.AdminErrorCode;
+import com.example.surveyapp.domain.admin.exception.AdminException;
+import com.example.surveyapp.domain.admin.presentation.dto.StatDto;
+import com.example.surveyapp.domain.admin.presentation.dto.StatsListDto;
+import com.example.surveyapp.domain.admin.presentation.dto.UserDto;
 import com.example.surveyapp.domain.admin.domain.model.BlackList;
 import com.example.surveyapp.domain.admin.domain.repository.BlackListRepository;
-import com.example.surveyapp.domain.user.domain.model.CategoryEnum;
-import com.example.surveyapp.domain.user.domain.model.User;
-import com.example.surveyapp.domain.user.domain.repository.UserBaseDataRepository;
-import com.example.surveyapp.domain.user.domain.repository.UserRepository;
-import com.example.surveyapp.global.response.exception.CustomException;
+import com.example.surveyapp.domain.user.exception.UserErrorCode;
+import com.example.surveyapp.domain.user.exception.UserException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,35 +20,27 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @DisplayName("service: admin")
 @ExtendWith(MockitoExtension.class)
 class AdminServiceTest {
 
     @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    UserBaseDataRepository userBaseDataRepository;
-
-    @Mock
-    private UserDto userDto;
+    private UserFacade userFacade;
 
     @Mock
     private BlackListRepository blackListRepository;
 
     @InjectMocks
     private AdminService adminService;
-
-    private final User user = UserFixtureGenerator.generateUserFixture();
 
     private final BlackList blackList = BlackListFixtureGenerator.generateBlackListFixture();
 
@@ -58,11 +50,12 @@ class AdminServiceTest {
     void success_getUserList() {
 
         // given
+        Long userId = 1L;
         String search = "test";
         Pageable pageable = Pageable.unpaged();
         Page<UserDto> userList = Page.empty();
-        when(userRepository.findAllBySearch(search, pageable)).thenReturn(userList);
 
+        when(userFacade.findAllBySearch(search,pageable)).thenReturn(userList);
         // when
         Page<UserDto> result = adminService.getUserList(search, pageable);
 
@@ -77,8 +70,10 @@ class AdminServiceTest {
 
         // given
         Long userId = 1L;
-        ReflectionTestUtils.setField(user, "id", userId);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        UserDto dto = mock(UserDto.class);
+
+        when(dto.getId()).thenReturn(userId);
+        when(userFacade.getUserDto(userId)).thenReturn(dto);
 
         // when
         UserDto result = adminService.getUser(userId);
@@ -94,11 +89,16 @@ class AdminServiceTest {
 
         // given
         Long userId = 1L;
+        UserDto dto = mock(UserDto.class);
+
+        //when(userFacade.getUserDto(userId)).thenReturn(dto);
+        doThrow(new UserException(UserErrorCode.NOT_FOUND_USER))
+                .when(userFacade).getUserDto(userId);
 
         // when & then
-        Assertions.assertThatThrownBy(() -> adminService.getUser(userId))
-                .isInstanceOf(CustomException.class)
-                .hasMessageContaining("사용자를 찾을 수 없습니다.");
+        assertThatThrownBy(() -> userFacade.getUserDto(userId))
+                .isInstanceOf(UserException.class)
+                .hasMessageContaining(UserErrorCode.NOT_FOUND_USER.getMessage());
 
     }
 
@@ -109,18 +109,21 @@ class AdminServiceTest {
         //given
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = LocalDateTime.now();
-        Long count = 1L;
-        when(userBaseDataRepository.countByCategoryAndDataAndStartDateAndEndDate(any(CategoryEnum.class),
-                any(Long.class),
-                any(LocalDateTime.class),
-                any(LocalDateTime.class)
-        )).thenReturn(count);
+        StatsListDto listDto = StatsListDto.of("카테고리");
+        Long count = 2L;
+
+        StatDto statDto = new StatDto(1L, count);
+        listDto.addStat(statDto);
+
+        List<StatsListDto> expected = List.of(listDto);
+
+        when(userFacade.getUserBaseDataStatistics(any(), any())).thenReturn(expected);
 
         //when
         List<StatsListDto> statsListDtoList = adminService.getStats(startDate, endDate);
 
         //then
-        Assertions.assertThat(statsListDtoList.get(0).getList().get(0).getCount()).isEqualTo(1L);
+        Assertions.assertThat(statsListDtoList.get(0).getList().get(0).getCount()).isEqualTo(2L);
     }
 
 
@@ -130,13 +133,17 @@ class AdminServiceTest {
 
         // given
         Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        UserDto dto = mock(UserDto.class);
+
+        when(userFacade.getUserDto(userId)).thenReturn(dto);
+        when(blackListRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(blackListRepository.save(any(BlackList.class))).thenReturn(blackList);
 
         // when
-        User result = adminService.addBlackList(userId);
+        UserDto result = adminService.addBlackList(userId);
 
         // then
-        Assertions.assertThat(user).isEqualTo(result);
+        Assertions.assertThat(result).isEqualTo(dto);
 
     }
 
@@ -147,10 +154,13 @@ class AdminServiceTest {
         // given
         Long userId = 1L;
 
+        doThrow(new UserException(UserErrorCode.NOT_FOUND_USER))
+                .when(userFacade).getUserDto(userId);
+
         // when & then
-        Assertions.assertThatThrownBy(() -> adminService.addBlackList(userId))
-                .isInstanceOf(CustomException.class)
-                .hasMessageContaining("사용자를 찾을 수 없습니다.");
+        assertThatThrownBy(() -> adminService.addBlackList(userId))
+                .isInstanceOf(UserException.class)
+                .hasMessageContaining(UserErrorCode.NOT_FOUND_USER.getMessage());
 
     }
 
@@ -160,12 +170,14 @@ class AdminServiceTest {
 
         // given
         Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        UserDto userDto = mock(UserDto.class);
+        when(userFacade.getUserDto(userId)).thenReturn(userDto);
+
         when(blackListRepository.findByUserId(userId)).thenReturn(Optional.of(blackList));
 
         // when & then
-        Assertions.assertThatThrownBy(() -> adminService.addBlackList(userId))
-                .isInstanceOf(CustomException.class)
+        assertThatThrownBy(() -> adminService.addBlackList(userId))
+                .isInstanceOf(AdminException.class)
                 .hasMessageContaining("해당 회원은 이미 블랙입니다.");
 
     }
@@ -177,15 +189,16 @@ class AdminServiceTest {
 
         // given
         Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        UserDto dto = mock(UserDto.class);
+        when(userFacade.getUserDto(userId)).thenReturn(dto);
         when(blackListRepository.findByUserId(userId)).thenReturn(Optional.of(blackList));
 
         // when
-        User result = adminService.deleteBlackList(userId);
+        UserDto result = adminService.deleteBlackList(userId);
 
 
         // then
-        Assertions.assertThat(user).isEqualTo(result);
+        Assertions.assertThat(result).isEqualTo(dto);
 
     }
 
@@ -196,10 +209,13 @@ class AdminServiceTest {
         // given
         Long userId = 1L;
 
+        doThrow(new UserException(UserErrorCode.NOT_FOUND_USER))
+                .when(userFacade).getUserDto(userId);
+
         // when & then
-        Assertions.assertThatThrownBy(() -> adminService.deleteBlackList(userId))
-                .isInstanceOf(CustomException.class)
-                .hasMessageContaining("사용자를 찾을 수 없습니다.");
+        assertThatThrownBy(() -> adminService.deleteBlackList(userId))
+                .isInstanceOf(UserException.class)
+                .hasMessageContaining(UserErrorCode.NOT_FOUND_USER.getMessage());
 
     }
 
@@ -209,12 +225,16 @@ class AdminServiceTest {
 
         // given
         Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        UserDto dto = mock(UserDto.class);
+        when(userFacade.getUserDto(userId)).thenReturn(dto);
+
+        when(blackListRepository.findByUserId(userId)).thenReturn(Optional.empty());
+
 
         // when & then
-        Assertions.assertThatThrownBy(() -> adminService.deleteBlackList(userId))
-                .isInstanceOf(CustomException.class)
-                .hasMessageContaining("해당 회원은 블랙이 아닙니다.");
+        assertThatThrownBy(() -> adminService.deleteBlackList(userId))
+                .isInstanceOf(AdminException.class)
+                .hasMessageContaining(AdminErrorCode.IS_NOT_BLACKLIST.getMessage());
 
     }
 }

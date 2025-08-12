@@ -1,9 +1,8 @@
-package com.example.surveyapp.domain.admin.controller;
+package com.example.surveyapp.domain.admin.presentation;
 
-import com.example.surveyapp.domain.admin.controller.dto.StatsListDto;
-import com.example.surveyapp.domain.admin.controller.dto.UserDto;
-import com.example.surveyapp.domain.admin.service.AdminService;
-import com.example.surveyapp.domain.user.domain.model.User;
+import com.example.surveyapp.domain.admin.presentation.dto.StatsListDto;
+import com.example.surveyapp.domain.admin.presentation.dto.UserDto;
+import com.example.surveyapp.domain.admin.application.AdminService;
 import com.example.surveyapp.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -63,11 +62,10 @@ public class AdminController {
 
     }
 
-
     // 블랙리스트 등록
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/black/{userId}")
-    public ResponseEntity<ApiResponse<User>> addBlackList(
+    public ResponseEntity<ApiResponse<UserDto>> addBlackList(
             @PathVariable Long userId
     ) {
         return ResponseEntity.ok(ApiResponse.success("블랙리스트에 등록되었습니다.", adminService.addBlackList(userId)));
@@ -77,7 +75,7 @@ public class AdminController {
     // 블랙리스트 삭제
     @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/black/{userId}")
-    public ResponseEntity<ApiResponse<User>> deleteBlackList(
+    public ResponseEntity<ApiResponse<UserDto>> deleteBlackList(
             @PathVariable Long userId
     ) {
         return ResponseEntity.ok(ApiResponse.success("블랙리스트에서 삭제되었습니다.", adminService.deleteBlackList(userId)));

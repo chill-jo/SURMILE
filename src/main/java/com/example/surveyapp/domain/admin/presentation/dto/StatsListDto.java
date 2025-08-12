@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.admin.controller.dto;
+package com.example.surveyapp.domain.admin.presentation.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

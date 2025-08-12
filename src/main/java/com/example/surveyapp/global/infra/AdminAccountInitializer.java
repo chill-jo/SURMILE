@@ -1,4 +1,4 @@
-package com.example.surveyapp.infra;
+package com.example.surveyapp.global.infra;
 
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
