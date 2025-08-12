@@ -3,15 +3,13 @@ package com.example.surveyapp.domain.survey.domain.service;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.model.enums.QuestionType;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
-import org.springframework.stereotype.Service;
+import com.example.surveyapp.domain.survey.exception.SurveyErrorCode;
+import com.example.surveyapp.domain.survey.exception.SurveyException;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 public class SurveyQuestionService {
 
     public void addQuestion(Survey survey, Question question){
@@ -29,14 +27,14 @@ public class SurveyQuestionService {
         return survey.getQuestions().stream()
                 .filter(q -> q.getId().equals(questionId))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(ErrorCode.QUESTION_NOT_FOUND));
+                .orElseThrow(() -> new SurveyException(SurveyErrorCode.QUESTION_NOT_FOUND));
     }
 
     public Question getQuestionByNumber(Survey survey, Long number){
         return survey.getQuestions().stream()
                 .filter(q -> q.getNumber().equals(number))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(ErrorCode.QUESTION_NOT_FOUND));
+                .orElseThrow(() -> new SurveyException(SurveyErrorCode.QUESTION_NOT_FOUND));
     }
 
     public List<Question> getQuestionsSortedByNumber(Survey survey){
