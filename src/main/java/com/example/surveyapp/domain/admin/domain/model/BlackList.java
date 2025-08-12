@@ -1,7 +1,7 @@
 package com.example.surveyapp.domain.admin.domain.model;
 
-import com.example.surveyapp.domain.user.domain.model.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Table(name = "black_list")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class BlackList {
 
@@ -20,18 +20,20 @@ public class BlackList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User userId;
-
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    public BlackList(Long userId) {
+    private BlackList(Long userId) {
         this.userId = userId;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public static BlackList of(Long userId) {
+        return new BlackList(userId);
     }
 
 }

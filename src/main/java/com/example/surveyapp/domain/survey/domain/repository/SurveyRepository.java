@@ -24,5 +24,4 @@ public interface SurveyRepository extends JpaRepository<Survey, Long> {
             "WHERE s.id = :surveyId")
     Optional<Survey> findSurveyWithQuestionsAndOptions(@Param("surveyId") Long surveyId);
 
-    boolean existByIdAndIsDeletedFalse(Long surveyId);
 }

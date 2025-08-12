@@ -1,10 +1,10 @@
 package com.example.surveyapp.domain.survey.domain.model.entity;
 
-import com.example.surveyapp.domain.survey.controller.dto.request.QuestionCreateRequestDto;
+import com.example.surveyapp.domain.survey.exception.SurveyErrorCode;
+import com.example.surveyapp.domain.survey.exception.SurveyException;
+import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionCreateRequestDto;
 import com.example.surveyapp.domain.survey.domain.model.enums.QuestionType;
 import com.example.surveyapp.global.config.entity.BaseEntity;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,8 +22,7 @@ public class Question extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-//
-//    private Long surveyId;
+
     @OneToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinColumn(name = "question_id")
     private List<Options> options = new ArrayList<>();
@@ -38,28 +37,33 @@ public class Question extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private QuestionType type;
 
-    public Question(Long number, String content, QuestionType type){
+    @Column(name = "survey_id")
+    private Long surveyId;
+
+    public Question(Long number, String content, QuestionType type, Long surveyId){
         this.number = number;
         this.content = content;
         this.type = type;
+        this.surveyId = surveyId;
     }
 
-    public static Question of(Long number, String content, QuestionType type) {
-        return new Question(number,content, type);
+    public static Question of(Long number, String content, QuestionType type, Long surveyId) {
+        return new Question(number,content, type, surveyId);
     }
 
-    public static Question from(QuestionCreateRequestDto requestDto){
+    public static Question from(QuestionCreateRequestDto requestDto, Long surveyId){
         return new Question(
                 requestDto.getNumber(),
                 requestDto.getContent(),
-                requestDto.getType()
+                requestDto.getType(),
+                surveyId
         );
     }
 
     public void update(Long number, String content, QuestionType type){
-        this.number = number;
-        this.content = content;
-        this.type = type;
+        this.number = (number != null) ? number : this.number;
+        this.content = (content != null) ? content : this.content;
+        this.type = (type != null) ? type : this.type;
 
         if(this.type.equals(QuestionType.SUBJECTIVE)){
             options.clear();
@@ -68,7 +72,7 @@ public class Question extends BaseEntity {
 
     public void addOption(Options option){
         if(type.equals(QuestionType.SUBJECTIVE)){
-            throw new CustomException(ErrorCode.OPTION_INVALID_FOR_SUBJECTIVE_QUESTION);
+            throw new SurveyException(SurveyErrorCode.OPTION_INVALID_FOR_SUBJECTIVE_QUESTION);
         }
         options.add(option);
 
@@ -85,13 +89,17 @@ public class Question extends BaseEntity {
         return options.stream()
                 .filter(o -> o.getId().equals(optionId))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(ErrorCode.OPTION_NOT_FOUND));
+                .orElseThrow(() -> new SurveyException(SurveyErrorCode.OPTION_NOT_FOUND));
     }
 
     public List<Options> getOptionsOrderByNumber(){
         return options.stream()
                 .sorted(Comparator.comparing(Options::getNumber))
                 .collect(Collectors.toList());
+    }
+
+    public void deleteOptionById(Long optionId){
+        options.removeIf(o -> o.getId().equals(optionId));
     }
 
 }

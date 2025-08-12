@@ -1,6 +1,5 @@
 package com.example.surveyapp.domain.survey.domain.model.entity;
 
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyUpdateRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -42,18 +41,6 @@ public class SurveyInfo {
         this.totalPoint = maxSurveyee * pointPerPerson;
         this.deadline = deadline;
         this.expectedTime = expectedTime;
-    }
-
-    public SurveyInfo updateSurveyInfo(SurveyUpdateRequestDto requestDto){
-
-        return new SurveyInfo(
-            requestDto.getTitle() != null ? requestDto.getTitle() : this.title,
-            requestDto.getDescription() != null ? requestDto.getDescription() : this.description,
-            requestDto.getMaxSurveyee() != null ? requestDto.getMaxSurveyee() : this.maxSurveyee,
-            requestDto.getPointPerPerson() != null ? requestDto.getPointPerPerson() : this.pointPerPerson,
-            requestDto.getDeadline() != null ? requestDto.getDeadline() : this.deadline,
-            requestDto.getExpectedTime() != null ? requestDto.getExpectedTime() : this.expectedTime
-        );
     }
 
 }

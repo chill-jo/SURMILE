@@ -1,13 +1,13 @@
 package com.example.surveyapp.config.testmockbeans;
 
-import com.example.surveyapp.domain.admin.service.AdminService;
-import com.example.surveyapp.domain.order.service.OrderService;
-import com.example.surveyapp.domain.point.service.PointService;
-import com.example.surveyapp.domain.product.service.ProductService;
-import com.example.surveyapp.domain.survey.service.OptionsService;
-import com.example.surveyapp.domain.survey.service.QuestionService;
-import com.example.surveyapp.domain.survey.service.SurveyService;
-import com.example.surveyapp.domain.user.service.UserService;
+import com.example.surveyapp.domain.admin.application.AdminService;
+import com.example.surveyapp.domain.order.application.OrderService;
+import com.example.surveyapp.domain.point.application.PointService;
+import com.example.surveyapp.domain.product.application.ProductService;
+import com.example.surveyapp.domain.survey.application.OptionsService;
+import com.example.surveyapp.domain.survey.application.QuestionService;
+import com.example.surveyapp.domain.survey.application.SurveyService;
+import com.example.surveyapp.domain.user.application.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
