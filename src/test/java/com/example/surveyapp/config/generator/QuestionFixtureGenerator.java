@@ -23,6 +23,6 @@ public class QuestionFixtureGenerator {
 
     public static Question getQuestion(Long surveyId, Long number, String content, QuestionType type){
 
-        return Question.of(surveyId, number, content, type);
+        return Question.of(number, content, type, surveyId);
     }
 }
