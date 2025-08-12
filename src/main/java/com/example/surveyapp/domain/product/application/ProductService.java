@@ -1,0 +1,127 @@
+package com.example.surveyapp.domain.product.application;
+
+import com.example.surveyapp.domain.product.exception.ProductErrorCode;
+import com.example.surveyapp.domain.product.exception.ProductException;
+import com.example.surveyapp.domain.product.presentation.dto.ProductCreateRequestDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductCreateResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductUpdateRequestDto;
+import com.example.surveyapp.domain.product.domain.model.Product;
+import com.example.surveyapp.domain.product.domain.model.ProductPoints;
+import com.example.surveyapp.domain.product.domain.model.Status;
+import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
+import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
+import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
+import com.example.surveyapp.global.reader.UserReader;
+
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@AllArgsConstructor
+@Transactional(readOnly = true)
+public class ProductService {
+
+    private final ProductRepository productRepository;
+    private final UserReader userReader;
+
+    /**
+     * @param requestDto         생성 요청 DTO
+     * @param userId 인증된 사용자 정보 가져오기(관리자만)
+     * @return
+     * @PreAuthorize("hashRole('ADMIN')") ADMIN 관리자만 생성 할 수 있도록
+     */
+    @Transactional
+    public ProductCreateResponseDto createProduct(ProductCreateRequestDto requestDto, Long userId) {
+        userReader.validateUserIdOrThrow(userId);
+        userReader.validateUserRole(userId,UserRoleEnum.ADMIN);
+
+        if (productRepository.existsByTitleAndIsDeletedFalse(requestDto.getTitle())){
+            throw new ProductException(ProductErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE);
+        }
+
+        Product product = Product.of(requestDto.getTitle(),
+                ProductPoints.of(requestDto.getPrice()),
+                requestDto.getContent(),
+                requestDto.getStatus());
+
+        Product saved = productRepository.save(product);
+        return ProductCreateResponseDto.from(saved);
+
+    }
+
+    /**
+     *
+     * @param page
+     * @param size
+     * @return
+     */
+    public List<ProductResponseDto> readAllProduct(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Product> products = productRepository.findAllByStatusAndIsDeletedFalse(Status.ON_SALE,pageable);
+
+        List<Product> productList = products.getContent();
+
+        return productList.stream()
+                .map(ProductResponseDto::from)
+                .toList();
+    }
+
+    public ProductResponseDto readOneProduct(Long id) {
+
+        Product product= productRepository.findByIdAndStatusAndIsDeletedFalse(id,Status.ON_SALE)
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
+        return ProductResponseDto.from(product);
+    }
+
+    @Transactional
+    public ProductUpdateResponseDto updateProduct(Long id, ProductUpdateRequestDto requestDto) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
+
+        if (!product.getTitle().equals(requestDto.getTitle())) {
+            boolean onlyOne = productRepository.existsByTitleAndIsDeletedFalse(requestDto.getTitle());
+            if (onlyOne){
+                throw new ProductException(ProductErrorCode.NOT_SAME_PRODUCT_TITLE);
+            }
+
+            if (requestDto.getStatus() == null) {
+                throw new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_STATUS);
+            }
+        }
+         product.update(
+                requestDto.getTitle(),
+                ProductPoints.of(requestDto.getPrice()),
+                requestDto.getContent(),
+                requestDto.getStatus());
+
+        product.changeStatus(requestDto.getStatus());
+
+        return new ProductUpdateResponseDto(
+                product.getId(),
+                product.getTitle(),
+                product.getContent(),
+                product.getPrice().getValue(),
+                product.getStatus()
+        );
+
+    }
+
+    @Transactional
+    public void deleteProduct(Long id, Long userId) {
+        userReader.validateUserIdOrThrow(userId);
+        userReader.validateUserRole(userId,UserRoleEnum.ADMIN);
+        Product product = productRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
+
+        product.delete();
+    }
+}
