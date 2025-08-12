@@ -1,18 +1,20 @@
-package com.example.surveyapp.domain.order.service;
+package com.example.surveyapp.domain.order.application;
 
-import com.example.surveyapp.domain.order.controller.dto.OrderCreateRequestDto;
-import com.example.surveyapp.domain.order.controller.dto.OrderCreateResponseDto;
-import com.example.surveyapp.domain.order.controller.dto.OrderResponseDto;
-import com.example.surveyapp.domain.order.facade.ProductFacade;
-import com.example.surveyapp.domain.order.model.Order;
-import com.example.surveyapp.domain.order.model.OrderItem;
-import com.example.surveyapp.domain.order.model.OrderItemPoints;
-import com.example.surveyapp.domain.order.model.repository.OrderRepository;;
-import com.example.surveyapp.domain.product.controller.dto.ProductInfoDto;
+import com.example.surveyapp.domain.order.exception.OrderErrorCode;
+import com.example.surveyapp.domain.order.exception.OrderException;
+import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto;
+import com.example.surveyapp.domain.order.presentation.dto.OrderCreateResponseDto;
+import com.example.surveyapp.domain.order.presentation.dto.OrderResponseDto;
+import com.example.surveyapp.domain.order.domain.event.OrderCreateEvent;
+import com.example.surveyapp.domain.order.application.facade.ProductFacade;
+import com.example.surveyapp.domain.order.domain.model.Order;
+import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
+import com.example.surveyapp.domain.order.domain.model.vo.OrderItemPoints;
+import com.example.surveyapp.domain.order.domain.repository.OrderRepository;;
+import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
 import com.example.surveyapp.global.reader.UserReader;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserReader userReader;
     private final ProductFacade productFacade;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public OrderCreateResponseDto createOrder(OrderCreateRequestDto requestDto, Long userId) {
@@ -36,11 +39,11 @@ public class OrderService {
 
         ProductInfoDto product = productFacade.findProductInfo(requestDto.getProductId());
 
-        OrderItem item = OrderItem.create(requestDto.getProductId(),
+        OrderItem item = OrderItem.of(requestDto.getProductId(),
                 product.getTitle(),
-                OrderItemPoints.create(product.getPrice()));
+                OrderItemPoints.of(product.getPrice()));
 
-        Order order = Order.create(
+        Order order = Order.of(
                 userId,
                 List.of(item)
                 );
@@ -48,6 +51,10 @@ public class OrderService {
         String status = product.getStatusName();
 
         Order saveOrder = orderRepository.save(order);
+        //이벤트 발행
+        eventPublisher.publishEvent(new OrderCreateEvent(order.getId(),
+                userId,
+                order.orderAmount()));
 
        return OrderCreateResponseDto.from(saveOrder,status);
     }
@@ -73,7 +80,7 @@ public class OrderService {
     public OrderResponseDto readOneOrder(Long id) {
 
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ORDER));
+                .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
 
         //유저정보 조회
         String username = userReader.usernameById(order.getUserId());
@@ -90,7 +97,7 @@ public class OrderService {
     public List<OrderResponseDto> readMyOrderList(int page, int size, Long userId) {
         userReader.validateUserIdOrThrow(userId);
         Pageable pageable = PageRequest.of(page,size);
-        Page<Order> orders = orderRepository.findByUserId(userId,pageable);
+        Page<Order> orders = orderRepository.findByUserIdAndIsDeletedFalse(userId,pageable);
 
         return orders.stream()
                 .map(order -> {
@@ -106,8 +113,8 @@ public class OrderService {
 
         userReader.validateUserIdOrThrow(userId);
 
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ORDER));
+        Order order = orderRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
 
         order.validateOrderer(userId);
 
@@ -123,10 +130,10 @@ public class OrderService {
     public void deleteOrder(Long id, Long userId) {
         userReader.validateUserIdOrThrow(userId);
         Order order = orderRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ORDER));
+                .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
 
         if (!order.getUserId().equals(userId)) {
-            throw new CustomException(ErrorCode.NOT_SAME_ORDER_USER);
+            throw new OrderException(OrderErrorCode.NOT_SAME_ORDER_USER);
         }
 
         order.delete();

@@ -1,17 +1,18 @@
-package com.example.surveyapp.domain.order.service;
+package com.example.surveyapp.domain.order.application;
 
 import com.example.surveyapp.config.generator.OrderFixtureGenerator;
-import com.example.surveyapp.domain.order.controller.dto.OrderCreateRequestDto;
-import com.example.surveyapp.domain.order.controller.dto.OrderCreateResponseDto;
-import com.example.surveyapp.domain.order.controller.dto.OrderResponseDto;
-import com.example.surveyapp.domain.order.facade.ProductFacade;
-import com.example.surveyapp.domain.order.model.Order;
-import com.example.surveyapp.domain.order.model.repository.OrderRepository;
-import com.example.surveyapp.domain.product.controller.dto.ProductInfoDto;
+import com.example.surveyapp.domain.order.domain.event.OrderCreateEvent;
+import com.example.surveyapp.domain.order.exception.OrderErrorCode;
+import com.example.surveyapp.domain.order.exception.OrderException;
+import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto;
+import com.example.surveyapp.domain.order.presentation.dto.OrderCreateResponseDto;
+import com.example.surveyapp.domain.order.presentation.dto.OrderResponseDto;
+import com.example.surveyapp.domain.order.application.facade.ProductFacade;
+import com.example.surveyapp.domain.order.domain.model.Order;
+import com.example.surveyapp.domain.order.domain.repository.OrderRepository;
+import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.global.reader.UserReader;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +68,7 @@ class OrderServiceTest {
         when(orderRepository.save(any(Order.class))).thenReturn(order);
         when(productFacade.findProductInfo(productId)).thenReturn(productInfoDto);
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        doNothing().when(eventPublisher).publishEvent(any());
+        doNothing().when(eventPublisher).publishEvent(any(OrderCreateEvent.class));
 
         OrderCreateResponseDto responseDto = orderService.createOrder(requestDto, userId);
 
@@ -78,6 +79,7 @@ class OrderServiceTest {
         assertThat(responseDto.getStatus()).isEqualTo("ON_SALE");
         assertThat(responseDto.getTitle()).isEqualTo(order.getOneOrderItemOrThrow().getTitle());
 
+        verify(eventPublisher).publishEvent(any(OrderCreateEvent.class));
         verify(orderRepository, times(1)).save(any(Order.class));
     }
 
@@ -102,6 +104,8 @@ class OrderServiceTest {
         when(userReader.usernameById(1L)).thenReturn("dohan1");
         when(userReader.usernameById(2L)).thenReturn("dohan2");
         when(userReader.usernameById(3L)).thenReturn("dohan3");
+        when(productFacade.findProductInfo(any()))
+                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE,"ON_SALE"));
         // When
         //실행할 행동
         List<OrderResponseDto> orderResponseDtos = orderService.readAllOrder(page, size);
@@ -127,6 +131,9 @@ class OrderServiceTest {
         ReflectionTestUtils.setField(order, "id", 1L);
 
         when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+        when(productFacade.findProductInfo(any()))
+                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE,"ON_SALE"));
+
         // When
         //실행할 행동
         OrderResponseDto orderResponseDto = orderService.readOneOrder(order.getId());
@@ -146,21 +153,25 @@ class OrderServiceTest {
         //테스트 전제 조건 및 환경 설정
         Long userId = 1L;
         Order order = OrderFixtureGenerator.generateOrderFixture(userId);
+        ReflectionTestUtils.setField(order,"id",1L);
         int page = 0;
         int size = 10;
 
         Pageable pageable = PageRequest.of(page, size);
 
         PageImpl<Order> orders = new PageImpl<>(List.of(order), pageable, 1);
-        when(orderRepository.findByUserId(userId, pageable)).thenReturn(orders);
+        when(orderRepository.findByUserIdAndIsDeletedFalse(userId, pageable)).thenReturn(orders);
         doNothing().when(userReader).validateUserIdOrThrow(userId);
+        when(productFacade.findProductInfo(any()))
+                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE,"ON_SALE"));
+
 
         // When
         List<OrderResponseDto> responseDto = orderService.readMyOrderList(page, size, userId);
 
         // Then
         assertThat(responseDto.stream().map(OrderResponseDto::getOrderId)
-                .toList()).isEqualTo(1L);
+                .toList()).isEqualTo(List.of(1L));
     }
 
 @Test
@@ -171,15 +182,18 @@ void 참여자_주문_단건_조회() {
     Long userId = 1L;
     Order order = OrderFixtureGenerator.generateOrderFixture(userId);
 
-    when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+    when(orderRepository.findByIdAndIsDeletedFalse(order.getId())).thenReturn(Optional.of(order));
     doNothing().when(userReader).validateUserIdOrThrow(userId);
+    when(productFacade.findProductInfo(any()))
+            .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE,"ON_SALE"));
+
     // When
     //실행할 행동
     OrderResponseDto responseDto = orderService.readOneMyOrder(order.getId(), order.getUserId());
 
     // Then
     //검증 사항
-    verify(orderRepository).findById(responseDto.getOrderId());
+    verify(orderRepository).findByIdAndIsDeletedFalse(responseDto.getOrderId());
 
     assertThat(responseDto.getOrderNumber()).isEqualTo(responseDto.getOrderNumber());
 
@@ -190,10 +204,13 @@ void 참여자_주문_단건_조회() {
 void 자신이_주문하지않은_다른_주문은_조회가_불가능하다() {
     // Given
     //테스트 전제 조건 및 환경 설정
-    Long userId = 1L;
-    Order order = OrderFixtureGenerator.generateOrderFixture(userId);
+    Long ownerId= 2L; //주문자 ID
+    Long userId = 1L; //검색자 ID
+    Order order = OrderFixtureGenerator.generateOrderFixture(ownerId);
+    ReflectionTestUtils.setField(order,"id",1L);
 
-    when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+
+    when(orderRepository.findByIdAndIsDeletedFalse(1L)).thenReturn(Optional.of(order));
     doNothing().when(userReader).validateUserIdOrThrow(userId);
 
     // When
@@ -201,8 +218,8 @@ void 자신이_주문하지않은_다른_주문은_조회가_불가능하다() {
 
     // Then
     //검증 사항
-    assertThatThrownBy(() -> orderService.readOneMyOrder(order.getId(),userId))
-            .isInstanceOf(CustomException.class)
-            .hasMessageContaining(ErrorCode.NOT_YOUR_ORDER.getMessage());
+    assertThatThrownBy(() -> orderService.readOneMyOrder(1L,userId))
+            .isInstanceOf(OrderException.class)
+            .hasMessageContaining(OrderErrorCode.NOT_YOUR_ORDER.getMessage());
 }
 }
