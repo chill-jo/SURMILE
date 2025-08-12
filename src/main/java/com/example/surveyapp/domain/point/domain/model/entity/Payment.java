@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.point.domain.model.entity;
 
-
+import com.example.surveyapp.domain.point.domain.model.entity.vo.Money;
 import com.example.surveyapp.domain.point.domain.model.enums.Method;
 import com.example.surveyapp.domain.point.domain.model.enums.TargetType;
 import com.example.surveyapp.domain.point.domain.model.enums.PointStatus;
@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.util.UUID;
+
 @Getter
 @Entity
 @NoArgsConstructor
