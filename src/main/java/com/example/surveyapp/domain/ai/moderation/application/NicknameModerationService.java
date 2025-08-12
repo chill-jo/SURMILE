@@ -1,8 +1,8 @@
-package com.example.surveyapp.domain.ai.moderation.service;
+package com.example.surveyapp.domain.ai.moderation.application;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationRequestDto;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationResponseDto;
+import com.example.surveyapp.domain.ai.moderation.presentation.dto.NicknameModerationRequestDto;
+import com.example.surveyapp.domain.ai.moderation.presentation.dto.NicknameModerationResponseDto;
 import com.example.surveyapp.domain.ai.moderation.prompt.NicknameModerationPromptTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
