@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.admin.controller.dto;
+package com.example.surveyapp.domain.admin.presentation.dto;
 
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
