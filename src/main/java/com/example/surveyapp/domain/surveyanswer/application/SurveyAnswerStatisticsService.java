@@ -1,12 +1,10 @@
 package com.example.surveyapp.domain.surveyanswer.application;
 
-import com.example.surveyapp.domain.survey.application.SurveyQueryService;
-import com.example.surveyapp.domain.survey.domain.model.entity.Question;
-import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
+import com.example.surveyapp.domain.survey.application.dto.QuestionDto;
+import com.example.surveyapp.domain.surveyanswer.application.facade.SurveyFacade;
 import com.example.surveyapp.domain.surveyanswer.application.factory.SurveyAnswerStatisticsFactory;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyStatisticsDto;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyStatisticsQuestionDto;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyStatisticsDto;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyStatisticsQuestionDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,20 +15,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SurveyAnswerStatisticsService {
 
-    private final SurveyQueryService surveyQuestionQueryService;
-    private final SurveyQuestionService surveyQuestionService;
     private final SurveyAnswerStatisticsFactory surveyStatisticsFactory;
+    private final SurveyFacade surveyFacade;
 
     @Transactional
     public SurveyStatisticsDto getStatistics(Long surveyId){
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
 
-        SurveyStatisticsDto surveyStatisticsDto = surveyStatisticsFactory.toStatisticsDto(survey);
+        SurveyStatisticsDto surveyStatisticsDto = surveyStatisticsFactory.toStatisticsDto(surveyId);
 
-        List<Question> questionList = surveyQuestionService.getQuestionsSortedByNumber(survey);
-        List<SurveyStatisticsQuestionDto> questionDtoList = surveyStatisticsFactory.getQuestionsDtoList(questionList);
+        List<QuestionDto> questionDtoList = surveyFacade.getQuestionDtos(surveyId);
+        List<SurveyStatisticsQuestionDto> statisticsQuestionDtoList = surveyStatisticsFactory.getQuestionsDtoList(surveyId, questionDtoList);
 
-        surveyStatisticsDto.addQuestionDtoList(questionDtoList);
+        surveyStatisticsDto.addQuestionDtoList(statisticsQuestionDtoList);
 
         return surveyStatisticsDto;
     }
