@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.point.domain.model.entity;
+package com.example.surveyapp.domain.point.domain.model.entity.vo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

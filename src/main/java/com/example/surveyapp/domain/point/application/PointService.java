@@ -1,14 +1,16 @@
-package com.example.surveyapp.domain.point.service;
+package com.example.surveyapp.domain.point.application;
 
-import com.example.surveyapp.domain.point.controller.dto.request.PointChargeRequestDto;
-import com.example.surveyapp.domain.point.controller.dto.response.PointHistoryResponseDto;
+import com.example.surveyapp.domain.point.exception.PointErrorCode;
+import com.example.surveyapp.domain.point.exception.PointException;
+import com.example.surveyapp.domain.point.presentation.dto.request.PointChargeRequestDto;
+import com.example.surveyapp.domain.point.presentation.dto.response.PointHistoryResponseDto;
 import com.example.surveyapp.domain.point.domain.model.entity.*;
+import com.example.surveyapp.domain.point.domain.model.entity.vo.Money;
+import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
 import com.example.surveyapp.domain.point.domain.model.enums.*;
 import com.example.surveyapp.domain.point.domain.repository.PaymentRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointHistoryRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,15 +36,15 @@ public class PointService {
 
         Money amount = Money.krw(dto.getPrice());
 
-        PointPoints price = moneyToPointService.convert(amount);
+        PointBalance chargePoint = moneyToPointService.convert(amount);
 
-        Point point = getPoint(userId);
+        PointWallet pointWallet = getPoint(userId);
 
         //충전 전 금액
-        PointPoints currentBalance = point.getPoints();
+        PointBalance currentBalance = pointWallet.getPointBalance();
 
         //포인트 충전. (dirty checking)
-        point.pointCharge(price);
+        pointWallet.pointCharge(chargePoint);
 
         Payment payment = Payment.of(
                 amount,
@@ -54,74 +56,17 @@ public class PointService {
 
         PointHistory history = PointHistory.of(
                 currentBalance,
-                price,
-                point.getPoints(),
+                chargePoint,
+                pointWallet.getPointBalance(),
                 PointType.CHARGE,
                 Target.PAYMENTS,
                 payment.getId(),
                 "포인트 충전",
                 userId,
-                point
+                pointWallet
         );
 
         pointHistoryRepository.save(history);
-    }
-
-
-    // 설문 응답하는 경우 적립
-    @PreAuthorize("hasAnyRole('SURVEYEE')")
-    @Transactional
-    public void earn(Long userId, PointPoints amount, Long surveyAnswerId){
-
-        Point point = getPoint(userId);
-
-        //적립 전 포인트
-        PointPoints currentBalance = point.getPoints();
-
-        //포인트 적립 (dirty checking)
-        point.earn(amount);
-
-        //포인트 내역 기록
-        PointHistory history = PointHistory.of(
-                currentBalance,
-                amount,
-                point.getPoints(),
-                PointType.EARN,
-                Target.SURVEY,
-                surveyAnswerId,
-                "설문 응답 포인트 적립",
-                userId,
-                point
-        );
-
-        pointHistoryRepository.save(history);
-    }
-
-
-    @PreAuthorize("hasAnyRole('SURVEYOR')")
-    @Transactional
-    public void surveyorRedeem(Long userId, PointPoints amount, Long surveyId){
-
-        Point point = getPoint(userId);
-
-        PointPoints currentBalance = point.getPoints();
-
-        point.redeem(amount);
-
-        PointHistory history = PointHistory.of(
-                currentBalance,
-                amount,
-                point.getPoints(),
-                PointType.USAGE,
-                Target.SURVEY,
-                surveyId,
-                "설문 생성 포인트 차감",
-                userId,
-                point
-        );
-
-        pointHistoryRepository.save(history);
-
     }
 
     @Transactional(readOnly = true)
@@ -138,9 +83,9 @@ public class PointService {
      * @param userId
      * @return
      */
-    private Point getPoint(Long userId){
+    private PointWallet getPoint(Long userId){
         return pointRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POINT_NOT_FOUND));
+                .orElseThrow(() -> new PointException(PointErrorCode.POINT_NOT_FOUND));
     }
 
 }
