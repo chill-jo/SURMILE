@@ -4,17 +4,16 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.example.surveyapp.domain.survey.controller.dto.request.OptionCreateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.request.OptionUpdateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.OptionResponseDto;
+import com.example.surveyapp.domain.survey.domain.SurveyValidator;
+import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
+import com.example.surveyapp.domain.survey.presentation.dto.request.OptionCreateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.OptionUpdateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.OptionResponseDto;
 import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.survey.domain.repository.OptionsRepository;
-import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
-import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
-import com.example.surveyapp.domain.survey.facade.UserFacade;
-import com.example.surveyapp.domain.user.domain.model.User;
+import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
+import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,76 +25,56 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 @DisplayName("Service::Options")
 @ExtendWith(MockitoExtension.class)
-public class OptionsServiceTest {
+public class OptionsServiceTest{
 
     @Mock
-    private OptionsRepository optionsRepository;
+    private SurveyQueryService surveyQueryService;
 
     @Mock
-    private QuestionRepository questionRepository;
-
-    @Mock
-    private SurveyRepository surveyRepository;
-
-    @Mock
-    private UserFacade userFacade;
+    private UserReader userReader;
 
     @InjectMocks
     private OptionsService optionsService;
 
-    @Captor
-    ArgumentCaptor<Options> optionsCaptor;
-
     @Test
     @DisplayName("기능_선택지 생성을 성공한다")
     void 선택지를_생성한다(){
+        // given
         Long userId = 1L;
-        Long surveyId = 1L;
-        Long questionId = 1L;
-        Long number = 1L;
-        String content = "테스트선택지내용";
+        Long surveyId = 2L;
+        Long questionId = 3L;
 
-        User userMock = mock(User.class);
+        OptionCreateRequestDto requestDto = new OptionCreateRequestDto(10L, "테스트선택지내용");
+        SurveyValidator surveyValidator = mock(SurveyValidator.class);
+        SurveyQuestionService surveyQuestionService = mock(SurveyQuestionService.class);
+        ReflectionTestUtils.setField(optionsService, "surveyQuestionService", surveyQuestionService);
+        ReflectionTestUtils.setField(optionsService, "surveyValidator", surveyValidator);
+
         Survey surveyMock = mock(Survey.class);
         Question questionMock = mock(Question.class);
+        Options option = new Options(requestDto.getNumber(), requestDto.getContent());
+        ReflectionTestUtils.setField(option, "id", 1L);
 
-        OptionCreateRequestDto requestDto = new OptionCreateRequestDto(number, content);
-
-        when(userFacade.findUser(userId)).thenReturn(userMock);
-        when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(surveyMock));
-        when(questionRepository.findById(questionId)).thenReturn(Optional.of(questionMock));
-
-        when(questionMock.isSubjective()).thenReturn(false);
-
-        when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
-        when(surveyMock.isNotStarted()).thenReturn(true);
-        when(questionMock.isFromSurvey(surveyId)).thenReturn(true);
-
-        when(optionsRepository.save(any(Options.class))).thenAnswer(invocation -> {
-            Options o = invocation.getArgument(0);
-            ReflectionTestUtils.setField(o, "id", 1L);
-            return o;
-        });
-
-        //when
+        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
+        when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
+        doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
+        // when
         OptionResponseDto responseDto = optionsService.createOption(userId, surveyId, questionId, requestDto);
 
-        //then
+        // then
+        assertThat(responseDto).isNotNull();
+        assertThat(responseDto.getNumber()).isEqualTo(requestDto.getNumber());
+        assertThat(responseDto.getContent()).isEqualTo(requestDto.getContent());
 
-        verify(optionsRepository).save(optionsCaptor.capture());
-        Options savedOption = optionsCaptor.getValue();
-        assertThat(savedOption.getQuestionId()).isSameAs(questionId);
-        assertThat(responseDto.getNumber()).isEqualTo(number);
-        assertThat(responseDto.getContent()).isEqualTo(content);
-
-        verify(userFacade).findUser(userId);
-        verify(surveyRepository).findByIdAndIsDeletedFalse(surveyId);
-        verify(questionRepository).findById(questionId);
-        verify(questionMock).isSubjective();
+        verify(userReader).validateUserIdOrThrow(userId);
+        verify(surveyQueryService).findSurvey(surveyId);
+        verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
+        verify(surveyValidator).validateUpdatable(userId, surveyMock);
+        verify(questionMock).addOption(any(Options.class));
     }
 
     @Test
@@ -105,7 +84,11 @@ public class OptionsServiceTest {
         Long surveyId = 1L;
         Long questionId = 1L;
 
-        User userMock = mock(User.class);
+        SurveyValidator surveyValidator = mock(SurveyValidator.class);
+        SurveyQuestionService surveyQuestionService = mock(SurveyQuestionService.class);
+        ReflectionTestUtils.setField(optionsService, "surveyQuestionService", surveyQuestionService);
+        ReflectionTestUtils.setField(optionsService, "surveyValidator", surveyValidator);
+
         Survey surveyMock = mock(Survey.class);
         Question questionMock = mock(Question.class);
         Options optionMock1 = mock(Options.class);
@@ -113,16 +96,11 @@ public class OptionsServiceTest {
 
         List<Options> optionsMockList = List.of(optionMock1, optionMock2);
 
-        when(userFacade.findUser(userId)).thenReturn(userMock);
-
-        when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(surveyMock));
-        when(questionRepository.findById(questionId)).thenReturn(Optional.of(questionMock));
-
-        when(surveyMock.isInProgress()).thenReturn(false);
-        when(userMock.isUserRoleSurveyee()).thenReturn(false);
-        when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
-
-        when(optionsRepository.findAllByQuestionId(questionId)).thenReturn(optionsMockList);
+        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
+        when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
+        when(userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE)).thenReturn(true);
+        when(questionMock.getOptions()).thenReturn(optionsMockList);
 
         when(optionMock1.getId()).thenReturn(1L);
         when(optionMock1.getNumber()).thenReturn(1L);
@@ -136,13 +114,12 @@ public class OptionsServiceTest {
         List<OptionResponseDto> responseDtoList = optionsService.getOptions(userId, surveyId, questionId);
 
         //then
-        verify(userFacade).findUser(userId);
-        verify(surveyRepository).findByIdAndIsDeletedFalse(surveyId);
-        verify(questionRepository).findById(questionId);
-        verify(surveyMock).isInProgress();
-        verify(userMock).isUserRoleSurveyee();
-        verify(surveyMock).isUserSurveyCreator(userMock);
-        verify(optionsRepository).findAllByQuestionId(questionId);
+        verify(userReader).validateUserIdOrThrow(userId);
+        verify(surveyQueryService).findSurvey(surveyId);
+        verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
+        verify(userReader).validateUserRole(userId, UserRoleEnum.SURVEYEE);
+        verify(surveyValidator).validateQuestionAccess(userId, surveyMock, true);
+        verify(questionMock).getOptions();
 
         assertThat(responseDtoList.size()).isEqualTo(2);
         assertThat(responseDtoList.get(0).getId()).isEqualTo(1L);
@@ -163,24 +140,19 @@ public class OptionsServiceTest {
         String content = "테스트질문지내용수정";
 
         OptionUpdateRequestDto requestDto = new OptionUpdateRequestDto(number, content);
+        SurveyValidator surveyValidator = mock(SurveyValidator.class);
+        SurveyQuestionService surveyQuestionService = mock(SurveyQuestionService.class);
+        ReflectionTestUtils.setField(optionsService, "surveyQuestionService", surveyQuestionService);
+        ReflectionTestUtils.setField(optionsService, "surveyValidator", surveyValidator);
 
-        User userMock = mock(User.class);
         Survey surveyMock = mock(Survey.class);
         Question questionMock = mock(Question.class);
         Options optionMock = mock(Options.class);
 
-        when(userFacade.findUser(userId)).thenReturn(userMock);
-        when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(surveyMock));
-        when(questionRepository.findById(questionId)).thenReturn(Optional.of(questionMock));
-        when(optionsRepository.findById(optionId)).thenReturn(Optional.of(optionMock));
-
-        when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
-        when(surveyMock.isNotStarted()).thenReturn(true);
-        when(questionMock.isFromSurvey(surveyId)).thenReturn(true);
-        when(optionMock.isFromQuestion(questionId)).thenReturn(true);
-
-        doNothing().when(optionMock).changeNumber(number);
-        doNothing().when(optionMock).changeContent(content);
+        when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
+        when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
+        doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
+        when(questionMock.updateOption(optionId, requestDto.getNumber(), requestDto.getContent())).thenReturn(optionMock);
 
         when(optionMock.getId()).thenReturn(optionId);
         when(optionMock.getNumber()).thenReturn(number);
@@ -191,19 +163,17 @@ public class OptionsServiceTest {
 
         //then
         assertThat(responseDto.getId()).isEqualTo(optionId);
-        assertThat(responseDto.getNumber()).isEqualTo(number);
-        assertThat(responseDto.getContent()).isEqualTo(content);
+        assertThat(responseDto.getNumber()).isEqualTo(requestDto.getNumber());
+        assertThat(responseDto.getContent()).isEqualTo(requestDto.getContent());
 
-        verify(userFacade).findUser(userId);
-        verify(surveyRepository).findByIdAndIsDeletedFalse(surveyId);
-        verify(questionRepository).findById(questionId);
-        verify(optionsRepository).findById(optionId);
-        verify(surveyMock).isUserSurveyCreator(userMock);
-        verify(surveyMock).isNotStarted();
-        verify(questionMock).isFromSurvey(surveyId);
-        verify(optionMock).isFromQuestion(questionId);
-        verify(optionMock).changeNumber(number);
-        verify(optionMock).changeContent(content);
+        verify(userReader).validateUserIdOrThrow(userId);
+        verify(surveyQueryService).findSurvey(surveyId);
+        verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
+        verify(surveyValidator).validateUpdatable(userId, surveyMock);
+        verify(questionMock).updateOption(optionId, requestDto.getNumber(), requestDto.getContent());
+        verify(optionMock).getId();
+        verify(optionMock).getNumber();
+        verify(optionMock).getContent();
     }
 
     @Test
@@ -213,35 +183,26 @@ public class OptionsServiceTest {
         Long surveyId = 1L;
         Long questionId = 1L;
         Long optionId = 1L;
+        SurveyValidator surveyValidator = mock(SurveyValidator.class);
+        SurveyQuestionService surveyQuestionService = mock(SurveyQuestionService.class);
+        ReflectionTestUtils.setField(optionsService, "surveyQuestionService", surveyQuestionService);
+        ReflectionTestUtils.setField(optionsService, "surveyValidator", surveyValidator);
 
-        User userMock = mock(User.class);
         Survey surveyMock = mock(Survey.class);
         Question questionMock = mock(Question.class);
-        Options optionMock = mock(Options.class);
 
-        when(userFacade.findUser(userId)).thenReturn(userMock);
-        when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(surveyMock));
-        when(questionRepository.findById(questionId)).thenReturn(Optional.of(questionMock));
-        when(optionsRepository.findById(optionId)).thenReturn(Optional.of(optionMock));
+        when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
+        when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
 
-        when(surveyMock.isUserSurveyCreator(userMock)).thenReturn(true);
-        when(surveyMock.isNotStarted()).thenReturn(true);
-        when(questionMock.isFromSurvey(surveyId)).thenReturn(true);
-        when(optionMock.isFromQuestion(questionId)).thenReturn(true);
-
-        doNothing().when(optionsRepository).delete(optionMock);
-
-        //when
+        // when
         optionsService.deleteOption(userId, surveyId, questionId, optionId);
 
-        //then
-        verify(userFacade).findUser(userId);
-        verify(surveyRepository).findByIdAndIsDeletedFalse(surveyId);
-        verify(questionRepository).findById(questionId);
-        verify(optionsRepository).findById(optionId);
-        verify(surveyMock).isUserSurveyCreator(userMock);
-        verify(surveyMock).isNotStarted();
-        verify(questionMock).isFromSurvey(surveyId);
-        verify(optionsRepository).delete(optionMock);
+        // then
+        verify(userReader).validateUserIdOrThrow(userId);
+        verify(surveyQueryService).findSurvey(surveyId);
+        verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
+        verify(surveyValidator).validateDeletable(userId, surveyMock);
+        verify(questionMock).deleteOptionById(optionId);
     }
 }
+
