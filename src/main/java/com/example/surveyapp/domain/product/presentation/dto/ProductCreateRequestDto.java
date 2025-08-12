@@ -1,27 +1,25 @@
-package com.example.surveyapp.domain.product.controller.dto;
+package com.example.surveyapp.domain.product.presentation.dto;
 
 import com.example.surveyapp.domain.product.domain.model.Status;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class ProductCreateRequestDto {
 
     @NotNull
     @Size(max = 30)
-    private String title;
+    private final String title;
 
     @NotNull
-    private String content;
+    private final String content;
 
     @NotNull
-    private Long price;
+    private final Long price;
 
     @NotNull
-    private Status status;
+    private final Status status;
 }

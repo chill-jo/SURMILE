@@ -1,19 +1,18 @@
-package com.example.surveyapp.domain.product.service;
+package com.example.surveyapp.domain.product.application;
 
-import com.example.surveyapp.domain.product.controller.dto.ProductCreateRequestDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductCreateResponseDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductResponseDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductUpdateRequestDto;
+import com.example.surveyapp.domain.product.exception.ProductErrorCode;
+import com.example.surveyapp.domain.product.exception.ProductException;
+import com.example.surveyapp.domain.product.presentation.dto.ProductCreateRequestDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductCreateResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductUpdateRequestDto;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.ProductPoints;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
-import com.example.surveyapp.domain.product.service.dto.ProductUpdateResponseDto;
-import com.example.surveyapp.domain.user.domain.model.User;
+import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
-import com.example.surveyapp.domain.user.domain.repository.UserRepository;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
+import com.example.surveyapp.global.reader.UserReader;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,7 +29,7 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final UserRepository userRepository;
+    private final UserReader userReader;
 
     /**
      * @param requestDto         생성 요청 DTO
@@ -40,19 +39,15 @@ public class ProductService {
      */
     @Transactional
     public ProductCreateResponseDto createProduct(ProductCreateRequestDto requestDto, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
-        if (user.getUserRole() != UserRoleEnum.ADMIN) {
-            throw new CustomException(ErrorCode.NOT_ADMIN_USER_ERROR);
-        }
+        userReader.validateUserIdOrThrow(userId);
+        userReader.validateUserRole(userId,UserRoleEnum.ADMIN);
 
         if (productRepository.existsByTitleAndIsDeletedFalse(requestDto.getTitle())){
-            throw new CustomException(ErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE);
+            throw new ProductException(ProductErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE);
         }
 
-        Product product = Product.create(requestDto.getTitle(),
-                ProductPoints.create(requestDto.getPrice()),
+        Product product = Product.of(requestDto.getTitle(),
+                ProductPoints.of(requestDto.getPrice()),
                 requestDto.getContent(),
                 requestDto.getStatus());
 
@@ -80,34 +75,35 @@ public class ProductService {
                 .toList();
     }
 
-
     public ProductResponseDto readOneProduct(Long id) {
 
         Product product= productRepository.findByIdAndStatusAndIsDeletedFalse(id,Status.ON_SALE)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PRODUCT));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
         return ProductResponseDto.from(product);
     }
 
     @Transactional
     public ProductUpdateResponseDto updateProduct(Long id, ProductUpdateRequestDto requestDto) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PRODUCT));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
 
         if (!product.getTitle().equals(requestDto.getTitle())) {
             boolean onlyOne = productRepository.existsByTitleAndIsDeletedFalse(requestDto.getTitle());
             if (onlyOne){
-                throw new CustomException(ErrorCode.NOT_SAME_PRODUCT_TITLE);
+                throw new ProductException(ProductErrorCode.NOT_SAME_PRODUCT_TITLE);
             }
 
             if (requestDto.getStatus() == null) {
-                throw new CustomException(ErrorCode.NOT_FOUND_PRODUCT_STATUS);
+                throw new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_STATUS);
             }
         }
          product.update(
                 requestDto.getTitle(),
-                ProductPoints.create(requestDto.getPrice()),
+                ProductPoints.of(requestDto.getPrice()),
                 requestDto.getContent(),
                 requestDto.getStatus());
+
+        product.changeStatus(requestDto.getStatus());
 
         return new ProductUpdateResponseDto(
                 product.getId(),
@@ -121,14 +117,10 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long id, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
-        if (user.getUserRole() != UserRoleEnum.ADMIN) {
-            throw new CustomException(ErrorCode.NOT_ADMIN_USER_ERROR);
-        }
+        userReader.validateUserIdOrThrow(userId);
+        userReader.validateUserRole(userId,UserRoleEnum.ADMIN);
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PRODUCT));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
 
         product.delete();
     }

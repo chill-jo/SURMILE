@@ -1,11 +1,11 @@
-package com.example.surveyapp.domain.product.infra;
+package com.example.surveyapp.domain.product.infrastructure;
 
-import com.example.surveyapp.domain.order.facade.ProductFacade;
-import com.example.surveyapp.domain.product.controller.dto.ProductInfoDto;
+import com.example.surveyapp.domain.order.application.facade.ProductFacade;
+import com.example.surveyapp.domain.product.exception.ProductErrorCode;
+import com.example.surveyapp.domain.product.exception.ProductException;
+import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public class ProductFacadeImpl implements ProductFacade {
     @Override
     public ProductInfoDto findProductInfo(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PRODUCT));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
 
         return new ProductInfoDto(
                 product.getTitle(),

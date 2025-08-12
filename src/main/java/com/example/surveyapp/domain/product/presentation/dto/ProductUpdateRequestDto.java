@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.product.controller.dto;
+package com.example.surveyapp.domain.product.presentation.dto;
 
 import com.example.surveyapp.domain.product.domain.model.Status;
 import lombok.AllArgsConstructor;
@@ -8,11 +8,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ProductUpdateRequestDto {
 
-    private String title;
+    private final String title;
 
-    private Long price;
+    private final Long price;
 
-    private String content;
+    private final String content;
 
-    private Status status;
+    private final Status status;
 }

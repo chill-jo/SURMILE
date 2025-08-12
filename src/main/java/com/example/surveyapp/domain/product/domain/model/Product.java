@@ -1,8 +1,8 @@
 package com.example.surveyapp.domain.product.domain.model;
 
+import com.example.surveyapp.domain.product.exception.ProductErrorCode;
+import com.example.surveyapp.domain.product.exception.ProductException;
 import com.example.surveyapp.global.config.entity.BaseEntity;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,7 +40,10 @@ public class Product extends BaseEntity {
         this.status = status;
     }
 
-    public static Product create(String title, ProductPoints price, String content, Status status) {
+    public static Product of(String title,
+                             ProductPoints price,
+                             String content,
+                             Status status) {
         return Product.builder()
                 .title(title)
                 .price(price)
@@ -50,11 +53,11 @@ public class Product extends BaseEntity {
     }
 
     /**
-     *
+     * 상태 전환
      * @param newStatus
      */
     public void changeStatus(Status newStatus) {
-        if (this.status == newStatus) return;
+        if (status == null || this.status == newStatus) return;
 
         if (this.status == Status.STOPPED_SALE && newStatus == Status.ON_SALE){
            productPriceZeroOrThrow();
@@ -65,7 +68,7 @@ public class Product extends BaseEntity {
     public void delete() {
 
         if (this.status == Status.ON_SALE) {
-            throw new CustomException(ErrorCode.NOT_DELETE_ON_SALE_PRODUCT);
+            throw new ProductException(ProductErrorCode.NOT_DELETE_ON_SALE_PRODUCT);
         }
 
         this.isDeleted = true;
@@ -80,7 +83,7 @@ public class Product extends BaseEntity {
 
     public void productPriceZeroOrThrow(){
         if (price.isZero()) {
-            throw new CustomException(ErrorCode.NOT_PRODUCT_PRICE_ZERO);
+            throw new ProductException(ProductErrorCode.NOT_PRODUCT_PRICE_ZERO);
         }
     }
 

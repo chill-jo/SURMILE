@@ -1,20 +1,19 @@
-package com.example.surveyapp.domain.product.service;
+package com.example.surveyapp.domain.product.application;
 
 import com.example.surveyapp.config.generator.ProductFixtureGenerator;
-import com.example.surveyapp.domain.product.controller.dto.ProductCreateRequestDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductCreateResponseDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductResponseDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductUpdateRequestDto;
+import com.example.surveyapp.domain.product.exception.ProductErrorCode;
+import com.example.surveyapp.domain.product.exception.ProductException;
+import com.example.surveyapp.domain.product.presentation.dto.ProductCreateRequestDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductCreateResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductUpdateRequestDto;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
-import com.example.surveyapp.domain.product.service.dto.ProductUpdateResponseDto;
-import com.example.surveyapp.domain.user.domain.model.User;
+import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
-import com.example.surveyapp.domain.user.domain.repository.UserRepository;
 import com.example.surveyapp.global.reader.UserReader;
 import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,12 +48,12 @@ class ProductServiceTest {
     private ProductService productService;
 
     @Test
-    @DisplayName("기능_테스트_상품 생성을 관리자가 정상적으로 한다.")
+    @DisplayName("기능_테스트_관리자가 상품 생성을 정상적으로 한다.")
     void 상품_생성() {
         // Given
         //테스트 전제 조건 및 환경 설정
-
         Product product = ProductFixtureGenerator.generateProductFixture();
+        ReflectionTestUtils.setField(product,"id",1L);
         Long userId = 1L;
 
         ProductCreateRequestDto requestDto = new ProductCreateRequestDto(product.getTitle(),
@@ -63,7 +62,7 @@ class ProductServiceTest {
                 product.getStatus());
 
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        doNothing().when(userReader).validateUserRole(userId,UserRoleEnum.ADMIN);
+        when(userReader.validateUserRole(userId,UserRoleEnum.ADMIN)).thenReturn(true);
         when(productRepository.save(any(Product.class))).thenReturn(product);
         // When
         //실행할 행동
@@ -71,9 +70,10 @@ class ProductServiceTest {
 
         // Then
         //검증 사항
+        verify(userReader, times((1))).validateUserRole(userId,UserRoleEnum.ADMIN);
         verify(productRepository,times(1)).save(any(Product.class));
         assertEquals(product.getTitle(), productCreateResponseDto.getTitle());
-        assertEquals(product.getPrice(),productCreateResponseDto.getPrice());
+        assertEquals(product.getPrice().getValue(),productCreateResponseDto.getPrice());
         assertEquals(product.getStatus(),productCreateResponseDto.getStatus());
 
     }
@@ -93,7 +93,7 @@ class ProductServiceTest {
         //실행할 행동
 
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        doThrow(new CustomException(ErrorCode.NOT_ADMIN_USER_ERROR))
+        doThrow(new CustomException(ProductErrorCode.NOT_ADMIN_USER_ERROR))
                 .when(userReader)
                 .validateUserRole(userId,UserRoleEnum.ADMIN);
 
@@ -101,7 +101,7 @@ class ProductServiceTest {
         //검증 사항
         assertThatThrownBy(() -> productService.createProduct(requestDto, userId))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining(ErrorCode.NOT_ADMIN_USER_ERROR.getMessage());
+                .hasMessageContaining(ProductErrorCode.NOT_ADMIN_USER_ERROR.getMessage());
     }
 
     @Test
@@ -118,7 +118,7 @@ class ProductServiceTest {
                 product.getStatus());
         // When
         //실행할 행동
-        doThrow(new CustomException(ErrorCode.NOT_ADMIN_USER_ERROR))
+        doThrow(new CustomException(ProductErrorCode.NOT_ADMIN_USER_ERROR))
                 .when(userReader)
                 .validateUserRole(userId,UserRoleEnum.ADMIN);
         doNothing().when(userReader).validateUserIdOrThrow(userId);
@@ -126,7 +126,7 @@ class ProductServiceTest {
         //검증 사항
         assertThatThrownBy(() -> productService.createProduct(requestDto, userId))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining(ErrorCode.NOT_ADMIN_USER_ERROR.getMessage());
+                .hasMessageContaining(ProductErrorCode.NOT_ADMIN_USER_ERROR.getMessage());
     }
 
     @Test
@@ -145,14 +145,14 @@ class ProductServiceTest {
         // When
         //실행할 행동
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        doNothing().when(userReader).validateUserRole(userId,UserRoleEnum.ADMIN);
+        when(userReader.validateUserRole(userId,UserRoleEnum.ADMIN)).thenReturn(true);
         when(productRepository.existsByTitleAndIsDeletedFalse(product.getTitle())).thenReturn(true);
 
         // Then
         //검증 사항
         assertThatThrownBy(() -> productService.createProduct(requestDto,userId))
-                .isInstanceOf(CustomException.class)
-                .hasMessageContaining(ErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE.getMessage());
+                .isInstanceOf(ProductException.class)
+                .hasMessageContaining(ProductErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE.getMessage());
 
     }
 
@@ -235,8 +235,12 @@ class ProductServiceTest {
         //테스트 전제 조건 및 환경 설정
         Long userId = 1L;
         Product product = ProductFixtureGenerator.generateProductFixture();
-
+        ReflectionTestUtils.setField(product,"id",1L);
+        ReflectionTestUtils.setField(product,"status",Status.STOPPED_SALE);
         when(productRepository.findByIdAndIsDeletedFalse(product.getId())).thenReturn(Optional.of(product));
+        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        when(userReader.validateUserRole(userId,UserRoleEnum.ADMIN)).thenReturn(true);
+
 
         // When
         //실행할 행동

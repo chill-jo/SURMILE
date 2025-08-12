@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.product.service.dto;
+package com.example.surveyapp.domain.product.application.dto;
 
 import com.example.surveyapp.domain.product.domain.model.Status;
 import lombok.Getter;
@@ -6,15 +6,15 @@ import lombok.Getter;
 @Getter
 public class ProductUpdateResponseDto {
 
-    private Long id;
+    private final Long id;
 
-    private String title;
+    private final String title;
 
-    private String content;
+    private final String content;
 
-    private Long price;
+    private final Long price;
 
-    private Status status;
+    private final Status status;
 
     public ProductUpdateResponseDto(Long id, String title, String content, Long price, Status status) {
         this.id = id;

@@ -1,15 +1,15 @@
-package com.example.surveyapp.domain.product.controller;
+package com.example.surveyapp.domain.product.presentation;
 
 import com.example.surveyapp.config.generator.ProductFixtureGenerator;
 import com.example.surveyapp.config.custommockuser.WithCustomMockUser;
-import com.example.surveyapp.domain.product.controller.dto.ProductCreateRequestDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductCreateResponseDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductResponseDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductUpdateRequestDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductCreateRequestDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductCreateResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductUpdateRequestDto;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
-import com.example.surveyapp.domain.product.service.ProductService;
-import com.example.surveyapp.domain.product.service.dto.ProductUpdateResponseDto;
+import com.example.surveyapp.domain.product.application.ProductService;
+import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.filter.JwtFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,8 +20,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.http.MediaType;
@@ -30,6 +32,9 @@ import org.springframework.http.MediaType;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -153,6 +158,7 @@ class ProductControllerTest {
         // Given
         //테스트 전제 조건 및 환경 설정
         Product product = ProductFixtureGenerator.generateProductFixture();
+        ReflectionTestUtils.setField(product,"id",1L);
         ProductResponseDto productResponseDto = new ProductResponseDto(product.getId(), product.getTitle(), product.getPrice().getValue(), product.getStatus());
         when(productService.readOneProduct(product.getId())).thenReturn(productResponseDto);
 
@@ -161,6 +167,26 @@ class ProductControllerTest {
         ResultActions actions = mockMvc.perform(get("/api/products/{id}",product.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productResponseDto)));
+//                .andDo(document("GET-200-상품-단건-조회-API",
+////                        requestHeaders(
+////                                headerWithName("Authorization")
+////                                        .description("JWT 인증 토큰 (Bearer + 토큰값)")
+////                                        .attributes(key("format").value("Bearer {jwt_token}")),
+////                                headerWithName("Accept").description("응답 데이터 타입")
+////                        ),
+////                        responseHeaders(
+////                                headerWithName(LOCATION).description("생성된 주문 위치")
+////                        ),
+//                        responseFields(
+//                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
+//                                fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
+//                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("주문 ID"),
+//                                fieldWithPath("data.orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
+//                                fieldWithPath("data.title").type(JsonFieldType.STRING).description("주문 상품 제목"),
+//                                fieldWithPath("data.status").type(JsonFieldType.STRING).description("주문 상품 상태"),
+//                                fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+//                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("주문 생성일"))));
+
 
         // Then
         //검증 사항

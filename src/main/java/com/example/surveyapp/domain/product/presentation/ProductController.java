@@ -1,11 +1,11 @@
-package com.example.surveyapp.domain.product.controller;
+package com.example.surveyapp.domain.product.presentation;
 
-import com.example.surveyapp.domain.product.controller.dto.ProductCreateRequestDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductCreateResponseDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductResponseDto;
-import com.example.surveyapp.domain.product.controller.dto.ProductUpdateRequestDto;
-import com.example.surveyapp.domain.product.service.ProductService;
-import com.example.surveyapp.domain.product.service.dto.ProductUpdateResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductCreateRequestDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductCreateResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductResponseDto;
+import com.example.surveyapp.domain.product.presentation.dto.ProductUpdateRequestDto;
+import com.example.surveyapp.domain.product.application.ProductService;
+import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
 import com.example.surveyapp.global.response.ApiResponse;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -27,8 +27,9 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ApiResponse<ProductCreateResponseDto>> create(@Valid @RequestBody ProductCreateRequestDto dto,
-                                                                        @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ApiResponse<ProductCreateResponseDto>> create(
+            @Valid @RequestBody ProductCreateRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getId();
         ProductCreateResponseDto product =  productService.createProduct(dto,userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("상품이 생성되었습니다.",product));
@@ -68,9 +69,9 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProductUpdateResponseDto>> update(@PathVariable Long id,
-                                                                        @RequestBody ProductUpdateRequestDto requestDto
-                                                                       ){
+    public ResponseEntity<ApiResponse<ProductUpdateResponseDto>> update(
+            @PathVariable Long id,
+            @RequestBody ProductUpdateRequestDto requestDto){
         ProductUpdateResponseDto responseDto = productService.updateProduct(id, requestDto);
         return ResponseEntity.status(HttpStatus.OK)
                .body(ApiResponse.success("상품이 수정 되었습니다.",responseDto));
@@ -81,8 +82,9 @@ public class ProductController {
      */
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id,
-                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         Long userId = userDetails.getId();
         productService.deleteProduct(id,userId);
         return ResponseEntity.status(HttpStatus.OK)

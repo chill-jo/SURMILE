@@ -1,23 +1,21 @@
-package com.example.surveyapp.domain.product.controller.dto;
+package com.example.surveyapp.domain.product.presentation.dto;
 
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class ProductCreateResponseDto {
 
-    private Long id;
+    private final Long id;
 
-    private String title;
+    private final String title;
 
-    private Long price;
+    private final Long price;
 
-    private Status status;
+    private final Status status;
 
     public ProductCreateResponseDto(Product product) {
         this.id =product.getId();
@@ -25,7 +23,6 @@ public class ProductCreateResponseDto {
         this.price = product.getPrice().getValue();
         this.status = product.getStatus();
     }
-
 
     public static ProductCreateResponseDto from(Product product) {
         return new ProductCreateResponseDto(product);
