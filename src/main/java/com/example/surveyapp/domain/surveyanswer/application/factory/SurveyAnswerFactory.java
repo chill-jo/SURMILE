@@ -1,8 +1,8 @@
 package com.example.surveyapp.domain.surveyanswer.application.factory;
 
 import com.example.surveyapp.domain.survey.application.SurveyQueryService;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyeeSurveyDto;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyeeSurveyListDto;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyeeSurveyDto;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyeeSurveyListDto;
 import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

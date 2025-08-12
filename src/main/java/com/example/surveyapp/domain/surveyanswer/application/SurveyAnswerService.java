@@ -1,15 +1,12 @@
 package com.example.surveyapp.domain.surveyanswer.application;
 
-import com.example.surveyapp.domain.survey.application.SurveyQueryService;
-import com.example.surveyapp.domain.survey.domain.SurveyValidator;
-import com.example.surveyapp.domain.survey.domain.model.entity.Question;
-import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
-import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
+import com.example.surveyapp.domain.survey.application.dto.QuestionIdAndTypeDto;
+import com.example.surveyapp.domain.surveyanswer.application.facade.SurveyFacade;
 import com.example.surveyapp.domain.surveyanswer.application.factory.SurveyAnswerFactory;
-import com.example.surveyapp.domain.surveyanswer.event.SurveyAnswerEvent;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.request.SurveyAnswerRequestDto;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyeeSurveyListDto;
+import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyAnswerEvent;
+import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyDoneEvent;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.request.SurveyAnswerRequestDto;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyeeSurveyListDto;
 import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
 import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.surveyanswer.domain.strategy.SurveyQuestionStrategy;
@@ -26,46 +23,46 @@ import java.util.List;
 public class SurveyAnswerService {
 
     private final UserReader userReader;
-    private final SurveyQueryService surveyQuestionQueryService;
-    private final SurveyValidator surveyValidator;
+    private final SurveyFacade surveyFacade;
     private final ApplicationEventPublisher eventPublisher;
     private final List<SurveyQuestionStrategy> surveyQuestionStrategies;
     private final SurveyAnswerFactory surveyAnswerFactory;
     private final SurveyAnswerRepository surveyAnswerRepository;
-    private final SurveyQuestionService surveyQuestionService;
+    private final SurveyAnswerQueryService surveyAnswerQueryService;
 
     @Transactional
     public void saveSurveyAnswer(Long surveyId, SurveyAnswerRequestDto requestDto, Long userId) {
 
         userReader.validateUserIdOrThrow(userId);
 
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
-        surveyValidator.validateStartable(survey);
-        surveyValidator.validateNotParticipated(userId, surveyId);
+        surveyFacade.validateSurveyStartable(surveyId);
+        surveyAnswerQueryService.validateParticipated(userId, surveyId);
 
         SurveyAnswer surveyAnswer = surveyAnswerRepository.save(SurveyAnswer.of(surveyId, userId));
 
-        saveAnswerWithStrategy(requestDto, survey, surveyAnswer);
+        saveAnswerWithStrategy(requestDto, surveyId, surveyAnswer);
 
-        eventPublisher.publishEvent(new SurveyAnswerEvent(userId, survey, surveyAnswer.getId()));
+        eventPublisher.publishEvent(new SurveyAnswerEvent(
+                userId,
+                surveyFacade.getPointPerPersonBySurveyId(surveyId),
+                surveyAnswer.getId()
+        ));
 
-        /// ////이부분을 이벤트로 처리할수는 없나?
-        if (surveyAnswerRepository.countBySurveyId(surveyId) >= survey.getSurveyInfo().getMaxSurveyee()) {
-            survey.changeSurveyStatus(SurveyStatus.DONE);
+        if (surveyAnswerRepository.countBySurveyId(surveyId) >= surveyFacade.getSurveyInfo(surveyId).getMaxSurveyee()) {
+            eventPublisher.publishEvent(new SurveyDoneEvent(surveyId));
         }
-        /// ////
     }
 
-    public void saveAnswerWithStrategy(SurveyAnswerRequestDto requestDto, Survey survey, SurveyAnswer surveyAnswer){
+    public void saveAnswerWithStrategy(SurveyAnswerRequestDto requestDto, Long surveyId, SurveyAnswer surveyAnswer){
         requestDto.getAnswers().forEach(questionAnswer -> {
-            Question question = surveyQuestionService.getQuestionByNumber(survey, questionAnswer.getNumber());
+            QuestionIdAndTypeDto questionDto = surveyFacade.getQuestionIdAndTypeByNumber(surveyId, questionAnswer.getNumber());
 
             // TODO 질문 타입에 따라 각 질문 응답을 처리할 수 있는 전략을 별도로 구성해서 처리하면 어떨까
             surveyQuestionStrategies.stream()
-                    .filter(it -> it.isSupport(question.getType()))
+                    .filter(it -> it.isSupport(questionDto.getQuestionType()))
                     .findFirst()
                     .orElseThrow()
-                    .doSave(questionAnswer, surveyAnswer, question.getId());
+                    .doSave(questionAnswer, surveyAnswer, questionDto.getQuestionId());
         });
     }
 

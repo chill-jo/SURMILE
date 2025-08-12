@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.surveyanswer.controller.dto.response;
+package com.example.surveyapp.domain.surveyanswer.presentation.dto.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

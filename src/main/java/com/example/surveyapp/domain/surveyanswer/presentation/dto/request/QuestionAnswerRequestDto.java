@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.surveyanswer.controller.dto.request;
+package com.example.surveyapp.domain.surveyanswer.presentation.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -9,9 +9,9 @@ import lombok.Getter;
 public class QuestionAnswerRequestDto {
 
     @NotBlank(message = "번호는 필수입니다.")
-    private Long number;
+    private final Long number;
 
     @NotBlank(message = "응답은 필수입니다.")
-    private Object answer;
+    private final Object answer;
 
 }

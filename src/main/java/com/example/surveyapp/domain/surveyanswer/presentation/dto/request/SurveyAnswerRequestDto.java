@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.surveyanswer.controller.dto.request;
+package com.example.surveyapp.domain.surveyanswer.presentation.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,6 @@ import java.util.List;
 @AllArgsConstructor
 public class SurveyAnswerRequestDto {
 
-    private List<QuestionAnswerRequestDto> answers;
+    private final List<QuestionAnswerRequestDto> answers;
 
 }

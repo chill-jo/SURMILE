@@ -1,6 +1,5 @@
 package com.example.surveyapp.domain.surveyanswer.domain.model;
 
-import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

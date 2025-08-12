@@ -1,10 +1,7 @@
-package com.example.surveyapp.domain.surveyanswer.controller.dto.response;
+package com.example.surveyapp.domain.surveyanswer.presentation.dto.response;
 
-import com.example.surveyapp.domain.survey.controller.dto.response.SurveyQuestionDto;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.List;

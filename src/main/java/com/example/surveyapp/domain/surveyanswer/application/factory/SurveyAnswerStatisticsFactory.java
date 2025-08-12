@@ -1,11 +1,12 @@
 package com.example.surveyapp.domain.surveyanswer.application.factory;
 
-import com.example.surveyapp.domain.survey.domain.model.entity.Options;
-import com.example.surveyapp.domain.survey.domain.model.entity.Question;
-import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyStatisticsDto;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyStatisticsOptionsDto;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyStatisticsQuestionDto;
+import com.example.surveyapp.domain.survey.application.dto.OptionDto;
+import com.example.surveyapp.domain.survey.application.dto.QuestionDto;
+import com.example.surveyapp.domain.survey.application.dto.SurveyInfoDto;
+import com.example.surveyapp.domain.surveyanswer.application.facade.SurveyFacade;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyStatisticsDto;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyStatisticsOptionsDto;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyStatisticsQuestionDto;
 import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyOptionsAnswerRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,53 +21,57 @@ public class SurveyAnswerStatisticsFactory {
 
     private final SurveyAnswerRepository surveyAnswerRepository;
     private final SurveyOptionsAnswerRepository surveyOptionsAnswerRepository;
+    private final SurveyFacade surveyFacade;
 
-    public SurveyStatisticsDto toStatisticsDto(Survey survey){
+    public SurveyStatisticsDto toStatisticsDto(Long surveyId){
+        SurveyInfoDto infoDto = surveyFacade.getSurveyInfo(surveyId);
+
         return SurveyStatisticsDto.of(
-                survey.getId(),
-                survey.getSurveyInfo().getTitle(),
-                survey.getSurveyInfo().getDescription(),
-                survey.getSurveyInfo().getMaxSurveyee(),
-                survey.getSurveyInfo().getPointPerPerson().getValue(),
-                survey.getSurveyInfo().getTotalPoint().getValue(),
-                survey.getSurveyInfo().getDeadline(),
-                survey.getSurveyInfo().getExpectedTime(),
-                surveyAnswerRepository.countBySurveyId(survey.getId())
+                surveyId,
+                infoDto.getTitle(),
+                infoDto.getDescription(),
+                infoDto.getMaxSurveyee(),
+                infoDto.getPointPerPerson(),
+                infoDto.getTotalPoint(),
+                infoDto.getDeadline(),
+                infoDto.getExpectedTime(),
+                surveyAnswerRepository.countBySurveyId(surveyId)
         );
     }
 
-    public List<SurveyStatisticsQuestionDto> getQuestionsDtoList(List<Question> questionList){
-        List<SurveyStatisticsQuestionDto> questionDtoList = new ArrayList<>();
+    public List<SurveyStatisticsQuestionDto> getQuestionsDtoList(Long surveyId, List<QuestionDto> questionDtoList){
+        List<SurveyStatisticsQuestionDto> statisticsQuestionDtoList = new ArrayList<>();
 
-        questionList.forEach(question -> {
+        questionDtoList.forEach(questionDto -> {
             SurveyStatisticsQuestionDto statisticsQuestionDto =
                     SurveyStatisticsQuestionDto.of(
-                            question.getId(),
-                            question.getNumber(),
-                            question.getContent()
+                            questionDto.getQuestionId(),
+                            questionDto.getNumber(),
+                            questionDto.getContent()
                     );
 
-            statisticsQuestionDto.addOptionsDtoList(getOptionsDtoList(question));
+            statisticsQuestionDto.addOptionsDtoList(getOptionsDtoList(surveyId, questionDto.getQuestionId()));
             //질문 dto 추가
-            questionDtoList.add(statisticsQuestionDto);
+            statisticsQuestionDtoList.add(statisticsQuestionDto);
         });
 
-        return questionDtoList;
+        return statisticsQuestionDtoList;
     }
-    public List<SurveyStatisticsOptionsDto> getOptionsDtoList(Question question){
-        List<Options> options = question.getOptions();
+    public List<SurveyStatisticsOptionsDto> getOptionsDtoList(Long surveyId, Long questionId){
+        List<OptionDto> options = surveyFacade.getOptionDtos(surveyId, questionId);
+
         List<SurveyStatisticsOptionsDto> optionsDtoList = new ArrayList<>();
 
         if(options == null){
             return null;
         }
-        options.forEach(option -> {
-            Long count = surveyOptionsAnswerRepository.countByQuestionAndNumber(question, option.getNumber());
+        options.forEach(optionDto -> {
+            Long count = surveyOptionsAnswerRepository.countByQuestionIdAndNumber(questionId, optionDto.getNumber());
             SurveyStatisticsOptionsDto statisticsOptionsDto =
                     SurveyStatisticsOptionsDto.of(
-                            option.getId(),
-                            option.getNumber(),
-                            option.getContent(),
+                            optionDto.getOptionId(),
+                            optionDto.getNumber(),
+                            optionDto.getContent(),
                             count
                     );
             optionsDtoList.add(statisticsOptionsDto);

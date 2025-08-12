@@ -1,11 +1,10 @@
-package com.example.surveyapp.domain.surveyanswer.controller;
+package com.example.surveyapp.domain.surveyanswer.presentation;
 
 import com.example.surveyapp.domain.surveyanswer.application.SurveyAnswerService;
 import com.example.surveyapp.domain.surveyanswer.application.SurveyAnswerStatisticsService;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.request.SurveyAnswerRequestDto;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyStatisticsDto;
-import com.example.surveyapp.domain.surveyanswer.controller.dto.response.SurveyeeSurveyListDto;
-import com.example.surveyapp.global.response.ApiResponse;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.request.SurveyAnswerRequestDto;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyStatisticsDto;
+import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyeeSurveyListDto;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

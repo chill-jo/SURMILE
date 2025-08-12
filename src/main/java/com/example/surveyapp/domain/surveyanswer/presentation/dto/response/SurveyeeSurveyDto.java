@@ -1,10 +1,7 @@
-package com.example.surveyapp.domain.surveyanswer.controller.dto.response;
+package com.example.surveyapp.domain.surveyanswer.presentation.dto.response;
 
-import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
