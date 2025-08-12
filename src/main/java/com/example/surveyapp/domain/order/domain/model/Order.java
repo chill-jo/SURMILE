@@ -1,10 +1,10 @@
-package com.example.surveyapp.domain.order.model;
+package com.example.surveyapp.domain.order.domain.model;
 
-import com.example.surveyapp.domain.order.event.OrderCreateEvent;
+import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
+import com.example.surveyapp.domain.order.domain.model.vo.OrderNumber;
+import com.example.surveyapp.domain.order.exception.OrderErrorCode;
+import com.example.surveyapp.domain.order.exception.OrderException;
 import com.example.surveyapp.global.config.entity.BaseEntity;
-import com.example.surveyapp.global.config.event.EventsPublisher;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,16 +41,16 @@ public class Order extends BaseEntity {
     //수량 1개만 주문 가능 외 예외처리
     public OrderItem getOneOrderItemOrThrow(){
         if (orderItems.size() != 1) {
-            throw new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT);
+            throw new OrderException(OrderErrorCode.ONE_ORDER_ONE_PRODUCT);
         }
         return orderItems.stream().findFirst()
-                .orElseThrow(() -> new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT));
+                .orElseThrow(() -> new OrderException(OrderErrorCode.ONE_ORDER_ONE_PRODUCT));
     }
 
     //본인 주문 외 조회 시 예외처리
     public void validateOrderer(Long userId){
         if (!this.getUserId().equals(userId)){
-            throw new CustomException(ErrorCode.NOT_YOUR_ORDER);
+            throw new OrderException(OrderErrorCode.NOT_YOUR_ORDER);
         }
     }
     public void delete(){
@@ -64,18 +64,15 @@ public class Order extends BaseEntity {
         this.orderItems.addAll(orderItems);
     }
 
-    public static Order create(Long userId, List<OrderItem> orderItems) {
+    public static Order of(Long userId, List<OrderItem> orderItems) {
         if (orderItems == null || orderItems.size() != 1){
-            throw new CustomException(ErrorCode.ONE_ORDER_ONE_PRODUCT);
+            throw new OrderException(OrderErrorCode.ONE_ORDER_ONE_PRODUCT);
         }
         Order order = Order.builder()
                 .userId(userId)
                 .orderNumber(OrderNumber.generator())
                 .orderItems(orderItems)
                 .build();
-        EventsPublisher.raise(new OrderCreateEvent(order.getId(),
-                userId,
-                order.orderAmount())); //이벤트 발행
         return order;
     }
 
