@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.survey.controller.dto.response;
+package com.example.surveyapp.domain.survey.presentation.dto.response;
 
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import lombok.Getter;

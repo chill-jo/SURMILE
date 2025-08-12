@@ -1,14 +1,14 @@
 package com.example.surveyapp.domain.survey.application.mapper;
 
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyCreateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.OptionResponseDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.QuestionOptionsDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.SurveyResponseDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.SurveyCreateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.OptionResponseDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.QuestionOptionsDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyResponseDto;
 import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
-import com.example.surveyapp.domain.survey.controller.dto.response.SurveyQuestionDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
 import com.example.surveyapp.domain.survey.domain.model.vo.SurveyPoints;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import org.springframework.stereotype.Component;
@@ -19,11 +19,7 @@ import java.util.stream.Collectors;
 @Component
 public class SurveyMapper {
 
-    private final SurveyQuestionService surveyQuestionService;
-
-    public SurveyMapper(SurveyQuestionService surveyQuestionService) {
-        this.surveyQuestionService = surveyQuestionService;
-    }
+    private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
 
     // survey 상세조회
     public SurveyResponseDto toResponseDto(Survey survey){

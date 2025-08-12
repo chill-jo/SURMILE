@@ -1,11 +1,11 @@
-package com.example.surveyapp.domain.survey.controller;
+package com.example.surveyapp.domain.survey.presentation;
 
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyCreateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyStatusUpdateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyUpdateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.*;
+import com.example.surveyapp.domain.survey.presentation.dto.request.SurveyCreateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.SurveyStatusUpdateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.SurveyUpdateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.*;
 import com.example.surveyapp.domain.survey.application.SurveyService;
-import com.example.surveyapp.domain.survey.controller.dto.response.SurveyQuestionDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

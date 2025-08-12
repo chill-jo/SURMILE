@@ -1,17 +1,16 @@
-package com.example.surveyapp.domain.survey.controller.dto.response;
+package com.example.surveyapp.domain.survey.presentation.dto.response;
 
 import com.example.surveyapp.domain.survey.domain.model.entity.Options;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 public class OptionResponseDto {
 
-    private Long id;
+    private final Long id;
 
-    private Long number;
+    private final Long number;
 
-    private String content;
+    private final String content;
 
     public OptionResponseDto(Long id, Long number, String content){
         this.id = id;
@@ -26,5 +25,4 @@ public class OptionResponseDto {
                 option.getContent()
         );
     }
-
 }

@@ -1,10 +1,8 @@
-package com.example.surveyapp.domain.survey.controller.dto.response;
+package com.example.surveyapp.domain.survey.presentation.dto.response;
 
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -13,21 +11,21 @@ import java.time.LocalDateTime;
 public class SurveyResponseDto {
     private final Long id;
 
-    private String title;
+    private final String title;
 
-    private String description;
+    private final String description;
 
-    private Long maxSurveyee;
+    private final Long maxSurveyee;
 
-    private Long pointPerPerson;
+    private final Long pointPerPerson;
 
-    private Long totalPoint;
+    private final Long totalPoint;
 
-    private LocalDateTime deadline;
+    private final LocalDateTime deadline;
 
-    private Long expectedTime;
+    private final Long expectedTime;
 
-    private SurveyStatus status;
+    private final SurveyStatus status;
 
     private Long surveyeeCount = 0L;
 

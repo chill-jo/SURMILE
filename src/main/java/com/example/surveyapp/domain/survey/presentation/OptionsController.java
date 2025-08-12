@@ -1,8 +1,8 @@
-package com.example.surveyapp.domain.survey.controller;
+package com.example.surveyapp.domain.survey.presentation;
 
-import com.example.surveyapp.domain.survey.controller.dto.request.OptionCreateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.request.OptionUpdateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.OptionResponseDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.OptionCreateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.OptionUpdateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.OptionResponseDto;
 import com.example.surveyapp.domain.survey.application.OptionsService;
 import com.example.surveyapp.global.response.ApiResponse;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
@@ -24,7 +24,7 @@ public class OptionsController {
 
     @PostMapping("/{surveyId}/question/{questionId}/option")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
-    public ResponseEntity<ApiResponse<OptionResponseDto>> createOption(
+    public ResponseEntity<OptionResponseDto> createOption(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId,
@@ -35,11 +35,11 @@ public class OptionsController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(true, "선택지가 생성되었습니다.", responseDto));
+                .body(responseDto);
     }
 
     @GetMapping("/{surveyId}/question/{questionId}/option")
-    public ResponseEntity<ApiResponse<List<OptionResponseDto>>> getOptions(
+    public ResponseEntity<List<OptionResponseDto>> getOptions(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId
@@ -49,12 +49,12 @@ public class OptionsController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "선택지 목록을 조회했습니다.", responseDtoList));
+                .body(responseDtoList);
     }
 
     @PatchMapping("/{surveyId}/question/{questionId}/option/{optionId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
-    public ResponseEntity<ApiResponse<OptionResponseDto>> updateOption(
+    public ResponseEntity<OptionResponseDto> updateOption(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId,
@@ -66,12 +66,12 @@ public class OptionsController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "선택지가 수정되었습니다.", responseDto));
+                .body(responseDto);
     }
 
     @DeleteMapping("/{surveyId}/question/{questionId}/option/{optionId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
-    public ResponseEntity<ApiResponse<Void>> deleteOption(
+    public ResponseEntity<Void> deleteOption(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId,
@@ -82,7 +82,7 @@ public class OptionsController {
         optionsService.deleteOption(userId, surveyId, questionId, optionId);
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "선택지가 삭제되었습니다.", null));
+                .ok()
+                .body(null);
     }
 }

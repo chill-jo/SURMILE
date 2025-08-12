@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.survey.infra;
+package com.example.surveyapp.domain.survey.infrastructure;
 
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.enums.QuestionType;
@@ -13,6 +13,7 @@ public class QuestionReadEntity {
     @Id
     private Long id;
 
+    @Column(name = "survey_id", nullable = false)
     private Long surveyId;
 
     private Long number;
@@ -22,6 +23,6 @@ public class QuestionReadEntity {
     private QuestionType type;
 
     public Question toQuestion(){
-        return new Question(number, content, type);
+        return new Question(number, content, type, surveyId);
     }
 }

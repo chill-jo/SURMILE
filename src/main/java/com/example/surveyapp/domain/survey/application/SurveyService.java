@@ -1,18 +1,17 @@
 package com.example.surveyapp.domain.survey.application;
 
-import com.example.surveyapp.domain.survey.domain.SurveyStatusUpdatePolicy;
+import com.example.surveyapp.domain.survey.application.facade.SurveyAnswerFacade;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.application.mapper.SurveyMapper;
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyCreateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyStatusUpdateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.request.SurveyUpdateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.*;
+import com.example.surveyapp.domain.survey.presentation.dto.request.SurveyCreateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.SurveyStatusUpdateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.SurveyUpdateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.*;
 import com.example.surveyapp.domain.survey.domain.model.entity.*;
-import com.example.surveyapp.domain.survey.controller.dto.response.SurveyQuestionDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
 import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
-import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
-import com.example.surveyapp.domain.survey.event.SurveyCreateEvent;
+import com.example.surveyapp.domain.survey.domain.event.SurveyCreateEvent;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
@@ -27,15 +26,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SurveyService {
 
-
-    private final SurveyRepository surveyRepository;
-    private final SurveyMapper surveyMapper;
-    private final SurveyAnswerRepository surveyAnswerRepository;
-    private final SurveyStatusUpdatePolicy statusUpdatePolicy;
-    private final SurveyQueryService surveyQuestionQueryService;
-    private final SurveyValidator surveyValidator;
     private final UserReader userReader;
     private final ApplicationEventPublisher eventPublisher;
+    private final SurveyRepository surveyRepository;
+    private final SurveyMapper surveyMapper;
+    private final SurveyQueryService surveyQueryService;
+    private final SurveyValidator surveyValidator = new SurveyValidator();
+    private final SurveyAnswerFacade surveyAnswerFacade;
 
     @Transactional
     public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
@@ -48,9 +45,7 @@ public class SurveyService {
         Survey saved = surveyRepository.save(survey);
 
         if(userReader.validateUserRole(userId, UserRoleEnum.SURVEYOR)){
-            /// /////////// 이벤트 처리될 부분
             eventPublisher.publishEvent(new SurveyCreateEvent(saved, userId));
-            /// ///////////
         }
 
         return surveyMapper.toResponseDto(saved);
@@ -72,7 +67,7 @@ public class SurveyService {
     public SurveyResponseDto updateSurveyInfo(Long userId, Long surveyId, SurveyUpdateRequestDto requestDto) {
 
         userReader.validateUserIdOrThrow(userId);
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+        Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
 
         SurveyInfo oldSurveyInfo = survey.getSurveyInfo();
@@ -88,10 +83,9 @@ public class SurveyService {
     public SurveyStatusResponseDto updateSurveyStatus(Long userId, Long surveyId, SurveyStatusUpdateRequestDto requestDto) {
 
         userReader.validateUserIdOrThrow(userId);
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+        Survey survey = surveyQueryService.findSurvey(surveyId);
 
         surveyValidator.validateStatusUpdatable(userId, survey);
-        statusUpdatePolicy.validateStatus(survey.getStatus(), requestDto.getStatus());
 
         survey.changeSurveyStatus(requestDto.getStatus());
 
@@ -103,7 +97,7 @@ public class SurveyService {
 
         userReader.validateUserIdOrThrow(userId);
 
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+        Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateDeletable(userId, survey);
 
         survey.deleteSurvey();
@@ -114,9 +108,9 @@ public class SurveyService {
     @Transactional
     public SurveyResponseDto getSurvey(Long surveyId) {
 
-        Survey survey = surveyQuestionQueryService.findSurvey(surveyId);
+        Survey survey = surveyQueryService.findSurvey(surveyId);
         SurveyResponseDto responseDto = surveyMapper.toResponseDto(survey);
-        responseDto.changeSurveyeeCount(surveyAnswerRepository.countBySurveyId(surveyId));
+        responseDto.changeSurveyeeCount(surveyAnswerFacade.getParticipatedCount(surveyId));
 
         return responseDto;
     }
@@ -126,9 +120,9 @@ public class SurveyService {
     public SurveyQuestionDto startSurvey(Long userId, Long surveyId) {
         userReader.validateUserIdOrThrow(userId);
 
-        Survey survey = surveyQuestionQueryService.findSurveyWithQuestionsAndOptions(surveyId);
+        Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateStartable(survey);
-        surveyValidator.validateNotParticipated(userId, surveyId);
+        surveyAnswerFacade.validateParticipated(userId, surveyId);
 
         return surveyMapper.toSurveyQuestionDto(survey);
     }

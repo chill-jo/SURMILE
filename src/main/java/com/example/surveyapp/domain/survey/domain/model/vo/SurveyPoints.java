@@ -1,7 +1,7 @@
 package com.example.surveyapp.domain.survey.domain.model.vo;
 
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
+import com.example.surveyapp.domain.survey.exception.SurveyErrorCode;
+import com.example.surveyapp.domain.survey.exception.SurveyException;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class SurveyPoints {
 
     private Long validatePriceOrThrow(Long value) {
         if (value == null || value < 0) {
-            throw new CustomException(ErrorCode.INVALID_SURVEY_POINT);
+            throw new SurveyException(SurveyErrorCode.INVALID_SURVEY_POINT);
         }
         return value;
     }

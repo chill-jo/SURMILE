@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.survey.event;
+package com.example.surveyapp.domain.survey.domain.event;
 
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import lombok.Getter;

@@ -1,11 +1,10 @@
-package com.example.surveyapp.domain.survey.controller;
+package com.example.surveyapp.domain.survey.presentation;
 
-import com.example.surveyapp.domain.survey.controller.dto.request.QuestionCreateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.request.QuestionUpdateRequestDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.PageQuestionResponseDto;
-import com.example.surveyapp.domain.survey.controller.dto.response.QuestionResponseDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionCreateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionUpdateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.PageQuestionResponseDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.QuestionResponseDto;
 import com.example.surveyapp.domain.survey.application.QuestionService;
-import com.example.surveyapp.global.response.ApiResponse;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class QuestionController {
     //***인증인가 추가 후 userId 부분 수정***
     @PostMapping("/{surveyId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
-    public ResponseEntity<ApiResponse<QuestionResponseDto>> createQuestion(
+    public ResponseEntity<QuestionResponseDto> createQuestion(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long surveyId,
             @Valid @RequestBody QuestionCreateRequestDto requestDto
@@ -35,12 +34,12 @@ public class QuestionController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(true, "질문이 생성되었습니다.", responseDto));
+                .body(responseDto);
     }
 
     //질문 목록 조회
     @GetMapping("/{surveyId}/question")
-    public ResponseEntity<ApiResponse<PageQuestionResponseDto<QuestionResponseDto>>> getQuestions(
+    public ResponseEntity<PageQuestionResponseDto<QuestionResponseDto>> getQuestions(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -51,12 +50,12 @@ public class QuestionController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "질문 목록을 조회했습니다.", responseDto));
+                .body(responseDto);
     }
 
     //질문 단건 조회
     @GetMapping("/{surveyId}/question/{questionId}")
-    public ResponseEntity<ApiResponse<QuestionResponseDto>> getQuestion(
+    public ResponseEntity<QuestionResponseDto> getQuestion(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId
@@ -66,13 +65,13 @@ public class QuestionController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "질문을 조회했습니다.", responseDto));
+                .body( responseDto);
     }
 
     //***인증인가 추가 후 userId 부분 수정***
     @PatchMapping("/{surveyId}/question/{questionId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
-    public ResponseEntity<ApiResponse<QuestionResponseDto>> updateQuestion(
+    public ResponseEntity<QuestionResponseDto> updateQuestion(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId,
@@ -83,13 +82,13 @@ public class QuestionController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "질문이 수정되었습니다.", responseDto));
+                .body(responseDto);
     }
 
     //***인증인가 추가 후 userId 부분 수정***
     @DeleteMapping("/{surveyId}/question/{questionId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
-    public ResponseEntity<ApiResponse<Void>> deleteQuestion(
+    public ResponseEntity<Void> deleteQuestion(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId
@@ -99,6 +98,6 @@ public class QuestionController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "질문이 삭제되었습니다.", null));
+                .body(null);
     }
 }
