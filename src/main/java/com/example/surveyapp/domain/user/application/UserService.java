@@ -1,23 +1,22 @@
-package com.example.surveyapp.domain.user.service;
+package com.example.surveyapp.domain.user.application;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationRequestDto;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationResponseDto;
-import com.example.surveyapp.domain.ai.moderation.service.NicknameModerationService;
-import com.example.surveyapp.domain.point.domain.model.entity.Point;
+import com.example.surveyapp.domain.ai.moderation.presentation.dto.NicknameModerationRequestDto;
+import com.example.surveyapp.domain.ai.moderation.presentation.dto.NicknameModerationResponseDto;
+import com.example.surveyapp.domain.ai.moderation.application.NicknameModerationService;
+import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
-import com.example.surveyapp.domain.user.controller.dto.*;
-import com.example.surveyapp.domain.user.controller.dto.RegisterRequestDto;
-import com.example.surveyapp.domain.user.controller.dto.UserRequestDto;
-import com.example.surveyapp.domain.user.controller.dto.UserResponseDto;
+import com.example.surveyapp.domain.user.exception.UserErrorCode;
+import com.example.surveyapp.domain.user.exception.UserException;
+import com.example.surveyapp.domain.user.presentation.dto.*;
+import com.example.surveyapp.domain.user.presentation.dto.RegisterRequestDto;
+import com.example.surveyapp.domain.user.presentation.dto.UserRequestDto;
+import com.example.surveyapp.domain.user.presentation.dto.UserResponseDto;
 import com.example.surveyapp.domain.user.domain.model.CategoryEnum;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserBaseData;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.domain.user.domain.repository.UserBaseDataRepository;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import com.example.surveyapp.global.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,15 +39,15 @@ public class UserService {
     @Transactional
     public void register(RegisterRequestDto requestDto) {
         if (userRepository.existsByEmail(requestDto.getEmail())) {
-            throw new CustomException(ErrorCode.EXISTS_EMAIL);
+            throw new UserException(UserErrorCode.EXISTS_EMAIL);
         }
 
         if (userRepository.existsByNickname(requestDto.getNickname())) {
-            throw new CustomException(ErrorCode.EXISTS_NICKNAME);
+            throw new UserException(UserErrorCode.EXISTS_NICKNAME);
         }
 
         if (!requestDto.getPassword().equals(requestDto.getConfirmPassword())) {
-            throw new CustomException(ErrorCode.NOT_MATCH_PASSWORD);
+            throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
         }
         validateNicknameModeration(requestDto.getNickname());
 
@@ -64,17 +63,17 @@ public class UserService {
 
         userRepository.save(user);
 
-        Point point = Point.of(user);
+        PointWallet point = PointWallet.of(user.getId());
         pointRepository.save(point);
     }
 
     @Transactional(readOnly = true)
     public LoginResponseDto login(LoginRequestDto requestDto) {
         User user = userRepository.findByEmailAndIsDeletedFalse(requestDto.getEmail())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
 
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw new CustomException(ErrorCode.NOT_MATCH_PASSWORD);
+            throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
         }
 
         String accessToken = jwtUtil.createAccessToken(user.getId(), user.getUserRole());
@@ -89,10 +88,10 @@ public class UserService {
     @Transactional
     public void withdraw(Long userId, WithdrawRequestDto requestDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
 
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw new CustomException(ErrorCode.NOT_MATCH_PASSWORD);
+            throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
         }
 
         user.softDelete();
@@ -119,11 +118,11 @@ public class UserService {
 
     private void validateDuplicatedUser(UserRequestDto userRequestDto) {
         if (userRepository.existsByEmail(userRequestDto.getEmail())) {
-            throw new CustomException(ErrorCode.EXISTS_EMAIL);
+            throw new UserException(UserErrorCode.EXISTS_EMAIL);
         }
 
         if (userRepository.existsByNickname(userRequestDto.getNickname())) {
-            throw new CustomException(ErrorCode.EXISTS_NICKNAME);
+            throw new UserException(UserErrorCode.EXISTS_NICKNAME);
         }
     }
 
@@ -132,15 +131,14 @@ public class UserService {
         NicknameModerationResponseDto nicknameModerationResult = nicknameModerationService.moderate(nicknameModerationRequest);
 
         if(nicknameModerationResult.getStatus() == ModerationResultStatusEnum.DENIED){
-            throw new CustomException(ErrorCode.INVALID_NICKNAME);
+            throw new UserException(UserErrorCode.INVALID_NICKNAME);
         }
     }
 
     private User findUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
     }
-
 
     // 참여자 로그인 시 기초 정보 체크하여 없을 경우 기초정보 입력 메서드 호출
     // 참여자 기초 정보 작성 선택지 보여주는 메서드
@@ -155,11 +153,11 @@ public class UserService {
     public void saveBaseDatas(Long userId, BaseDataListRequestDto requestDto) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_USER)
+                () -> new UserException(UserErrorCode.NOT_FOUND_USER)
         );
 
         if (CategoryEnum.values().length != requestDto.getList().size()) {
-            throw new CustomException(ErrorCode.MISSING_BASE_DATA_CATEGORIES);
+            throw new UserException(UserErrorCode.MISSING_BASE_DATA_CATEGORIES);
         }
 
         requestDto.getList().forEach(
@@ -175,7 +173,6 @@ public class UserService {
                     }
                 }
         );
-
     }
 
     // 참여자 기초 정보 R
@@ -183,7 +180,7 @@ public class UserService {
     public BaseDataListResponseDto getBaseDatas(Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_USER)
+                () -> new UserException(UserErrorCode.NOT_FOUND_USER)
         );
 
         List<UserBaseData> userBaseDataList = userBaseDataRepository.findAllByUserId(user);

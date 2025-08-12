@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.user.controller.dto;
+package com.example.surveyapp.domain.user.presentation.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

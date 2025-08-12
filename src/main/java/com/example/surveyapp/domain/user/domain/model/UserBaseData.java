@@ -7,7 +7,7 @@ import lombok.*;
 @Entity
 @Getter
 @Table(name = "user_base_data")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserBaseData extends BaseEntity {
 
     @Id

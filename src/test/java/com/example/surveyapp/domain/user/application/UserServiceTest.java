@@ -1,14 +1,14 @@
-package com.example.surveyapp.domain.user.service;
+package com.example.surveyapp.domain.user.application;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.controller.dto.NicknameModerationResponseDto;
-import com.example.surveyapp.domain.ai.moderation.service.NicknameModerationService;
-import com.example.surveyapp.domain.user.controller.dto.UserRequestDto;
-import com.example.surveyapp.domain.user.controller.dto.UserResponseDto;
+import com.example.surveyapp.domain.ai.moderation.presentation.dto.NicknameModerationResponseDto;
+import com.example.surveyapp.domain.ai.moderation.application.NicknameModerationService;
+import com.example.surveyapp.domain.user.exception.UserErrorCode;
+import com.example.surveyapp.domain.user.exception.UserException;
+import com.example.surveyapp.domain.user.presentation.dto.UserRequestDto;
+import com.example.surveyapp.domain.user.presentation.dto.UserResponseDto;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -92,7 +92,7 @@ public class UserServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> userService.updateMyInfo(ID, requestDto))
-                .isInstanceOf(CustomException.class)
-                .hasMessageContaining(ErrorCode.EXISTS_EMAIL.getMessage());
+                .isInstanceOf(UserException.class)
+                .hasMessageContaining(UserErrorCode.EXISTS_EMAIL.getMessage());
     }
 }

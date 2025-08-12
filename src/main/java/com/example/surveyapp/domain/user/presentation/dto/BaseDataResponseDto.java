@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.user.controller.dto;
+package com.example.surveyapp.domain.user.presentation.dto;
 
 import com.example.surveyapp.domain.user.domain.model.CategoryEnum;
 import lombok.Getter;
