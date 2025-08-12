@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.ai.moderation.config;
+package com.example.surveyapp.domain.ai.config;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;
