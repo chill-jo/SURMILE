@@ -1,7 +1,7 @@
 package com.example.surveyapp.domain.product.domain.model;
 
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
+import com.example.surveyapp.domain.product.exception.ProductErrorCode;
+import com.example.surveyapp.domain.product.exception.ProductException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Embeddable
 @Getter
-@NoArgsConstructor(access =  AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductPoints {
 
     @Column(name = "products_points_amount", nullable = false)
@@ -20,17 +20,8 @@ public class ProductPoints {
         this.value = validatePriceOrThrow(value);
     }
 
-    public static ProductPoints create(Long value) {
+    public static ProductPoints of(Long value) {
         return new ProductPoints(value);
-    }
-
-    public ProductPoints add(ProductPoints amount) {
-        return new ProductPoints(this.value + amount.value);
-    }
-
-    public ProductPoints minus(ProductPoints amount) {
-        ProductPoints points = new ProductPoints(this.value - amount.value);
-        return points;
     }
 
     public boolean isZero() {
@@ -39,10 +30,10 @@ public class ProductPoints {
 
     private Long validatePriceOrThrow(Long value) {
         if (value == null || value < 0) {
-            throw new CustomException(ErrorCode.INVALID_PRICE_PRODUCT);
+            throw new ProductException(ProductErrorCode.INVALID_PRICE_PRODUCT);
         }
         return value;
     }
-    }
+}
 
 
