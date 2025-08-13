@@ -79,10 +79,13 @@ public class UserService {
 
         String accessToken = jwtUtil.createAccessToken(user.getId(), user.getUserRole());
 
+        String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getUserRole());
+
         return LoginResponseDto.builder()
                 .id(String.valueOf(user.getId()))
                 .name(user.getName())
-                .token(accessToken)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 

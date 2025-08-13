@@ -55,6 +55,9 @@ dependencies {
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.5'
 
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     testRuntimeOnly 'com.h2database:h2'
 
 // query-dsl 5.1.0

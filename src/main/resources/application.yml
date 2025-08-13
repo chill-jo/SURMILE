@@ -23,6 +23,11 @@ spring:
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQLDialect
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
 logging:
   level:
     org:
@@ -39,4 +44,5 @@ jwt:
     key: ${JWT_SECRET_KEY}
   access-token:
       expiration:
-        mills: 1800000
+        access-token: 1800000 # 30 minutes
+        refresh-token: 1209600000 # 14 days

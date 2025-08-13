@@ -1,32 +1,47 @@
 package com.example.surveyapp.global.security.jwt;
 
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
+import com.example.surveyapp.global.response.exception.CustomException;
+import com.example.surveyapp.global.response.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
+
+    private final RedisTemplate<String, String> redisTemplate;
+
     private static final String BEARER_PREFIX = "Bearer ";
 //    private static final long TOKEN_TIME = 30 * 60 * 1000L; // 30분
+    private static final String REFRESH_TOKEN_KEY_PREFIX = "refresh_token_user_id_";
+
 
     @Value("${jwt.secret.key}")
     private String secretKey;
 
-    @Value("${jwt.access-token.expiration.mills}")
-    private long TOKEN_TIME;
+    @Value("${jwt.access-token.expiration.access-token}")
+    private long ACCESS_TOKEN_TIME;
+
+    @Value("${jwt.access-token.expiration.refresh-token}")
+    private long REFRESH_TOKEN_TIME;
 
     private SecretKey key;
+
 
     @PostConstruct
     public void init() {
@@ -53,10 +68,43 @@ public class JwtUtil {
                 .setSubject(String.valueOf(userId)) // id : 1
                 .claim("role", userRole.name()) // role: SURVEYEE
                 .issuedAt(now) // 2025-07-26T16:21:47
-                .expiration(new Date(now.getTime() + TOKEN_TIME)) // 발급일로부터 30분
+                .expiration(new Date(now.getTime() + ACCESS_TOKEN_TIME)) // 발급일로부터 30분
                 // 다른 시스템에서 우리시스템에 들어오기 위해 필요한 입장권을 만들지 못하도록 하는 장치
                 .signWith(key)
                 .compact();
+    }
+
+    // Refresh Token 발급
+    public String createRefreshToken(Long userId, UserRoleEnum userRole) {
+        Date now = new Date();
+
+        String token = BEARER_PREFIX + Jwts.builder()
+                .setSubject(String.valueOf(userId)) // id : 1
+                .claim("role", userRole.name()) // role: SURVEYEE
+                .issuedAt(now) // 2025-07-26T16:21:47
+                .expiration(new Date(now.getTime() + REFRESH_TOKEN_TIME)) // 발급일로부터 14일
+                .signWith(key)
+                .compact();
+
+        redisTemplate.opsForValue().set(REFRESH_TOKEN_KEY_PREFIX + userId, substringToken(token), Duration.ofMillis(REFRESH_TOKEN_TIME));
+
+        return token;
+
+    }
+
+    // Refresh Token 유효 검증
+    public boolean isValidRefreshToken(String refreshToken) {
+
+        if (!validateToken(refreshToken)) {
+            return false;
+        }
+
+        String subject = extractUserId(refreshToken);
+        Long userId = Long.parseLong(subject);
+        String foundRefreshToken = redisTemplate.opsForValue().get(REFRESH_TOKEN_KEY_PREFIX + userId);
+
+        return refreshToken.equals(foundRefreshToken);
+
     }
 
 
