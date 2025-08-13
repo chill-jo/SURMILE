@@ -1,10 +1,8 @@
 package com.example.surveyapp.domain.user.application;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
 import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
-import com.example.surveyapp.domain.point.domain.model.entity.Point;
-import com.example.surveyapp.domain.point.domain.repository.PointRepository;
+import com.example.surveyapp.domain.user.domain.event.RegisterEvent;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;
 import com.example.surveyapp.domain.user.presentation.dto.*;
@@ -16,10 +14,9 @@ import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserBaseData;
 import com.example.surveyapp.domain.user.domain.repository.UserBaseDataRepository;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import com.example.surveyapp.global.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +30,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final PointRepository pointRepository;
     private final UserBaseDataRepository userBaseDataRepository;
     private final ModerationService moderationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void register(RegisterRequestDto requestDto) {
@@ -64,8 +61,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        PointWallet point = PointWallet.of(user.getId());
-        pointRepository.save(point);
+        eventPublisher.publishEvent(new RegisterEvent(user.getId()));
     }
 
     @Transactional(readOnly = true)
