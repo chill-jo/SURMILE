@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.point.domain.model.entity;
 
-
+import com.example.surveyapp.domain.point.domain.model.entity.vo.Money;
 import com.example.surveyapp.domain.point.domain.model.enums.Method;
 import com.example.surveyapp.domain.point.domain.model.enums.TargetType;
 import com.example.surveyapp.domain.point.domain.model.enums.PointStatus;
@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.util.UUID;
+
 @Getter
 @Entity
 @NoArgsConstructor
@@ -20,8 +21,8 @@ public class Payment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long amount;
+    @Embedded
+    private Money amount;
 
     @Column(unique = true, nullable = false)
     private UUID paymentKey;
@@ -39,15 +40,15 @@ public class Payment extends BaseEntity {
     private TargetType targetType;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Payment(Long amount, PointStatus pointStatus, Method method, TargetType targetType) {
-        this.amount=amount;
-        this.paymentKey=UUID.randomUUID();
+    private Payment(Money amount, PointStatus pointStatus, Method method, TargetType targetType) {
+        this.amount = amount;
+        this.paymentKey = UUID.randomUUID();
         this.pointStatus = pointStatus;
-        this.method=method;
-        this.targetType=targetType;
+        this.method = method;
+        this.targetType = targetType;
     }
 
-    public static Payment of(Long amount, PointStatus pointStatus, Method method, TargetType targetType){
+    public static Payment of(Money amount, PointStatus pointStatus, Method method, TargetType targetType){
         return Payment.builder()
                 .amount(amount)
                 .pointStatus(pointStatus)

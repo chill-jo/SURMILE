@@ -23,4 +23,11 @@ public interface SurveyRepository extends JpaRepository<Survey, Long> {
 
     @Query("SELECT s FROM Survey s WHERE s.isDeleted = false")
     Page<Survey> findAllSurveyPaged(Pageable pageable);
+
+    @Query("SELECT s FROM Survey s "+
+            "LEFT JOIN FETCH s.questions q " +
+            "LEFT JOIN FETCH q.options o " +
+            "WHERE s.id = :surveyId")
+    Optional<Survey> findSurveyWithQuestionsAndOptions(@Param("surveyId") Long surveyId);
+
 }
