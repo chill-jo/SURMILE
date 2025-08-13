@@ -76,7 +76,7 @@ class OrderServiceTest {
         //검증 사항
         assertThat(responseDto.getPrice() >= order.orderAmount());
         assertThat(responseDto.getOrderNumber()).isNotBlank();
-        assertThat(responseDto.getStatus()).isEqualTo("ON_SALE");
+        assertThat(responseDto.getStatus()).isEqualTo(Status.ON_SALE.getStatus());
         assertThat(responseDto.getTitle()).isEqualTo(order.getOneOrderItemOrThrow().getTitle());
 
         verify(eventPublisher).publishEvent(any(OrderCreateEvent.class));

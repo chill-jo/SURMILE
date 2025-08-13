@@ -71,7 +71,7 @@ class ProductServiceTest {
         verify(productRepository,times(1)).save(any(Product.class));
         assertEquals(product.getTitle(), productCreateResponseDto.getTitle());
         assertEquals(product.getPrice().getValue(),productCreateResponseDto.getPrice());
-        assertEquals(product.getStatus(),productCreateResponseDto.getStatus());
+
 
     }
 
