@@ -1,6 +1,5 @@
 package com.example.surveyapp.domain.user.domain.event;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
