@@ -28,6 +28,15 @@ public class PointService {
     private final PointHistoryRepository pointHistoryRepository;
     private final PaymentRepository paymentRepository;
 
+    @Transactional
+    public void createPointWallet(Long userId){
+
+        if(!pointRepository.existsByUserId(userId)){
+            PointWallet pointWallet = PointWallet.of(userId);
+            pointRepository.save(pointWallet);
+        }
+    }
+
     // 충전
     @PreAuthorize("hasAnyRole('SURVEYOR')")
     @Transactional
