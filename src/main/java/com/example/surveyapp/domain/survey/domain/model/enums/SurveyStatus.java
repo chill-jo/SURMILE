@@ -1,7 +1,6 @@
 package com.example.surveyapp.domain.survey.domain.model.enums;
 
 import lombok.Getter;
-import org.springframework.security.core.parameters.P;
 
 import java.util.Arrays;
 
