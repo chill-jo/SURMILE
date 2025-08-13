@@ -68,7 +68,7 @@ class ProductControllerTest {
         ProductCreateResponseDto responseDto = new ProductCreateResponseDto(product.getId(),
                 product.getTitle(),
                 product.getPrice().getValue(),
-                product.getStatus());
+                product.getStatus().getStatus());
 
         when(productService.createProduct(any(ProductCreateRequestDto.class), eq(1L))).thenReturn(responseDto);
         // When
@@ -92,8 +92,8 @@ class ProductControllerTest {
     @WithCustomMockUser(id = 1, role = UserRoleEnum.ADMIN)
     void 상품_전체_조회를_한다() throws Exception {
         // Given
-        ProductResponseDto product1 = new ProductResponseDto(1L, "상품1", 2000L, Status.ON_SALE);
-        ProductResponseDto product2 = new ProductResponseDto(2L, "상품2", 2500L, Status.ON_SALE);
+        ProductResponseDto product1 = new ProductResponseDto(1L, "상품1", 2000L, Status.ON_SALE.getStatus());
+        ProductResponseDto product2 = new ProductResponseDto(2L, "상품2", 2500L, Status.ON_SALE.getStatus());
         List<ProductResponseDto> productList = List.of(product1, product2);
 
         when(productService.readAllProduct(0,10)).thenReturn(productList);
@@ -121,8 +121,8 @@ class ProductControllerTest {
     @WithCustomMockUser(id = 2, role = UserRoleEnum.SURVEYEE)
     void 상품_전체_조회_참여자계정은_가능해야한다() throws Exception {
         // Given
-        ProductResponseDto product1 = new ProductResponseDto(1L, "상품1", 2000L, Status.ON_SALE);
-        ProductResponseDto product2 = new ProductResponseDto(2L, "상품2", 2500L, Status.ON_SALE);
+        ProductResponseDto product1 = new ProductResponseDto(1L, "상품1", 2000L, Status.ON_SALE.getStatus());
+        ProductResponseDto product2 = new ProductResponseDto(2L, "상품2", 2500L, Status.ON_SALE.getStatus());
         List<ProductResponseDto> productList = List.of(product1, product2);
 
         when(productService.readAllProduct(0,10)).thenReturn(productList);
@@ -154,7 +154,7 @@ class ProductControllerTest {
         //테스트 전제 조건 및 환경 설정
         Product product = ProductFixtureGenerator.generateProductFixture();
         ReflectionTestUtils.setField(product,"id",1L);
-        ProductResponseDto productResponseDto = new ProductResponseDto(product.getId(), product.getTitle(), product.getPrice().getValue(), product.getStatus());
+        ProductResponseDto productResponseDto = new ProductResponseDto(product.getId(), product.getTitle(), product.getPrice().getValue(), product.getStatus().getStatus());
         when(productService.readOneProduct(product.getId())).thenReturn(productResponseDto);
 
         // When
@@ -200,7 +200,7 @@ class ProductControllerTest {
         //테스트 전제 조건 및 환경 설정
         Long productId = 1L;
         ProductUpdateRequestDto requestDto = new ProductUpdateRequestDto("변경된 상품명", 2500L, "변경된 상품설명", Status.ON_SALE);
-        ProductUpdateResponseDto responseDto = new ProductUpdateResponseDto(1L, "변경된 상품명", "변경된 상품설명:", 2500L, Status.ON_SALE);
+        ProductUpdateResponseDto responseDto = new ProductUpdateResponseDto(1L, "변경된 상품명", "변경된 상품설명:", 2500L, Status.ON_SALE.getStatus());
 
         when(productService.updateProduct(eq(productId), any(ProductUpdateRequestDto.class))).thenReturn(responseDto);
 
@@ -262,7 +262,7 @@ class ProductControllerTest {
         ReflectionTestUtils.setField(product,"id",1L);
 
         ProductStatusUpdateRequestDto requestDto = new ProductStatusUpdateRequestDto(Status.ON_SALE);
-        ProductStatusUpdateResponseDto responseDto = new ProductStatusUpdateResponseDto(Status.STOPPED_SALE);
+        ProductStatusUpdateResponseDto responseDto = new ProductStatusUpdateResponseDto(Status.STOPPED_SALE.getStatus());
         when(productService.statusUpdate(eq(userId), eq(product.getId()),any(ProductStatusUpdateRequestDto.class))).thenReturn(responseDto);
 
         // When
@@ -277,7 +277,7 @@ class ProductControllerTest {
 
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.newStatus").value("STOPPED_SALE"));
+                .andExpect(jsonPath("$.data.newStatus").value(Status.STOPPED_SALE.getStatus()));
     }
 
 }
