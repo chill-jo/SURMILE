@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.ai.chat.controller.dto;
+package com.example.surveyapp.domain.ai.chat.presentation.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
