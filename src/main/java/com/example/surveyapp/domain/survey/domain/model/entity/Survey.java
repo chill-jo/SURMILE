@@ -1,17 +1,17 @@
 package com.example.surveyapp.domain.survey.domain.model.entity;
 
+import com.example.surveyapp.domain.survey.domain.SurveyStatusUpdatePolicy;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
-import com.example.surveyapp.domain.user.domain.model.User;
+import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
+import com.example.surveyapp.domain.survey.exception.SurveyErrorCode;
+import com.example.surveyapp.domain.survey.exception.SurveyException;
 import com.example.surveyapp.global.config.entity.BaseEntity;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -23,34 +23,10 @@ public class Survey extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 직접 참조
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Long userId;
 
-    // 간접 참조
-//    private Long userId;
-
-    @Column(nullable = false, length = 100)
-    private String title;
-
-    @Column(nullable = false, length = 255)
-    private String description;
-
-    @Column(nullable = false)
-    private Long maxSurveyee;
-
-    @Column(nullable = false)
-    private Long pointPerPerson;
-
-    @Column(nullable = false)
-    private Long totalPoint;
-
-    @Column(nullable = false)
-    private LocalDateTime deadline;
-
-    @Column(nullable = false)
-    private Long expectedTime;
+    @Embedded
+    private SurveyInfo surveyInfo;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -59,31 +35,36 @@ public class Survey extends BaseEntity {
     @Column(name= "is_deleted", nullable = false)
     private boolean isDeleted;
 
-    public void deleteSurvey(){
-        this.isDeleted = true;
+    @OneToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
+    @JoinColumn(name = "survey_id")
+    private List<Question> questions = new ArrayList<>();
+
+    public Survey(Long userId, SurveyInfo surveyInfo) {
+        this.userId = userId;
+        this.surveyInfo = surveyInfo;
+        this.status = SurveyStatus.NOT_STARTED;
+        this.isDeleted = false;
+    }
+
+    public static Survey of(Long userId, SurveyInfo surveyInfo) {
+        return new Survey(userId, surveyInfo);
     }
 
     public void changeSurveyStatus(SurveyStatus newStatus) {
-        validateStatus(newStatus);
+        SurveyStatusUpdatePolicy policy = new SurveyStatusUpdatePolicy();
+        policy.validateStatus(status, newStatus);
         this.status = newStatus;
     }
 
-    private void validateStatus(SurveyStatus newStatus){
-        if(status.equals(newStatus)){
-            throw new CustomException(ErrorCode.INVALID_SURVEY_STATUS_TRANSITION);
+    public void updateSurveyInfo(SurveyInfo newSurveyInfo){
+        surveyInfo = newSurveyInfo;
+    }
+
+    public void deleteSurvey(){
+        if(isDeleted){
+            throw new SurveyException(SurveyErrorCode.SURVEY_ALREADY_DELETED);
         }
-        if(newStatus.isNotStarted()){
-            throw new CustomException(ErrorCode.INVALID_SURVEY_STATUS_TRANSITION);
-        }
-        if(status.isDone() && newStatus.isInProgress()){
-            throw new CustomException(ErrorCode.INVALID_SURVEY_STATUS_TRANSITION);
-        }
-        if(!status.isInProgress() && newStatus.isPaused()){
-            throw new CustomException(ErrorCode.INVALID_SURVEY_STATUS_TRANSITION);
-        }
-        if(status.isNotStarted() && newStatus.isDone()){
-            throw new CustomException(ErrorCode.INVALID_SURVEY_STATUS_TRANSITION);
-        }
+        isDeleted = true;
     }
 
     public boolean isNotStarted(){
@@ -92,39 +73,7 @@ public class Survey extends BaseEntity {
     public boolean isInProgress(){
         return status.isInProgress();
     }
-
-    public boolean isUserSurveyCreator(User user){
-        return this.user.equals(user);
+    public boolean isUserSurveyCreator(Long userId){
+        return this.userId.equals(userId);
     }
-
-    public Survey(User user, String title, String description, Long maxSurveyee, Long pointPerPerson,
-                  LocalDateTime deadline, Long expectedTime) {
-        this.user = user;
-        this.title = title;
-        this.description = description;
-        this.maxSurveyee = maxSurveyee;
-        this.pointPerPerson = pointPerPerson;
-        this.totalPoint = maxSurveyee * pointPerPerson;
-        this.deadline = deadline;
-        this.expectedTime = expectedTime;
-        this.status = SurveyStatus.NOT_STARTED;
-        this.isDeleted = false;
-    }
-
-    public void update(String title, String description, Long maxSurveyee, Long pointPerPerson,
-                       LocalDateTime deadline, Long expectedTime) {
-        if (title != null) this.title = title;
-        if (description != null) this.description = description;
-        if (maxSurveyee != null) this.maxSurveyee = maxSurveyee;
-        if (pointPerPerson != null) this.pointPerPerson = pointPerPerson;
-        if (deadline != null) this.deadline = deadline;
-        if (expectedTime != null) this.expectedTime = expectedTime;
-        this.totalPoint = this.maxSurveyee * this.pointPerPerson;
-    }
-
-    public static Survey of(User user, String title, String description, Long maxSurveyee,
-                            Long pointPerPerson, LocalDateTime deadline, Long expectedTime) {
-        return new Survey(user, title, description, maxSurveyee, pointPerPerson, deadline, expectedTime);
-    }
-
 }

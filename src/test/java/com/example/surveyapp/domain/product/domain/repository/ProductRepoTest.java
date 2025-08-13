@@ -1,17 +1,13 @@
 package com.example.surveyapp.domain.product.domain.repository;
 
-import com.example.surveyapp.config.testbase.DataJpaTestBase;
 import com.example.surveyapp.config.generator.ProductFixtureGenerator;
-import com.example.surveyapp.domain.product.controller.dto.ProductCreateResponseDto;
+import com.example.surveyapp.config.testbase.DataJpaTestBase;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
-import com.example.surveyapp.domain.product.domain.model.repository.ProductRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -25,7 +21,7 @@ public class ProductRepoTest extends DataJpaTestBase {
     @DisplayName("기능_테스트_상품 생성")
     public void 상품_생성() {
         // given
-        Product product = Product.create("상품", 2500L, "설명", Status.ON_SALE);
+        Product product = ProductFixtureGenerator.generateProductFixture();
         // when
         Product saved = productRepository.save(product);
 

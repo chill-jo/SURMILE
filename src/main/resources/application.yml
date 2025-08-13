@@ -3,9 +3,20 @@ spring:
     import: optional:file:.env[.properties]
   application:
     name: surveyApp
+
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
+    vectorstore:
+      redis:
+        initialize-schema: true
+        index-name: surveyApp-index
+        prefix: embedding
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
   datasource:
     url: ${DB_URL}

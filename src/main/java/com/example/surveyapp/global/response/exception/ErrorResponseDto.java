@@ -15,7 +15,7 @@ public class ErrorResponseDto {
 
     public ErrorResponseDto(ErrorCode errorCode, String message) {
         this.status = errorCode.getStatus().value();
-        this.errorCode = errorCode.name();
+        this.errorCode = errorCode.getStatus().name();
         this.message = message;
     }
     public ErrorResponseDto(HttpStatus httpStatus, String message){

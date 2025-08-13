@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = e.getErrorCode();
         ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorCode, e.getMessage());
 
-        log.warn("[클라이언트 예외 발생] {} - {}", errorCode.name(), e.getMessage());
+        log.warn("[클라이언트 예외 발생] {} - {}", errorCode.getStatus(), e.getMessage());
 
         return ResponseEntity
                 .status(errorResponseDto.getStatus())
