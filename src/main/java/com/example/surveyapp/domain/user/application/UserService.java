@@ -2,8 +2,7 @@ package com.example.surveyapp.domain.user.application;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
 import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
-import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
-import com.example.surveyapp.domain.point.domain.model.entity.Point;
+import com.example.surveyapp.domain.ai.moderation.application.ModerationService;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;
@@ -16,8 +15,6 @@ import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserBaseData;
 import com.example.surveyapp.domain.user.domain.repository.UserBaseDataRepository;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
 import com.example.surveyapp.global.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
