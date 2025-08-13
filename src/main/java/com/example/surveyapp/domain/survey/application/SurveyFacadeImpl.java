@@ -32,9 +32,14 @@ public class SurveyFacadeImpl implements SurveyFacade {
                 () -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
     }
 
+    public Survey findSurveyWithPessimisticLock(Long surveyId){
+        return surveyRepository.findByIdAndIsDeletedFalseWithPessimisticLock(surveyId).orElseThrow(
+                () -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
+    }
+
     @Override
     public void validateSurveyStartable(Long surveyId) {
-        Survey survey = findSurvey(surveyId);
+        Survey survey = findSurveyWithPessimisticLock(surveyId);
         surveyValidator.validateStartable(survey);
     }
 
