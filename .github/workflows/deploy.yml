@@ -50,6 +50,12 @@ jobs:
               container_name: survey-app
               env_file:
                 - .env
+  
+            redis:
+              image: redis/redis-stack:latest
+              ports:
+                - "6379:6379"
+              container_name: redis
           EOL
 
       - name: 파일 생성 확인
