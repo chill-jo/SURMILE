@@ -2,23 +2,25 @@ package com.example.surveyapp.domain.product.application.dto;
 
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductUpdateResponseDto {
 
-    private final Long id;
+    private Long id;
 
-    private final String title;
+    private String title;
 
-    private final String content;
+    private String content;
 
-    private final Long price;
+    private Long price;
 
-    private final Status status;
+    private Status status;
 
     public static ProductUpdateResponseDto from(Product product) {
       return new ProductUpdateResponseDto(
