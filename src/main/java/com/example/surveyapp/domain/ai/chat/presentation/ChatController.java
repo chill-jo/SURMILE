@@ -1,10 +1,10 @@
-package com.example.surveyapp.domain.ai.chat.controller;
+package com.example.surveyapp.domain.ai.chat.presentation;
 
-import com.example.surveyapp.domain.ai.chat.controller.dto.ChatRequestDto;
-import com.example.surveyapp.domain.ai.chat.controller.dto.ChatResponseDto;
-import com.example.surveyapp.domain.ai.chat.controller.dto.IndexRequestDto;
+import com.example.surveyapp.domain.ai.chat.presentation.dto.ChatRequestDto;
+import com.example.surveyapp.domain.ai.chat.presentation.dto.ChatResponseDto;
+import com.example.surveyapp.domain.ai.chat.presentation.dto.IndexRequestDto;
 import com.example.surveyapp.domain.ai.chat.rag.DocumentIndexer;
-import com.example.surveyapp.domain.ai.chat.service.ChatService;
+import com.example.surveyapp.domain.ai.chat.application.ChatService;
 import com.example.surveyapp.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
