@@ -15,13 +15,13 @@ public class ProductCreateResponseDto {
 
     private final Long price;
 
-    private final Status status;
+    private final String status;
 
     public ProductCreateResponseDto(Product product) {
         this.id =product.getId();
         this.title = product.getTitle();
         this.price = product.getPrice().getValue();
-        this.status = product.getStatus();
+        this.status = product.getStatus().getStatus();
     }
 
     public static ProductCreateResponseDto from(Product product) {

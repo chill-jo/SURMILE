@@ -44,6 +44,9 @@ public class Product extends BaseEntity {
                              ProductPoints price,
                              String content,
                              Status status) {
+        if (price.isZero()){
+            throw new ProductException(ProductErrorCode.INVALID_PRICE_PRODUCT);
+        }
         return Product.builder()
                 .title(title)
                 .price(price)
