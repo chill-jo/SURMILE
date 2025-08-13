@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.ai.chat.service;
+package com.example.surveyapp.domain.ai.chat.application;
 
 import com.example.surveyapp.domain.ai.chat.prompt.ChatPromptTemplate;
 import com.example.surveyapp.domain.ai.chat.rag.DocumentSearcher;

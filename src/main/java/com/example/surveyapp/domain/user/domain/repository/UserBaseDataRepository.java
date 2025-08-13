@@ -22,8 +22,8 @@ public interface UserBaseDataRepository extends JpaRepository<UserBaseData, Long
             FROM UserBaseData AS ubd
             WHERE ubd.category = :category
                     AND ubd.data = :data
-                    AND ubd.updatedAt >= :startDate
-                    AND ubd.updatedAt <= :endDate
+                    AND (ubd.updatedAt >= :startDate OR :startDate IS NULL)
+                    AND (ubd.updatedAt <= :endDate OR :endDate IS NULL)
             """)
     Long countByCategoryAndDataAndStartDateAndEndDate(
             CategoryEnum category, Long data,

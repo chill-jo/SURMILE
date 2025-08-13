@@ -51,8 +51,8 @@ public class AdminController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/stats")
     public ResponseEntity<ApiResponse<List<StatsListDto>>> getStats(
-            @RequestParam(required = false, defaultValue = "1999-01-01 00:00:00") String startDate,
-            @RequestParam(required = false, defaultValue = "2999-01-01 00:00:00") String endDate
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
     ) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime startDateLocal = LocalDateTime.parse(startDate, formatter);
