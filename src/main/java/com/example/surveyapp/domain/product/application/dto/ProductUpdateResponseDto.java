@@ -20,7 +20,7 @@ public class ProductUpdateResponseDto {
 
     private Long price;
 
-    private Status status;
+    private String status;
 
     public static ProductUpdateResponseDto from(Product product) {
       return new ProductUpdateResponseDto(
@@ -28,7 +28,7 @@ public class ProductUpdateResponseDto {
               product.getTitle(),
               product.getContent(),
               product.getPrice().getValue(),
-              product.getStatus()
+              product.getStatus().getStatus()
       );
 
     }
