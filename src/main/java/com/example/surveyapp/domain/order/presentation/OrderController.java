@@ -25,61 +25,60 @@ public class OrderController {
 
     @PostMapping
     @PreAuthorize("hasRole('SURVEYEE')")
-    public ResponseEntity<ApiResponse<OrderCreateResponseDto>> create(@Valid@RequestBody OrderCreateRequestDto requestDto,
+    public ResponseEntity<OrderCreateResponseDto> create(@Valid@RequestBody OrderCreateRequestDto requestDto,
                                                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getId();
         OrderCreateResponseDto order = orderService.createOrder(requestDto,userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("주문이 완료되었습니다.",order));
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public  ResponseEntity<ApiResponse<List<OrderResponseDto>>> readAllOrder(
+    public  ResponseEntity<List<OrderResponseDto>> readAllOrder(
             @RequestParam(defaultValue = "0")int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         List<OrderResponseDto> orderList = orderService.readAllOrder(page, size);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("주문목록을 조회 하였습니다.",orderList));
+        return ResponseEntity.status(HttpStatus.OK).body(orderList);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<OrderResponseDto>> readOneOrder(@PathVariable Long id) {
+    public ResponseEntity<OrderResponseDto> readOneOrder(@PathVariable Long id) {
         OrderResponseDto responseDto = orderService.readOneOrder(id);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("주문 단 건 조회가 완료되었습니다.",responseDto));
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @GetMapping("/my")
     @PreAuthorize("hasRole('SURVEYEE')")
-    public ResponseEntity<ApiResponse<List<OrderResponseDto>>> readMyOrders(
+    public ResponseEntity<List<OrderResponseDto>> readMyOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         Long userId = userDetails.getId();
         List<OrderResponseDto> myOrderList = orderService.readMyOrderList(page,size,userId);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("내 주문 목록 조회 하였습니다.",myOrderList));
+        return ResponseEntity.status(HttpStatus.OK).body(myOrderList);
     }
 
     @GetMapping("/my/{id}")
     @PreAuthorize("hasRole('SURVEYEE')")
-    public ResponseEntity<ApiResponse<OrderResponseDto>> readOneMyOrder(
+    public ResponseEntity<OrderResponseDto> readOneMyOrder(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getId();
         OrderResponseDto responseDto = orderService.readOneMyOrder(id,userId);
-       return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("내 주문 단건 조회하였습니다.",responseDto));
+       return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('SURVEYEE')")
-    public ResponseEntity<ApiResponse<Void>> delete(
+    public ResponseEntity<Void> delete(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ){
         Long userId = userDetails.getId();
         orderService.deleteOrder(id,userId);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("주문 내역이 삭제되었습니다.",null));
-
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }
