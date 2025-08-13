@@ -5,10 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class QuestionCreateRequestDto {
 
     @NotNull(message = "질문 번호는 필수입니다.")

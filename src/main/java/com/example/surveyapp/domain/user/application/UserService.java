@@ -1,10 +1,9 @@
 package com.example.surveyapp.domain.user.application;
 
 import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.presentation.dto.NicknameModerationRequestDto;
-import com.example.surveyapp.domain.ai.moderation.presentation.dto.NicknameModerationResponseDto;
-import com.example.surveyapp.domain.ai.moderation.application.NicknameModerationService;
 import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
+import com.example.surveyapp.domain.point.domain.model.entity.Point;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;
@@ -17,6 +16,8 @@ import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserBaseData;
 import com.example.surveyapp.domain.user.domain.repository.UserBaseDataRepository;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
+import com.example.surveyapp.global.response.exception.CustomException;
+import com.example.surveyapp.global.response.exception.ErrorCode;
 import com.example.surveyapp.global.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,7 +35,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final PointRepository pointRepository;
     private final UserBaseDataRepository userBaseDataRepository;
-    private final NicknameModerationService nicknameModerationService;
+    private final ModerationService moderationService;
 
     @Transactional
     public void register(RegisterRequestDto requestDto) {
@@ -116,6 +117,7 @@ public class UserService {
         return UserResponseDto.from(user);
     }
 
+    // 유저 정보 중복 여부 검사
     private void validateDuplicatedUser(UserRequestDto userRequestDto) {
         if (userRepository.existsByEmail(userRequestDto.getEmail())) {
             throw new UserException(UserErrorCode.EXISTS_EMAIL);
@@ -126,19 +128,21 @@ public class UserService {
         }
     }
 
-    private void validateNicknameModeration(String nicknmae){
-        NicknameModerationRequestDto nicknameModerationRequest = new NicknameModerationRequestDto(nicknmae);
-        NicknameModerationResponseDto nicknameModerationResult = nicknameModerationService.moderate(nicknameModerationRequest);
+    // 닉네임 적절성 검사
+    private void validateNicknameModeration(String nickname){
+        ModerationResultStatusEnum status = moderationService.moderate("nickname", nickname);
 
-        if(nicknameModerationResult.getStatus() == ModerationResultStatusEnum.DENIED){
+        if(status == ModerationResultStatusEnum.DENIED){
             throw new UserException(UserErrorCode.INVALID_NICKNAME);
         }
     }
 
+    // ID로 유저 찾기
     private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
     }
+
 
     // 참여자 로그인 시 기초 정보 체크하여 없을 경우 기초정보 입력 메서드 호출
     // 참여자 기초 정보 작성 선택지 보여주는 메서드
@@ -173,6 +177,7 @@ public class UserService {
                     }
                 }
         );
+
     }
 
     // 참여자 기초 정보 R

@@ -7,8 +7,13 @@ import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;
 import com.example.surveyapp.domain.user.presentation.dto.UserRequestDto;
 import com.example.surveyapp.domain.user.presentation.dto.UserResponseDto;
+import com.example.surveyapp.domain.ai.moderation.service.ModerationService;
+import com.example.surveyapp.domain.user.controller.dto.UserRequestDto;
+import com.example.surveyapp.domain.user.controller.dto.UserResponseDto;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
+import com.example.surveyapp.global.response.exception.CustomException;
+import com.example.surveyapp.global.response.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +41,7 @@ public class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private NicknameModerationService nicknameModerationService;
+    private ModerationService moderationService;
 
     @Test
     @DisplayName("기능_테스트_회원_정보를_조회한다")
@@ -65,11 +70,8 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(requestDto.getEmail())).thenReturn(false);
         when(userRepository.existsByNickname(requestDto.getNickname())).thenReturn(false);
         when(passwordEncoder.encode(requestDto.getPassword())).thenReturn("encodedPw123!");
-        when(nicknameModerationService.moderate(any()))
-                .thenReturn(new NicknameModerationResponseDto(
-                        ModerationResultStatusEnum.APPROVED,
-                        "적합한 닉네임입니다."
-                ));
+        when(moderationService.moderate(eq("nickname"), eq("newNickname")))
+                .thenReturn(ModerationResultStatusEnum.APPROVED);
 
         // When
         UserResponseDto updatedUser = userService.updateMyInfo(ID, requestDto);
