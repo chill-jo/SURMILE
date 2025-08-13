@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface PointRepository extends JpaRepository<PointWallet, Long> {
     Optional<PointWallet> findByUserId(Long userId);
+    Boolean existsByUserId(Long userId);
 }

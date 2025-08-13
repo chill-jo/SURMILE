@@ -1,6 +1,7 @@
 package com.example.surveyapp.domain.survey.presentation.dto.request;
 
 import com.example.surveyapp.domain.survey.domain.model.enums.QuestionType;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,13 +9,13 @@ import org.hibernate.validator.constraints.Length;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class QuestionUpdateRequestDto {
 
-    private final Long number;
+    private Long number;
 
     @Length(min = 5, max = 255, message = "질문 내용은 5~255자 사이여야 합니다.")
-    private final String content;
+    private String content;
 
-    private final QuestionType type;
+    private QuestionType type;
 }
