@@ -3,10 +3,7 @@ package com.example.surveyapp.domain.product.application;
 import com.example.surveyapp.config.generator.ProductFixtureGenerator;
 import com.example.surveyapp.domain.product.exception.ProductErrorCode;
 import com.example.surveyapp.domain.product.exception.ProductException;
-import com.example.surveyapp.domain.product.presentation.dto.ProductCreateRequestDto;
-import com.example.surveyapp.domain.product.presentation.dto.ProductCreateResponseDto;
-import com.example.surveyapp.domain.product.presentation.dto.ProductResponseDto;
-import com.example.surveyapp.domain.product.presentation.dto.ProductUpdateRequestDto;
+import com.example.surveyapp.domain.product.presentation.dto.*;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
@@ -230,7 +227,7 @@ class ProductServiceTest {
 
     @Test
     @DisplayName("기능_테스트_상품을 삭제한다")
-    void 상품_삭제() {
+    void 관리자_상품_삭제() {
         // Given
         //테스트 전제 조건 및 환경 설정
         Long userId = 1L;
@@ -249,5 +246,49 @@ class ProductServiceTest {
         //검증 사항
         assertThat(product.isDeleted()).isTrue();
         verify(productRepository,times(1)).findByIdAndIsDeletedFalse(product.getId());
+    }
+
+    @Test
+    @DisplayName("예외_테스트_판매중 상품을 삭제는 불가능하다")
+    void 관리자_판매중_상품_삭제_불가() {
+        // Given
+        //테스트 전제 조건 및 환경 설정
+        Long userId = 1L;
+        Product product = ProductFixtureGenerator.generateProductFixture();
+        ReflectionTestUtils.setField(product,"id",1L);
+        when(productRepository.findByIdAndIsDeletedFalse(product.getId())).thenReturn(Optional.of(product));
+        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        when(userReader.validateUserRole(userId,UserRoleEnum.ADMIN)).thenReturn(true);
+
+
+        // When
+        //실행할 행동
+
+        // Then
+        //검증 사항
+        assertThatThrownBy(() -> productService.deleteProduct(product.getId(),userId))
+                .isInstanceOf(ProductException.class)
+                        .hasMessageContaining(ProductErrorCode.NOT_DELETE_ON_SALE_PRODUCT.getMessage());
+        verify(productRepository,times(1)).findByIdAndIsDeletedFalse(product.getId());
+    }
+
+    @Test
+    @DisplayName("기능_테스트_상품 상태를 변경한다")
+    void 관리자_상품_상태_변경() {
+        // Given
+        //테스트 전제 조건 및 환경 설정
+        Long userId =1L;
+        Product product = ProductFixtureGenerator.generateProductFixture();
+        ReflectionTestUtils.setField(product,"id",1L);
+
+        when(productRepository.findByIdAndIsDeletedFalse(product.getId())).thenReturn(Optional.of(product));
+        when(userReader.validateUserRole(userId,UserRoleEnum.ADMIN)).thenReturn(true);
+        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        // When
+        //실행할 행동
+        productService.statusUpdate(userId, product.getId(),new ProductStatusUpdateRequestDto(Status.STOPPED_SALE));
+        // Then
+        //검증 사항
+        assertThat(product.getStatus()).isEqualTo(Status.STOPPED_SALE);
     }
 }
