@@ -1,0 +1,19 @@
+package com.example.surveyapp.domain.ai.chat.rag;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+public class DocumentIndexer {
+    private final VectorStore vectorStore;
+
+    public void indexText(String content) {
+        Document doc = new Document(content);
+        vectorStore.add(List.of(doc));
+    }
+}
