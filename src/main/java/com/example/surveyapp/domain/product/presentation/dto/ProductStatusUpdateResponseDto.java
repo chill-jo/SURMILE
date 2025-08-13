@@ -9,10 +9,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ProductStatusUpdateResponseDto {
 
-    private Status newStatus;
+    private String newStatus;
 
     public static ProductStatusUpdateResponseDto from(Product product){
-        return new ProductStatusUpdateResponseDto(product.getStatus());
+        return new ProductStatusUpdateResponseDto(product.getStatus().getStatus());
     }
 
 }

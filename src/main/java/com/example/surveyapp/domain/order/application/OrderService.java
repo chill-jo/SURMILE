@@ -48,7 +48,7 @@ public class OrderService {
                 List.of(item)
                 );
 
-        String status = product.getStatusName();
+        String status = product.getStatus().getStatus();
 
         Order saveOrder = orderRepository.save(order);
         //이벤트 발행
@@ -71,7 +71,7 @@ public class OrderService {
                     OrderItem item = order.getOneOrderItemOrThrow();
                     String username = userReader.usernameById(order.getUserId());
                     ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
-                    String status = product.getStatusName();
+                    String status = product.getStatus().getStatus();
                     return OrderResponseDto.from(order,username,status);
                 })
                 .toList();
@@ -88,7 +88,7 @@ public class OrderService {
         //상품정보 조회
         OrderItem item = order.getOneOrderItemOrThrow();
         ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
-        String status = product.getStatusName();
+        String status = product.getStatus().getStatus();
 
         return OrderResponseDto.from(order,username,status);
 
@@ -104,7 +104,7 @@ public class OrderService {
                     OrderItem item = order.getOneOrderItemOrThrow();
                     String username = userReader.usernameById(order.getUserId());
                     ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
-                    String status = product.getStatusName();
+                    String status = product.getStatus().getStatus();
                     return OrderResponseDto.from(order,username,status);})
                 .toList();
         }
@@ -121,7 +121,7 @@ public class OrderService {
         OrderItem item = order.getOneOrderItemOrThrow();
         String username = userReader.usernameById(order.getUserId());
         ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
-        String status = product.getStatusName();
+        String status = product.getStatus().getStatus();
 
         return OrderResponseDto.from(order,username,status);
     }
