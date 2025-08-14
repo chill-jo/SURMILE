@@ -13,8 +13,10 @@ import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import com.example.surveyapp.domain.survey.exception.SurveyErrorCode;
 import com.example.surveyapp.domain.survey.exception.SurveyException;
 import com.example.surveyapp.domain.surveyanswer.application.facade.SurveyFacade;
+import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,10 +28,28 @@ public class SurveyFacadeImpl implements SurveyFacade {
     private final SurveyRepository surveyRepository;
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
+    private final SurveyAnswerRepository surveyAnswerRepository;
 
     public Survey findSurvey(Long surveyId) {
         return surveyRepository.findByIdAndIsDeletedFalse(surveyId).orElseThrow(
                 () -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
+    }
+
+    @Override
+    public Survey findSurveyWithPessimisticLock(Long surveyId){
+        return surveyRepository.findByIdAndIsDeletedFalseWithPessimisticLock(surveyId)
+                .orElseThrow(() -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
+    }
+
+    public void validateAndReserveSlot(Long surveyId) {
+        Survey survey = findSurveyWithPessimisticLock(surveyId);
+
+        Long count = surveyAnswerRepository.countBySurveyId(surveyId);
+        Long max = survey.getSurveyInfo().getMaxSurveyee();
+
+        if (count >= max) {
+            throw new SurveyException(SurveyErrorCode.INVALID_SURVEY_STATUS_TRANSITION);
+        }
     }
 
     @Override
