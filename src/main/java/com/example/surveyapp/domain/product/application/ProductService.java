@@ -2,10 +2,7 @@ package com.example.surveyapp.domain.product.application;
 
 import com.example.surveyapp.domain.product.exception.ProductErrorCode;
 import com.example.surveyapp.domain.product.exception.ProductException;
-import com.example.surveyapp.domain.product.presentation.dto.ProductCreateRequestDto;
-import com.example.surveyapp.domain.product.presentation.dto.ProductCreateResponseDto;
-import com.example.surveyapp.domain.product.presentation.dto.ProductResponseDto;
-import com.example.surveyapp.domain.product.presentation.dto.ProductUpdateRequestDto;
+import com.example.surveyapp.domain.product.presentation.dto.*;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.ProductPoints;
 import com.example.surveyapp.domain.product.domain.model.Status;
@@ -87,15 +84,14 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
 
+        product.changeStatus(product.getStatus());
+
         if (!product.getTitle().equals(requestDto.getTitle())) {
             boolean onlyOne = productRepository.existsByTitleAndIsDeletedFalse(requestDto.getTitle());
             if (onlyOne){
                 throw new ProductException(ProductErrorCode.NOT_SAME_PRODUCT_TITLE);
             }
 
-            if (requestDto.getStatus() == null) {
-                throw new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT_STATUS);
-            }
         }
          product.update(
                 requestDto.getTitle(),
@@ -105,13 +101,7 @@ public class ProductService {
 
         product.changeStatus(requestDto.getStatus());
 
-        return new ProductUpdateResponseDto(
-                product.getId(),
-                product.getTitle(),
-                product.getContent(),
-                product.getPrice().getValue(),
-                product.getStatus()
-        );
+        return ProductUpdateResponseDto.from(product);
 
     }
 
@@ -123,5 +113,15 @@ public class ProductService {
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
 
         product.delete();
+    }
+
+    @Transactional
+    public ProductStatusUpdateResponseDto statusUpdate(Long userId, Long id, ProductStatusUpdateRequestDto requestDto) {
+        userReader.validateUserIdOrThrow(userId);
+        userReader.validateUserRole(userId,UserRoleEnum.ADMIN);
+        Product product = productRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
+        product.changeStatus(requestDto.getNewStatus());
+        return ProductStatusUpdateResponseDto.from(product);
     }
 }

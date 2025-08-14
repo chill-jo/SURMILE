@@ -1,5 +1,6 @@
-package com.example.surveyapp.domain.order.presentation.dto;
+package com.example.surveyapp.domain.product.presentation.dto;
 
+import com.example.surveyapp.domain.product.domain.model.Status;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,9 +10,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderCreateRequestDto {
+public class ProductStatusUpdateRequestDto {
 
     @NotNull
-    private Long productId;
-
- }
+    private Status newStatus;
+}

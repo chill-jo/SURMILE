@@ -10,7 +10,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class InitDocumentLoader {
+public class InitialDocumentLoader {
     private final VectorStore vectorStore;
 
     // 초기 요구사항 문서 등록

@@ -15,14 +15,14 @@ public class ProductResponseDto {
 
     private final Long price;
 
-    private final Status status;
+    private final String status;
 
     public static ProductResponseDto from(Product product) {
         return new ProductResponseDto(
                 product.getId(),
                 product.getTitle(),
                 product.getPrice().getValue(),
-                product.getStatus()
+                product.getStatus().getStatus()
         );
     }
 }

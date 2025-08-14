@@ -2,10 +2,7 @@ package com.example.surveyapp.domain.product.presentation;
 
 import com.example.surveyapp.config.generator.ProductFixtureGenerator;
 import com.example.surveyapp.config.custommockuser.WithCustomMockUser;
-import com.example.surveyapp.domain.product.presentation.dto.ProductCreateRequestDto;
-import com.example.surveyapp.domain.product.presentation.dto.ProductCreateResponseDto;
-import com.example.surveyapp.domain.product.presentation.dto.ProductResponseDto;
-import com.example.surveyapp.domain.product.presentation.dto.ProductUpdateRequestDto;
+import com.example.surveyapp.domain.product.presentation.dto.*;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.application.ProductService;
@@ -20,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -33,7 +29,6 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -73,7 +68,7 @@ class ProductControllerTest {
         ProductCreateResponseDto responseDto = new ProductCreateResponseDto(product.getId(),
                 product.getTitle(),
                 product.getPrice().getValue(),
-                product.getStatus());
+                product.getStatus().getStatus());
 
         when(productService.createProduct(any(ProductCreateRequestDto.class), eq(1L))).thenReturn(responseDto);
         // When
@@ -97,8 +92,8 @@ class ProductControllerTest {
     @WithCustomMockUser(id = 1, role = UserRoleEnum.ADMIN)
     void 상품_전체_조회를_한다() throws Exception {
         // Given
-        ProductResponseDto product1 = new ProductResponseDto(1L, "상품1", 2000L, Status.ON_SALE);
-        ProductResponseDto product2 = new ProductResponseDto(2L, "상품2", 2500L, Status.ON_SALE);
+        ProductResponseDto product1 = new ProductResponseDto(1L, "상품1", 2000L, Status.ON_SALE.getStatus());
+        ProductResponseDto product2 = new ProductResponseDto(2L, "상품2", 2500L, Status.ON_SALE.getStatus());
         List<ProductResponseDto> productList = List.of(product1, product2);
 
         when(productService.readAllProduct(0,10)).thenReturn(productList);
@@ -126,8 +121,8 @@ class ProductControllerTest {
     @WithCustomMockUser(id = 2, role = UserRoleEnum.SURVEYEE)
     void 상품_전체_조회_참여자계정은_가능해야한다() throws Exception {
         // Given
-        ProductResponseDto product1 = new ProductResponseDto(1L, "상품1", 2000L, Status.ON_SALE);
-        ProductResponseDto product2 = new ProductResponseDto(2L, "상품2", 2500L, Status.ON_SALE);
+        ProductResponseDto product1 = new ProductResponseDto(1L, "상품1", 2000L, Status.ON_SALE.getStatus());
+        ProductResponseDto product2 = new ProductResponseDto(2L, "상품2", 2500L, Status.ON_SALE.getStatus());
         List<ProductResponseDto> productList = List.of(product1, product2);
 
         when(productService.readAllProduct(0,10)).thenReturn(productList);
@@ -159,7 +154,7 @@ class ProductControllerTest {
         //테스트 전제 조건 및 환경 설정
         Product product = ProductFixtureGenerator.generateProductFixture();
         ReflectionTestUtils.setField(product,"id",1L);
-        ProductResponseDto productResponseDto = new ProductResponseDto(product.getId(), product.getTitle(), product.getPrice().getValue(), product.getStatus());
+        ProductResponseDto productResponseDto = new ProductResponseDto(product.getId(), product.getTitle(), product.getPrice().getValue(), product.getStatus().getStatus());
         when(productService.readOneProduct(product.getId())).thenReturn(productResponseDto);
 
         // When
@@ -205,7 +200,7 @@ class ProductControllerTest {
         //테스트 전제 조건 및 환경 설정
         Long productId = 1L;
         ProductUpdateRequestDto requestDto = new ProductUpdateRequestDto("변경된 상품명", 2500L, "변경된 상품설명", Status.ON_SALE);
-        ProductUpdateResponseDto responseDto = new ProductUpdateResponseDto(1L, "변경된 상품명", "변경된 상품설명:", 2500L, Status.ON_SALE);
+        ProductUpdateResponseDto responseDto = new ProductUpdateResponseDto(1L, "변경된 상품명", "변경된 상품설명:", 2500L, Status.ON_SALE.getStatus());
 
         when(productService.updateProduct(eq(productId), any(ProductUpdateRequestDto.class))).thenReturn(responseDto);
 
@@ -255,4 +250,34 @@ class ProductControllerTest {
 
 
     }
+
+    @Test
+    @DisplayName("기능_테스트_상품 상태를 변경 한다.")
+    @WithCustomMockUser(id = 1, role = UserRoleEnum.ADMIN)
+    void 상품_상태를_변경한다() throws Exception {
+        // Given
+        //테스트 전제 조건 및 환경 설정
+        Long userId = 1L;
+        Product product = ProductFixtureGenerator.generateProductFixture();
+        ReflectionTestUtils.setField(product,"id",1L);
+
+        ProductStatusUpdateRequestDto requestDto = new ProductStatusUpdateRequestDto(Status.ON_SALE);
+        ProductStatusUpdateResponseDto responseDto = new ProductStatusUpdateResponseDto(Status.STOPPED_SALE.getStatus());
+        when(productService.statusUpdate(eq(userId), eq(product.getId()),any(ProductStatusUpdateRequestDto.class))).thenReturn(responseDto);
+
+        // When
+        //실행할 행동
+        ResultActions actions = mockMvc.perform(patch("/api/products/{id}/status", product.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDto)));
+
+        // Then
+        //검증 사항
+        verify(productService, times(1)).statusUpdate(eq(userId),eq(product.getId()),any(ProductStatusUpdateRequestDto.class));
+
+        actions.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.newStatus").value(Status.STOPPED_SALE.getStatus()));
+    }
+
 }

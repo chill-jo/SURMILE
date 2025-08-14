@@ -60,7 +60,7 @@ class OrderServiceTest {
         //테스트 전제 조건 및 환경 설정
         Long userId = 1L;
         Long productId = 1L;
-        ProductInfoDto productInfoDto = new ProductInfoDto("chicken", 2500L, Status.ON_SALE, "ON_SALE");
+        ProductInfoDto productInfoDto = new ProductInfoDto("chicken", 2500L, Status.ON_SALE);
         Order order = OrderFixtureGenerator.generateOrderFixture(userId);
         OrderCreateRequestDto requestDto = new OrderCreateRequestDto(productId);
         // When
@@ -76,7 +76,7 @@ class OrderServiceTest {
         //검증 사항
         assertThat(responseDto.getPrice() >= order.orderAmount());
         assertThat(responseDto.getOrderNumber()).isNotBlank();
-        assertThat(responseDto.getStatus()).isEqualTo("ON_SALE");
+        assertThat(responseDto.getStatus()).isEqualTo(Status.ON_SALE.getStatus());
         assertThat(responseDto.getTitle()).isEqualTo(order.getOneOrderItemOrThrow().getTitle());
 
         verify(eventPublisher).publishEvent(any(OrderCreateEvent.class));
@@ -105,7 +105,7 @@ class OrderServiceTest {
         when(userReader.usernameById(2L)).thenReturn("dohan2");
         when(userReader.usernameById(3L)).thenReturn("dohan3");
         when(productFacade.findProductInfo(any()))
-                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE,"ON_SALE"));
+                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
         // When
         //실행할 행동
         List<OrderResponseDto> orderResponseDtos = orderService.readAllOrder(page, size);
@@ -132,7 +132,7 @@ class OrderServiceTest {
 
         when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
         when(productFacade.findProductInfo(any()))
-                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE,"ON_SALE"));
+                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
 
         // When
         //실행할 행동
@@ -163,7 +163,7 @@ class OrderServiceTest {
         when(orderRepository.findByUserIdAndIsDeletedFalse(userId, pageable)).thenReturn(orders);
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         when(productFacade.findProductInfo(any()))
-                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE,"ON_SALE"));
+                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
 
 
         // When
@@ -185,7 +185,7 @@ void 참여자_주문_단건_조회() {
     when(orderRepository.findByIdAndIsDeletedFalse(order.getId())).thenReturn(Optional.of(order));
     doNothing().when(userReader).validateUserIdOrThrow(userId);
     when(productFacade.findProductInfo(any()))
-            .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE,"ON_SALE"));
+            .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
 
     // When
     //실행할 행동

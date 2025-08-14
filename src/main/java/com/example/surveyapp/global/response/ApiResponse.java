@@ -1,5 +1,6 @@
 package com.example.surveyapp.global.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ public class ApiResponse<T>{
     private boolean success;
     private String message;
     private T data;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp;
 
     public ApiResponse(boolean success, String message, T data) {
