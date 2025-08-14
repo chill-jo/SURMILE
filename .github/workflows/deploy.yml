@@ -29,34 +29,10 @@ jobs:
         run: echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
 
       - name: Dockerfile 생성
-        run: |
-          cat > ./survey-app/Dockerfile << 'EOL'
-          FROM openjdk:17-jdk-slim
-          WORKDIR /app
-          COPY app.jar app.jar
-          COPY .env .env
-          ENTRYPOINT ["java", "-jar", "app.jar", "--spring.config.import=optional:file:.env[.properties]"]
-          EOL
+        run: mv ./Dockerfile ./survey-app
 
-      - name: Docker Compose 파일 생성
-        run: |
-          cat > ./survey-app/docker-compose.yml << 'EOL'
-          services:
-            app:
-              build: .
-              ports:
-                - "8080:8080"
-              restart: always
-              container_name: survey-app
-              env_file:
-                - .env
-  
-            redis:
-              image: redis/redis-stack:latest
-              ports:
-                - "6379:6379"
-              container_name: redis
-          EOL
+      - name: docker-compose.yml 파일 생성
+        run: mv ./docker-compose.yml ./survey-app
 
       - name: 파일 생성 확인
         run: |
