@@ -16,6 +16,6 @@ public interface SurveyFacade {
     SurveyInfoDto getSurveyInfo(Long surveyId);
     List<QuestionDto> getQuestionDtos(Long surveyId);
     List<OptionDto> getOptionDtos(Long surveyId, Long questionId);
-    Survey findSurveyWithPessimisticLock(Long surveyId);
-    void validateAndReserveSlot(Long surveyId);
+    Survey findByIdAndIsDeletedFalseWithPessimisticLock(Long surveyId);
+    void validateAndReserveSlot(Long surveyId, Long count);
 }

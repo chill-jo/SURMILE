@@ -28,28 +28,20 @@ public class SurveyFacadeImpl implements SurveyFacade {
     private final SurveyRepository surveyRepository;
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
-    private final SurveyAnswerRepository surveyAnswerRepository;
 
     public Survey findSurvey(Long surveyId) {
         return surveyRepository.findByIdAndIsDeletedFalse(surveyId).orElseThrow(
                 () -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
     }
 
-    public Survey findSurveyWithPessimisticLock(Long surveyId){
+    public Survey findByIdAndIsDeletedFalseWithPessimisticLock(Long surveyId){
         return surveyRepository.findByIdAndIsDeletedFalseWithPessimisticLock(surveyId).orElseThrow(
                 () -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
     }
 
-    @Override
-    public Survey findSurveyWithPessimisticLock(Long surveyId){
-        return surveyRepository.findByIdAndIsDeletedFalseWithPessimisticLock(surveyId)
-                .orElseThrow(() -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
-    }
+    public void validateAndReserveSlot(Long surveyId,Long count) {
+        Survey survey = findByIdAndIsDeletedFalseWithPessimisticLock(surveyId);
 
-    public void validateAndReserveSlot(Long surveyId) {
-        Survey survey = findSurveyWithPessimisticLock(surveyId);
-
-        Long count = surveyAnswerRepository.countBySurveyId(surveyId);
         Long max = survey.getSurveyInfo().getMaxSurveyee();
 
         if (count >= max) {
@@ -59,7 +51,7 @@ public class SurveyFacadeImpl implements SurveyFacade {
 
     @Override
     public void validateSurveyStartable(Long surveyId) {
-        Survey survey = findSurveyWithPessimisticLock(surveyId);
+        Survey survey = findByIdAndIsDeletedFalseWithPessimisticLock(surveyId);
         surveyValidator.validateStartable(survey);
     }
 
