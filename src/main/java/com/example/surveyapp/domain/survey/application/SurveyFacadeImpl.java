@@ -45,7 +45,7 @@ public class SurveyFacadeImpl implements SurveyFacade {
         Long max = survey.getSurveyInfo().getMaxSurveyee();
 
         if (count >= max) {
-            throw new SurveyException(SurveyErrorCode.INVALID_SURVEY_STATUS_TRANSITION);
+            throw new SurveyException(SurveyErrorCode.SURVEY_NOT_IN_PROGRESS);
         }
     }
 
