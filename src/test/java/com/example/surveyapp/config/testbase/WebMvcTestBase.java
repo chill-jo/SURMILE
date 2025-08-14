@@ -7,6 +7,7 @@ import com.example.surveyapp.domain.product.presentation.ProductController;
 import com.example.surveyapp.domain.survey.presentation.OptionsController;
 import com.example.surveyapp.domain.survey.presentation.QuestionController;
 import com.example.surveyapp.domain.survey.presentation.SurveyController;
+import com.example.surveyapp.domain.surveyanswer.presentation.SurveyAnswerController;
 import com.example.surveyapp.domain.user.presentation.UserController;
 import com.example.surveyapp.global.filter.JwtFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(
         controllers = {UserController.class, AdminController.class, OrderController.class,
                 PointController.class, ProductController.class, OptionsController.class,
-                QuestionController.class, SurveyController.class},
+                QuestionController.class, SurveyController.class, SurveyAnswerController.class},
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class)
 )
 @AutoConfigureMockMvc(addFilters = false)

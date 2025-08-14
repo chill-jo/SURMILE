@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class SurveyAnswerController {
 
     private final SurveyAnswerService surveyAnswerService;
-    private final SurveyAnswerStatisticsService statisticsService;
     private final SurveyAnswerStatisticsService surveyAnswerStatisticsService;
 
     // 설문 응답 제출
