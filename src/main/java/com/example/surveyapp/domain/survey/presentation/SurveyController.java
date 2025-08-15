@@ -15,6 +15,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/survey")
@@ -32,7 +34,8 @@ public class SurveyController {
         Long userId = userDetails.getId();
         SurveyResponseDto responseDto = surveyService.createSurvey(userId, requestDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        URI location = URI.create("/api/survey/" + responseDto.getId());
+        return ResponseEntity.created(location).body(responseDto);
     }
 
     //설문 목록 조회(정렬 없이 삭제된 설문만 제외)
