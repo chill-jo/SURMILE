@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
-@DisplayName("controller: Product 컨트롤 테스트")
+@DisplayName("controller: Product 컨트롤러 테스트")
 @WebMvcTest(controllers = ProductController.class,
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class))
 // 웹계층 테스트에 필요한 Bean들만 등록해주는 Annotations
@@ -149,17 +149,16 @@ class ProductControllerTest {
 
         verify(productService, times(1)).readAllProduct(0,10);
 
-          actions.andDo(print())
+          actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title").value("상품1"))
                 .andExpect(jsonPath("$.data[1].title").value("상품2"))
-                  .andDo(document("get-product",
+                  .andDo(document("get-products",
                           requestHeaders(
                                   headerWithName(HttpHeaders.AUTHORIZATION)
                                           .description("JWT 인증 토큰 (Bearer + 토큰 값")
                                           .attributes(key("format").value("Bearer {jwt_token"))
                           ),
-
                           // /api/products?page=1&size=10
                           queryParameters(
                                   parameterWithName("page").description("페이지 번호").optional(),
@@ -168,7 +167,7 @@ class ProductControllerTest {
                           responseFields(
                                   fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                   fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                  fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("상품 ID"),
+                                  fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("상품 ID"),
                                   fieldWithPath("data[].title").type(JsonFieldType.STRING).description("상품 제목"),
                                   fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("상품 가격"),
                                   fieldWithPath("data[].status").type(JsonFieldType.STRING).description("상품 상태"),
@@ -201,7 +200,7 @@ class ProductControllerTest {
 
         verify(productService, times(1)).readAllProduct(0,10);
 
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title").value("상품1"))
                 .andExpect(jsonPath("$.data[1].title").value("상품2"));
@@ -224,33 +223,33 @@ class ProductControllerTest {
         ResultActions actions = mockMvc.perform(get("/api/products/{id}",product.getId())
                         .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                         .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productResponseDto)))
-                .andDo(document("get-product",
-                requestHeaders(
-                        headerWithName(HttpHeaders.AUTHORIZATION)
-                                .description("JWT 인증 토큰 (Bearer + 토큰 값")
-                                .attributes(key("format").value("Bearer {jwt_token"))
-                ),
-                        // /api/orders/{id}
-                        pathParameters(
-                                parameterWithName("id").description("주문 ID")),
-                responseFields(
-                        fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("상품 ID"),
-                        fieldWithPath("data.title").type(JsonFieldType.STRING).description("상품 제목"),
-                        fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("상품 가격"),
-                        fieldWithPath("data.status").type(JsonFieldType.STRING).description("상품 상태"),
-                        fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
-
-                )));
+                .content(objectMapper.writeValueAsString(productResponseDto)));
 
         // Then
         //검증 사항
         verify(productService, times(1)).readOneProduct(product.getId());
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.title").value("상품명"));
+                .andExpect(jsonPath("$.data.title").value("상품명"))
+                .andDo(document("get-product",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        // /api/orders/{id}
+                        pathParameters(
+                                parameterWithName("id").description("주문 ID")),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("상품 ID"),
+                                fieldWithPath("data.title").type(JsonFieldType.STRING).description("상품 제목"),
+                                fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("상품 가격"),
+                                fieldWithPath("data.status").type(JsonFieldType.STRING).description("상품 상태"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
+
+                        )));
 
     }
 
