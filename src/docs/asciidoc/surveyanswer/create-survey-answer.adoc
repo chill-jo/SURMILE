@@ -1,0 +1,20 @@
+== Create Survey Answer API
+
+[example]
+`POST` 요청을 사용하여 설문 응답을 저장할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/create-survey-answer/http-request.adoc[]
+include::{snippets}/create-survey-answer/request-headers.adoc[]
+include::{snippets}/create-survey-answer/path-parameters.adoc[]
+include::{snippets}/create-survey-answer/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/create-survey-answer/http-response.adoc[]
+include::{snippets}/create-survey-answer/response-fields.adoc[]
+====
