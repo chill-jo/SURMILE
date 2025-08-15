@@ -4,7 +4,6 @@ import com.example.surveyapp.domain.survey.presentation.dto.request.OptionCreate
 import com.example.surveyapp.domain.survey.presentation.dto.request.OptionUpdateRequestDto;
 import com.example.surveyapp.domain.survey.presentation.dto.response.OptionResponseDto;
 import com.example.surveyapp.domain.survey.application.OptionsService;
-import com.example.surveyapp.global.response.ApiResponse;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -33,8 +33,9 @@ public class OptionsController {
         Long userId = userDetails.getId();
         OptionResponseDto responseDto = optionsService.createOption(userId, surveyId, questionId, requestDto);
 
+        URI location = URI.create("/api/survey/" + surveyId + "/question/" + questionId + "/option/" + responseDto.getId());
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .created(location)
                 .body(responseDto);
     }
 
