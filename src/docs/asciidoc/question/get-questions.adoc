@@ -1,0 +1,19 @@
+== Get Questions API
+
+[example]
+`GET` 요청을 사용하여 질문 목록을 조회할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/get-questions/http-request.adoc[]
+include::{snippets}/get-questions/request-headers.adoc[]
+include::{snippets}/get-questions/path-parameters.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/get-questions/http-response.adoc[]
+include::{snippets}/get-questions/response-fields.adoc[]
+====
