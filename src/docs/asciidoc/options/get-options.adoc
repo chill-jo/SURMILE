@@ -1,0 +1,19 @@
+== Get Options API
+
+[example]
+`GET` 요청을 사용하여 선택지 목록을 조회할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/get-options/http-request.adoc[]
+include::{snippets}/get-options/request-headers.adoc[]
+include::{snippets}/get-options/path-parameters.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/get-options/http-response.adoc[]
+include::{snippets}/get-options/response-fields.adoc[]
+====
