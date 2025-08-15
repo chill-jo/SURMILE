@@ -1,0 +1,13 @@
+== Delete Product API
+
+[example]
+`DEL` 요청을 사용하여 상품을 삭제할 수 있습니다.
+
+
+include::{snippets}/delete-product/path-parameters.adoc[]
+
+=== Http Response
+include::{snippets}/get-product/http-response.adoc[]
+include::{snippets}/delete-product/response-fields.adoc[]
+
+

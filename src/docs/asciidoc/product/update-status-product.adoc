@@ -1,0 +1,12 @@
+== Update Status Product API
+
+[example]
+`PATCH` 요청을 사용하여 상품 상태를 수정할 수 있습니다.
+
+
+include::{snippets}/update-status-product/request-fields.adoc[]
+include::{snippets}/update-status-product/http-request.adoc[]
+
+=== Http Response
+include::{snippets}/update-status-product/http-response.adoc[]
+

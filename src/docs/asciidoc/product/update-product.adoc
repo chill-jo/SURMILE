@@ -1,0 +1,12 @@
+== Update Product API
+
+[example]
+`PATCH` 요청을 사용하여 상품을 수정할 수 있습니다.
+
+
+include::{snippets}/update-product/request-fields.adoc[]
+include::{snippets}/update-product/http-request.adoc[]
+
+=== Http Response
+include::{snippets}/update-product/http-response.adoc[]
+

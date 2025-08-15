@@ -1,0 +1,19 @@
+== Create Product API
+
+[example]
+`POST` 요청을 사용하여 관리자는 상품을 생성할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/create-product/http-request.adoc[]
+include::{snippets}/create-product/request-headers.adoc[]
+include::{snippets}/create-order/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/create-order/http-response.adoc[]
+
+====
