@@ -1,7 +1,7 @@
 == Delete Survey API
 
 [example]
-`DELETE` 요청을 사용하여 설문을 등록할 수 있습니다.
+`DELETE` 요청을 사용하여 설문을 삭제할 수 있습니다.
 
 === Http Request
 
