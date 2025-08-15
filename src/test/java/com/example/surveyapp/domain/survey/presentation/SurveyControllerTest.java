@@ -25,6 +25,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.ActiveProfiles;
@@ -40,6 +41,10 @@ import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -92,6 +97,7 @@ public class SurveyControllerTest {
                 .thenReturn(responseDto);
 
         ResultActions actions = mockMvc.perform(post("/api/survey")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)));
 
@@ -100,7 +106,41 @@ public class SurveyControllerTest {
         actions.andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
-                .andExpect(jsonPath("$.data.status").value(SurveyStatus.NOT_STARTED.name()));
+                .andExpect(jsonPath("$.data.status").value(SurveyStatus.NOT_STARTED.name()))
+                .andDo(document("create-survey",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        requestFields(
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("설문 제목"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("설문 상세정보"),
+                                fieldWithPath("maxSurveyee").type(JsonFieldType.NUMBER).description("설문 참여 가능 인원"),
+                                fieldWithPath("pointPerPerson").type(JsonFieldType.NUMBER).description("설문 참여 시 인당 지급 포인트"),
+                                fieldWithPath("deadline").type(JsonFieldType.STRING).description("설문 마감 기한"),
+                                fieldWithPath("expectedTime").type(JsonFieldType.NUMBER).description("설문 예상 소요 시간")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("생성된 설문 위치")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("설문 ID"),
+                                fieldWithPath("data.title").type(JsonFieldType.STRING).description("설문 제목"),
+                                fieldWithPath("data.description").type(JsonFieldType.STRING).description("설문 상세설명"),
+                                fieldWithPath("data.maxSurveyee").type(JsonFieldType.NUMBER).description("설문 참여 가능 인원"),
+                                fieldWithPath("data.pointPerPerson").type(JsonFieldType.NUMBER).description("설문 참여 시 인당 지급 포인트"),
+                                fieldWithPath("data.totalPoint").type(JsonFieldType.NUMBER).description("설문 참여 마감 시 지급되는 포인트 총액"),
+                                fieldWithPath("data.deadline").type(JsonFieldType.STRING).description("설문 마감 기한"),
+                                fieldWithPath("data.expectedTime").type(JsonFieldType.NUMBER).description("설문 예상 소요 시간"),
+                                fieldWithPath("data.status").type(JsonFieldType.STRING).description("설문 상태"),
+                                fieldWithPath("data.surveyeeCount").type(JsonFieldType.NULL).description("설문 참여 인원")
+                        )
+                ))
+        ;
     }
 
     @Test
