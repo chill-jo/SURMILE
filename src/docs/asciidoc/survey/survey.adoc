@@ -1,0 +1,4 @@
+[[survey-resource]]
+= Survey API
+
+include::create-survey.adoc[]
