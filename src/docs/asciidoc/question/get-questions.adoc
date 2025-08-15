@@ -9,6 +9,7 @@
 include::{snippets}/get-questions/http-request.adoc[]
 include::{snippets}/get-questions/request-headers.adoc[]
 include::{snippets}/get-questions/path-parameters.adoc[]
+include::{snippets}/get-questions/query-parameters.adoc[]
 ====
 
 === Http Response

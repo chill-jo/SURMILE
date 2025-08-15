@@ -8,6 +8,7 @@
 ====
 include::{snippets}/get-surveys/http-request.adoc[]
 include::{snippets}/get-surveys/request-headers.adoc[]
+include::{snippets}/get-surveys/query-parameters.adoc[]
 ====
 
 === Http Response
