@@ -34,7 +34,7 @@ public class SurveyAnswerService {
     public void saveSurveyAnswer(Long surveyId, SurveyAnswerRequestDto requestDto, Long userId) {
 
         userReader.validateUserIdOrThrow(userId);
-
+        surveyFacade.validateAndReserveSlot(surveyId,surveyAnswerRepository.countBySurveyId(surveyId));
         surveyFacade.validateSurveyStartable(surveyId);
         surveyAnswerQueryService.validateParticipated(userId, surveyId);
 
