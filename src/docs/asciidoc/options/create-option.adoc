@@ -8,6 +8,7 @@
 ====
 include::{snippets}/create-option/http-request.adoc[]
 include::{snippets}/create-option/request-headers.adoc[]
+include::{snippets}/create-option/path-parameters.adoc[]
 include::{snippets}/create-option/request-fields.adoc[]
 ====
 
