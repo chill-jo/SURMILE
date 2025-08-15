@@ -2,7 +2,7 @@ package com.example.surveyapp.domain.surveyanswer.application;
 
 import com.example.surveyapp.domain.survey.application.dto.QuestionDto;
 import com.example.surveyapp.domain.surveyanswer.application.facade.SurveyFacade;
-import com.example.surveyapp.domain.surveyanswer.application.factory.SurveyAnswerStatisticsFactory;
+import com.example.surveyapp.domain.surveyanswer.application.mapper.SurveyAnswerStatisticsMapper;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyStatisticsDto;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyStatisticsQuestionDto;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SurveyAnswerStatisticsService {
 
-    private final SurveyAnswerStatisticsFactory surveyStatisticsFactory;
+    private final SurveyAnswerStatisticsMapper surveyStatisticsFactory;
     private final SurveyFacade surveyFacade;
 
     @Transactional
