@@ -10,3 +10,6 @@ toc-title: 목차
 :docinfo: shared-head
 
 include::survey/survey.adoc[]
+include::question/question.adoc[]
+include::options/options.adoc[]
+include::surveyanswer/surveyanswer.adoc[]
