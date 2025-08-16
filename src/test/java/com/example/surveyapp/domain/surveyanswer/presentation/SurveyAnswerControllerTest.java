@@ -101,7 +101,7 @@ public class SurveyAnswerControllerTest {
 
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isEmpty())
-                .andDo(document("create-survey-answer",
+                .andDo(document("surveyanswer/create-survey-answer",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -158,7 +158,7 @@ public class SurveyAnswerControllerTest {
                 .andExpect(jsonPath("$.data.survey[1].surveyId").value(2L))
                 .andExpect(jsonPath("$.data.survey[0].title").value("테스트참여설문제목1"))
                 .andExpect(jsonPath("$.data.survey[1].title").value("테스트참여설문제목2"))
-                .andDo(document("get-participated-surveys",
+                .andDo(document("surveyanswer/get-participated-surveys",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -250,7 +250,7 @@ public class SurveyAnswerControllerTest {
                 .andExpect(jsonPath("$.data.questions[0].options[1].content").value("테스트선택지내용2"))
                 .andExpect(jsonPath("$.data.questions[1].options[0].content").value("테스트선택지내용3"))
                 .andExpect(jsonPath("$.data.questions[1].options[1].content").value("테스트선택지내용4"))
-                .andDo(document("get-survey-statistics",
+                .andDo(document("surveyanswer/get-survey-statistics",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")

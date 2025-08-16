@@ -102,7 +102,7 @@ public class OptionsControllerTest {
         actions.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.number").value(requestDto.getNumber()))
                 .andExpect(jsonPath("$.data.content").value(requestDto.getContent()))
-                .andDo(document("create-option",
+                .andDo(document("options/create-option",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -165,7 +165,7 @@ public class OptionsControllerTest {
                 .andExpect(jsonPath("$.data[1].id").value(2L))
                 .andExpect(jsonPath("$.data[0].content").value("테스트선택지내용1"))
                 .andExpect(jsonPath("$.data[1].content").value("테스트선택지내용2"))
-                .andDo(document("get-options",
+                .andDo(document("options/get-options",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -219,7 +219,7 @@ public class OptionsControllerTest {
 
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content").value(requestDto.getContent()))
-                .andDo(document("update-option",
+                .andDo(document("options/update-option",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -264,7 +264,7 @@ public class OptionsControllerTest {
 
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isEmpty())
-                .andDo(document("delete-option",
+                .andDo(document("options/delete-option",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")

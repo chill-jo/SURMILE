@@ -107,7 +107,7 @@ public class SurveyControllerTest {
         actions.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
                 .andExpect(jsonPath("$.data.status").value(SurveyStatus.NOT_STARTED.name()))
-                .andDo(document("create-survey",
+                .andDo(document("survey/create-survey",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -194,7 +194,7 @@ public class SurveyControllerTest {
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content[0].title").value("테스트설문제목1"))
                 .andExpect(jsonPath("$.data.content[1].title").value("테스트설문제목2"))
-                .andDo(document("get-surveys",
+                .andDo(document("survey/get-surveys",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -269,7 +269,7 @@ public class SurveyControllerTest {
                 .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
                 .andExpect(jsonPath("$.data.description").value(requestDto.getDescription()))
                 .andExpect(jsonPath("$.data.maxSurveyee").value(requestDto.getMaxSurveyee()))
-                .andDo(document("update-survey-info",
+                .andDo(document("survey/update-survey-info",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -327,7 +327,7 @@ public class SurveyControllerTest {
 
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value(requestDto.getStatus().name()))
-                .andDo(document("update-survey-status",
+                .andDo(document("survey/update-survey-status",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -365,7 +365,7 @@ public class SurveyControllerTest {
 
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isEmpty())
-                .andDo(document("delete-survey",
+                .andDo(document("survey/delete-survey",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -414,7 +414,7 @@ public class SurveyControllerTest {
                 .andExpect(jsonPath("$.data.title").value("테스트설문제목"))
                 .andExpect(jsonPath("$.data.description").value("테스트설문내용"))
                 .andExpect(jsonPath("$.data.maxSurveyee").value(responseDto.getMaxSurveyee()))
-                .andDo(document("get-survey",
+                .andDo(document("survey/get-survey",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
@@ -491,7 +491,7 @@ public class SurveyControllerTest {
                 .andExpect(jsonPath("$.data.questions[0].options[1].number").value(2L))
                 .andExpect(jsonPath("$.data.questions[0].options[0].content").value("테스트선택지내용1"))
                 .andExpect(jsonPath("$.data.questions[0].options[1].content").value("테스트선택지내용2"))
-                .andDo(document("start-survey",
+                .andDo(document("survey/start-survey",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값)")
