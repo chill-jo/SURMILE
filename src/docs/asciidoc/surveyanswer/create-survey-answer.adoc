@@ -6,15 +6,15 @@
 === Http Request
 
 ====
-include::{snippets}/create-survey-answer/http-request.adoc[]
-include::{snippets}/create-survey-answer/request-headers.adoc[]
-include::{snippets}/create-survey-answer/path-parameters.adoc[]
-include::{snippets}/create-survey-answer/request-fields.adoc[]
+include::{snippets}/surveyanswer/create-survey-answer/http-request.adoc[]
+include::{snippets}/surveyanswer/create-survey-answer/request-headers.adoc[]
+include::{snippets}/surveyanswer/create-survey-answer/path-parameters.adoc[]
+include::{snippets}/surveyanswer/create-survey-answer/request-fields.adoc[]
 ====
 
 === Http Response
 
 ====
-include::{snippets}/create-survey-answer/http-response.adoc[]
-include::{snippets}/create-survey-answer/response-fields.adoc[]
+include::{snippets}/surveyanswer/create-survey-answer/http-response.adoc[]
+include::{snippets}/surveyanswer/create-survey-answer/response-fields.adoc[]
 ====

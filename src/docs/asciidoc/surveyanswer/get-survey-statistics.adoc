@@ -6,14 +6,14 @@
 === Http Request
 
 ====
-include::{snippets}/get-survey-statistics/http-request.adoc[]
-include::{snippets}/get-survey-statistics/request-headers.adoc[]
-include::{snippets}/get-survey-statistics/path-parameters.adoc[]
+include::{snippets}/surveyanswer/get-survey-statistics/http-request.adoc[]
+include::{snippets}/surveyanswer/get-survey-statistics/request-headers.adoc[]
+include::{snippets}/surveyanswer/get-survey-statistics/path-parameters.adoc[]
 ====
 
 === Http Response
 
 ====
-include::{snippets}/get-survey-statistics/http-response.adoc[]
-include::{snippets}/get-survey-statistics/response-fields.adoc[]
+include::{snippets}/surveyanswer/get-survey-statistics/http-response.adoc[]
+include::{snippets}/surveyanswer/get-survey-statistics/response-fields.adoc[]
 ====

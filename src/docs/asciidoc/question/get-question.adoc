@@ -6,14 +6,14 @@
 === Http Request
 
 ====
-include::{snippets}/get-question/http-request.adoc[]
-include::{snippets}/get-question/request-headers.adoc[]
-include::{snippets}/get-question/path-parameters.adoc[]
+include::{snippets}/question/get-question/http-request.adoc[]
+include::{snippets}/question/get-question/request-headers.adoc[]
+include::{snippets}/question/get-question/path-parameters.adoc[]
 ====
 
 === Http Response
 
 ====
-include::{snippets}/get-question/http-response.adoc[]
-include::{snippets}/get-question/response-fields.adoc[]
+include::{snippets}/question/get-question/http-response.adoc[]
+include::{snippets}/question/get-question/response-fields.adoc[]
 ====

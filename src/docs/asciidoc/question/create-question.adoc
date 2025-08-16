@@ -6,16 +6,16 @@
 === Http Request
 
 ====
-include::{snippets}/create-question/http-request.adoc[]
-include::{snippets}/create-question/request-headers.adoc[]
-include::{snippets}/create-question/path-parameters.adoc[]
-include::{snippets}/create-question/request-fields.adoc[]
+include::{snippets}/question/create-question/http-request.adoc[]
+include::{snippets}/question/create-question/request-headers.adoc[]
+include::{snippets}/question/create-question/path-parameters.adoc[]
+include::{snippets}/question/create-question/request-fields.adoc[]
 ====
 
 === Http Response
 
 ====
-include::{snippets}/create-question/http-response.adoc[]
-include::{snippets}/create-question/response-headers.adoc[]
-include::{snippets}/create-question/response-fields.adoc[]
+include::{snippets}/question/create-question/http-response.adoc[]
+include::{snippets}/question/create-question/response-headers.adoc[]
+include::{snippets}/question/create-question/response-fields.adoc[]
 ====

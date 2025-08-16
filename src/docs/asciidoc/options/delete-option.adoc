@@ -6,14 +6,14 @@
 === Http Request
 
 ====
-include::{snippets}/delete-option/http-request.adoc[]
-include::{snippets}/delete-option/request-headers.adoc[]
-include::{snippets}/delete-option/path-parameters.adoc[]
+include::{snippets}/options/delete-option/http-request.adoc[]
+include::{snippets}/options/delete-option/request-headers.adoc[]
+include::{snippets}/options/delete-option/path-parameters.adoc[]
 ====
 
 === Http Response
 
 ====
-include::{snippets}/delete-option/http-response.adoc[]
-include::{snippets}/delete-option/response-fields.adoc[]
+include::{snippets}/options/delete-option/http-response.adoc[]
+include::{snippets}/options/delete-option/response-fields.adoc[]
 ====

@@ -6,15 +6,15 @@
 === Http Request
 
 ====
-include::{snippets}/update-survey-status/http-request.adoc[]
-include::{snippets}/update-survey-status/request-headers.adoc[]
-include::{snippets}/update-survey-status/path-parameters.adoc[]
-include::{snippets}/update-survey-status/request-fields.adoc[]
+include::{snippets}/survey/update-survey-status/http-request.adoc[]
+include::{snippets}/survey/update-survey-status/request-headers.adoc[]
+include::{snippets}/survey/update-survey-status/path-parameters.adoc[]
+include::{snippets}/survey/update-survey-status/request-fields.adoc[]
 ====
 
 === Http Response
 
 ====
-include::{snippets}/update-survey-status/http-response.adoc[]
-include::{snippets}/update-survey-status/response-fields.adoc[]
+include::{snippets}/survey/update-survey-status/http-response.adoc[]
+include::{snippets}/survey/update-survey-status/response-fields.adoc[]
 ====

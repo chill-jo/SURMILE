@@ -6,13 +6,13 @@
 === Http Request
 
 ====
-include::{snippets}/get-participated-surveys/http-request.adoc[]
-include::{snippets}/get-participated-surveys/request-headers.adoc[]
+include::{snippets}/surveyanswer/get-participated-surveys/http-request.adoc[]
+include::{snippets}/surveyanswer/get-participated-surveys/request-headers.adoc[]
 ====
 
 === Http Response
 
 ====
-include::{snippets}/get-participated-surveys/http-response.adoc[]
-include::{snippets}/get-participated-surveys/response-fields.adoc[]
+include::{snippets}/surveyanswer/get-participated-surveys/http-response.adoc[]
+include::{snippets}/surveyanswer/get-participated-surveys/response-fields.adoc[]
 ====
