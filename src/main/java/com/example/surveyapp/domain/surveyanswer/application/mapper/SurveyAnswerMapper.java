@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.surveyanswer.application.factory;
+package com.example.surveyapp.domain.surveyanswer.application.mapper;
 
 import com.example.surveyapp.domain.survey.application.SurveyQueryService;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyeeSurveyDto;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class SurveyAnswerFactory {
+public class SurveyAnswerMapper {
 
     private final SurveyQueryService surveyQuestionQueryService;
 

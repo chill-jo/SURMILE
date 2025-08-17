@@ -1,0 +1,19 @@
+== Create Survey API
+
+[example]
+`POST` 요청을 사용하여 설문을 등록할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/create-survey/http-request.adoc[]
+include::{snippets}/create-survey/request-headers.adoc[]
+include::{snippets}/create-survey/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/create-survey/http-response.adoc[]
+include::{snippets}/create-survey/response-headers.adoc[]
+====
