@@ -1,6 +1,7 @@
 package com.example.surveyapp.config.testbase;
 
 import com.example.surveyapp.domain.admin.presentation.AdminController;
+import com.example.surveyapp.domain.ai.chat.presentation.ChatController;
 import com.example.surveyapp.domain.order.presentation.OrderController;
 import com.example.surveyapp.domain.point.presentation.PointController;
 import com.example.surveyapp.domain.product.presentation.ProductController;
@@ -23,7 +24,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(
         controllers = {UserController.class, AdminController.class, OrderController.class,
                 PointController.class, ProductController.class, OptionsController.class,
-                QuestionController.class, SurveyController.class, SurveyAnswerController.class},
+                QuestionController.class, SurveyController.class, SurveyAnswerController.class,
+                ChatController.class},
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class)
 )
 @AutoConfigureMockMvc(addFilters = false)
