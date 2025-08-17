@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
                 ChatController.class},
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class)
 )
+@AutoConfigureMockMvc(addFilters = false)
 public class WebMvcTestBase {
 
     @Autowired
