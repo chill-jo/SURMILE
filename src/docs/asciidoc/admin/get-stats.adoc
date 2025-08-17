@@ -1,0 +1,18 @@
+== Get Stats API
+
+[example]
+`GET` 요청을 사용하여 유저 기본정보 통계를 조회할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/admin/get-stats/http-request.adoc[]
+include::{snippets}/admin/get-stats/request-headers.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/admin/get-stats/http-response.adoc[]
+include::{snippets}/admin/get-stats/response-fields.adoc[]
+====
