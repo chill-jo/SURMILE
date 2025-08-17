@@ -2,6 +2,8 @@ package com.example.surveyapp.domain.order.presentation;
 
 import com.example.surveyapp.config.generator.OrderFixtureGenerator;
 import com.example.surveyapp.config.custommockuser.WithCustomMockUser;
+import com.example.surveyapp.config.testbase.WebMvcTestBase;
+import com.example.surveyapp.config.testmockbeans.TestMockBeans;
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto;
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateResponseDto;
 import com.example.surveyapp.domain.order.presentation.dto.OrderResponseDto;
@@ -10,20 +12,13 @@ import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
 import com.example.surveyapp.domain.order.application.OrderService;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
-import com.example.surveyapp.global.filter.JwtFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -32,24 +27,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.http.HttpHeaders.LOCATION;
-import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ActiveProfiles("test")
 @DisplayName(" controller : Order 컨트롤러 테스트")
-@WebMvcTest(controllers = OrderController.class,
-            excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class))
-@AutoConfigureMockMvc(addFilters = false)
-@AutoConfigureRestDocs
-public class OrderControllerTest {
+@Import(TestMockBeans.class)
+public class OrderControllerTest extends WebMvcTestBase {
 
     @Autowired
     ObjectMapper objectMapper;
@@ -57,7 +45,7 @@ public class OrderControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @MockitoBean
+    @Autowired
     private OrderService orderService;
 
     @Test

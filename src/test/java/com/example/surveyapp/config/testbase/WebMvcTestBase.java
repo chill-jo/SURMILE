@@ -13,6 +13,7 @@ import com.example.surveyapp.domain.user.presentation.UserController;
 import com.example.surveyapp.global.filter.JwtFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class)
 )
 @AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureRestDocs
 public class WebMvcTestBase {
 
     @Autowired

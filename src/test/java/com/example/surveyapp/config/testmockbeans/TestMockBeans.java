@@ -2,6 +2,8 @@ package com.example.surveyapp.config.testmockbeans;
 
 import com.example.surveyapp.domain.admin.application.AdminService;
 import com.example.surveyapp.domain.ai.chat.application.ChatService;
+import com.example.surveyapp.domain.ai.chat.rag.DocumentIndexer;
+import com.example.surveyapp.domain.ai.chat.rag.DocumentSearcher;
 import com.example.surveyapp.domain.order.application.OrderService;
 import com.example.surveyapp.domain.point.application.PointService;
 import com.example.surveyapp.domain.product.application.ProductService;
@@ -33,4 +35,6 @@ public class TestMockBeans {
     @Bean public SurveyAnswerQueryService surveyAnswerQueryService() {return mock(SurveyAnswerQueryService.class);}
     @Bean public SurveyAnswerStatisticsService surveyAnswerStatisticsService() {return mock(SurveyAnswerStatisticsService.class);}
     @Bean public ChatService chatService() {return mock(ChatService.class);}
+    @Bean public DocumentIndexer documentIndexer() {return mock(DocumentIndexer.class);}
+    @Bean public DocumentSearcher documentSearcher() {return mock(DocumentSearcher.class);}
 }
