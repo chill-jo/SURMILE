@@ -1,9 +1,5 @@
 package com.example.surveyapp.domain.surveyanswer.presentation;
 import com.example.surveyapp.config.custommockuser.WithCustomMockUser;
-import com.example.surveyapp.domain.survey.application.OptionsService;
-import com.example.surveyapp.domain.survey.presentation.SurveyController;
-import com.example.surveyapp.domain.survey.presentation.dto.request.OptionCreateRequestDto;
-import com.example.surveyapp.domain.survey.presentation.dto.response.OptionResponseDto;
 import com.example.surveyapp.domain.surveyanswer.application.SurveyAnswerService;
 import com.example.surveyapp.domain.surveyanswer.application.SurveyAnswerStatisticsService;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.request.QuestionAnswerRequestDto;
@@ -20,21 +16,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.example.surveyapp.config.generator.QuestionFixtureGenerator.surveyId;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
