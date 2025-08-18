@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.user.application;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
 import com.example.surveyapp.domain.ai.moderation.application.AiModerationService;
 import com.example.surveyapp.domain.user.domain.event.RegisterEvent;
@@ -31,8 +32,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final UserBaseDataRepository userBaseDataRepository;
-    private final AiModerationService aiModerationService;
     private final ApplicationEventPublisher eventPublisher;
+    private final AiModerationFacade aiModerationFacade;
 
     @Transactional
     public void register(RegisterRequestDto requestDto) {
@@ -47,7 +48,7 @@ public class UserService {
         if (!requestDto.getPassword().equals(requestDto.getConfirmPassword())) {
             throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
         }
-        validateNicknameModeration(requestDto.getNickname());
+        aiModerationFacade.checkNicknameModeration(requestDto.getNickname());
 
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
@@ -106,7 +107,7 @@ public class UserService {
 
         validateDuplicatedUser(requestDto);
 
-        validateNicknameModeration(requestDto.getNickname());
+        aiModerationFacade.checkNicknameModeration(requestDto.getNickname());
 
         user.updateInfo(requestDto.getEmail(), requestDto.getName(), requestDto.getNickname(), requestDto.getPassword(), passwordEncoder);
 
@@ -121,15 +122,6 @@ public class UserService {
 
         if (userRepository.existsByNickname(userRequestDto.getNickname())) {
             throw new UserException(UserErrorCode.EXISTS_NICKNAME);
-        }
-    }
-
-    // 닉네임 적절성 검사
-    private void validateNicknameModeration(String nickname){
-        AiModerationResultStatusEnum status = aiModerationService.moderate("nickname", nickname);
-
-        if(status == AiModerationResultStatusEnum.DENIED){
-            throw new UserException(UserErrorCode.INVALID_NICKNAME);
         }
     }
 

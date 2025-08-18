@@ -6,11 +6,19 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AiModerationResult {
-    private AiModerationResultStatusEnum status;
     private Long moderationId;
+    private AiModerationResultStatusEnum status;
 
-    private AiModerationResult(AiModerationResultStatusEnum status, Long moderationId) {
-        this.status = status;
+    @Builder(access = AccessLevel.PRIVATE)
+    private AiModerationResult(Long moderationId, AiModerationResultStatusEnum status) {
         this.moderationId = moderationId;
+        this.status = status;
+    }
+
+    public static AiModerationResult of(Long moderationId, AiModerationResultStatusEnum status) {
+        return AiModerationResult.builder()
+                .moderationId(moderationId)
+                .status(status)
+                .build();
     }
 }

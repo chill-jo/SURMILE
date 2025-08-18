@@ -12,7 +12,7 @@ public class AiModerationFacadeImpl implements AiModerationFacade {
     private final AiModerationService aiModerationService;
 
     @Override
-    public AiModerationResult moderateNickname(String nickname) {
+    public AiModerationResult checkNicknameModeration(String nickname) {
         return aiModerationService.moderate(AiModerationTargetType.USER_NICKNAME, nickname);
     }
 }
