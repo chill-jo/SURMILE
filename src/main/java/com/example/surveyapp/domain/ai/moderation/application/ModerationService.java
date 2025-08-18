@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.ai.moderation.application;
 
-import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.model.ModerationResultStatusEnum;
 import com.example.surveyapp.domain.ai.moderation.prompt.ModerationPromptTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;

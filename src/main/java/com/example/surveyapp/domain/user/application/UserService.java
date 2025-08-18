@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.user.application;
 
-import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.model.ModerationResultStatusEnum;
 import com.example.surveyapp.domain.ai.moderation.application.ModerationService;
 import com.example.surveyapp.domain.user.domain.event.RegisterEvent;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;

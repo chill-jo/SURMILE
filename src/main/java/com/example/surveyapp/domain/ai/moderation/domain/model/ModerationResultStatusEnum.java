@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.ai.moderation.config;
+package com.example.surveyapp.domain.ai.moderation.domain.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
