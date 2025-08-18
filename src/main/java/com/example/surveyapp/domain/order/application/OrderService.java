@@ -45,14 +45,14 @@ public class OrderService {
 
         Order order = Order.of(
                 userId,
-                List.of(item)
+                item
                 );
 
         String status = product.getStatus().getStatus();
 
         Order saveOrder = orderRepository.save(order);
         //이벤트 발행
-        eventPublisher.publishEvent(new OrderCreateEvent(order.getId(),
+        eventPublisher.publishEvent(new OrderCreateEvent(saveOrder.getId(),
                 userId,
                 order.orderAmount()));
 
@@ -68,7 +68,7 @@ public class OrderService {
 
         return ordersList.stream()
                 .map(order -> {
-                    OrderItem item = order.getOneOrderItemOrThrow();
+                    OrderItem item = order.getOrderItem();
                     String username = userReader.usernameById(order.getUserId());
                     ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
                     String status = product.getStatus().getStatus();
@@ -86,7 +86,7 @@ public class OrderService {
         String username = userReader.usernameById(order.getUserId());
 
         //상품정보 조회
-        OrderItem item = order.getOneOrderItemOrThrow();
+        OrderItem item = order.getOrderItem();
         ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
         String status = product.getStatus().getStatus();
 
@@ -101,7 +101,7 @@ public class OrderService {
 
         return orders.stream()
                 .map(order -> {
-                    OrderItem item = order.getOneOrderItemOrThrow();
+                    OrderItem item = order.getOrderItem();
                     String username = userReader.usernameById(order.getUserId());
                     ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
                     String status = product.getStatus().getStatus();
@@ -118,7 +118,7 @@ public class OrderService {
 
         order.validateOrderer(userId);
 
-        OrderItem item = order.getOneOrderItemOrThrow();
+        OrderItem item = order.getOrderItem();
         String username = userReader.usernameById(order.getUserId());
         ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
         String status = product.getStatus().getStatus();
