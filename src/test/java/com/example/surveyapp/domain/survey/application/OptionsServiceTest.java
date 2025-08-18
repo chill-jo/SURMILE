@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
+import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.vo.AiModerationResult;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import com.example.surveyapp.domain.survey.presentation.dto.request.OptionCreateRequestDto;
@@ -36,6 +39,9 @@ public class OptionsServiceTest{
     @InjectMocks
     private OptionsService optionsService;
 
+    @Mock
+    private AiModerationFacade aiModerationFacade;
+
     @Test
     @DisplayName("기능_선택지 생성을 성공한다")
     void 선택지를_생성한다(){
@@ -59,6 +65,9 @@ public class OptionsServiceTest{
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
+        when(aiModerationFacade.checkOptionsModeration(eq("테스트선택지내용")))
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
+
         // when
         OptionResponseDto responseDto = optionsService.createOption(userId, surveyId, questionId, requestDto);
 
@@ -149,6 +158,8 @@ public class OptionsServiceTest{
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
         when(questionMock.updateOption(optionId, requestDto.getNumber(), requestDto.getContent())).thenReturn(optionMock);
+        when(aiModerationFacade.checkOptionsModeration(eq("테스트질문지내용수정")))
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         when(optionMock.getId()).thenReturn(optionId);
         when(optionMock.getNumber()).thenReturn(number);

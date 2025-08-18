@@ -25,12 +25,4 @@ public class AiModerationSurveyResult {
                 .descriptionResult(descriptionResult)
                 .build();
     }
-
-    public AiModerationResultStatusEnum allStatus() {
-        if (titleResult != null && titleResult.getStatus() == AiModerationResultStatusEnum.DENIED)
-            return AiModerationResultStatusEnum.DENIED;
-        if (descriptionResult != null && descriptionResult.getStatus() == AiModerationResultStatusEnum.DENIED)
-            return AiModerationResultStatusEnum.DENIED;
-        return AiModerationResultStatusEnum.APPROVED;
-    }
 }

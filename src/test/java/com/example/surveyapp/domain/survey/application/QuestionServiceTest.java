@@ -2,6 +2,9 @@ package com.example.surveyapp.domain.survey.application;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
+import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.vo.AiModerationResult;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionReadRepository;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
@@ -47,6 +50,9 @@ public class QuestionServiceTest {
     @InjectMocks
     private QuestionService questionService;
 
+    @Mock
+    private AiModerationFacade aiModerationFacade;
+
     @Test
     @DisplayName("기능_질문 생성을 성공한다")
     void 질문을_생성한다(){
@@ -66,6 +72,8 @@ public class QuestionServiceTest {
 
         when(surveyQueryService.findSurvey(anyLong())).thenReturn(surveyMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
+        when(aiModerationFacade.checkQuestionModeration(eq("테스트질문내용")))
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
         Question question = Question.from(requestDto, surveyId);
 
         doNothing().when(surveyQuestionService).addQuestion(any(Survey.class), any(Question.class));
