@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -104,13 +105,13 @@ public class SurveyControllerTest {
         verify(surveyService, times(1))
                 .createSurvey(eq(userId), any(SurveyCreateRequestDto.class));
         actions.andDo(print())
-                .andExpect(status().isCreated())
+                .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
                 .andExpect(jsonPath("$.data.status").value(SurveyStatus.NOT_STARTED.name()))
-                .andDo(document("create-survey",
+                .andDo(document("survey/create-survey",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
-                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
                                         .attributes(key("format").value("Bearer {jwt_token"))
                         ),
                         requestFields(
@@ -184,16 +185,47 @@ public class SurveyControllerTest {
         when(surveyService.getSurveys(page, size)).thenReturn(pageSurveyResponseDto);
 
         ResultActions actions = mockMvc.perform(get("/api/survey")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .param("page", String.valueOf(page))
                 .param("size", String.valueOf(size)));
 
         verify(surveyService, times(1))
                 .getSurveys(page, size);
 
-        actions.andDo(print())
-                .andExpect(status().isOk())
+        actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content[0].title").value("테스트설문제목1"))
-                .andExpect(jsonPath("$.data.content[1].title").value("테스트설문제목2"));
+                .andExpect(jsonPath("$.data.content[1].title").value("테스트설문제목2"))
+                .andDo(document("survey/get-surveys",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        queryParameters(
+                                parameterWithName("page").description("페이지 번호").optional(),
+                                parameterWithName("size").description("페이지 크기").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("설문 ID"),
+                                fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("설문 제목"),
+                                fieldWithPath("data.content[].description").type(JsonFieldType.STRING).description("설문 상세설명"),
+                                fieldWithPath("data.content[].maxSurveyee").type(JsonFieldType.NUMBER).description("설문 참여 가능 인원"),
+                                fieldWithPath("data.content[].pointPerPerson").type(JsonFieldType.NUMBER).description("설문 참여 시 인당 지급 포인트"),
+                                fieldWithPath("data.content[].totalPoint").type(JsonFieldType.NUMBER).description("설문 참여 마감 시 지급되는 포인트 총액"),
+                                fieldWithPath("data.content[].deadline").type(JsonFieldType.STRING).description("설문 마감 기한"),
+                                fieldWithPath("data.content[].expectedTime").type(JsonFieldType.NUMBER).description("설문 예상 소요 시간"),
+                                fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("설문 상태"),
+                                fieldWithPath("data.content[].surveyeeCount").type(JsonFieldType.NUMBER).description("설문 참여 인원"),
+                                fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 결과 수"),
+                                fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("페이지 수"),
+                                fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 size"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("페이지 number")
+                        )
+                ))
+        ;
     }
 
     @Test
@@ -227,17 +259,50 @@ public class SurveyControllerTest {
                 .thenReturn(responseDto);
 
         ResultActions actions = mockMvc.perform(patch("/api/survey/{id}", surveyId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)));
 
         verify(surveyService, times(1))
                 .updateSurveyInfo(eq(userId), eq(surveyId), any(SurveyUpdateRequestDto.class));
 
-        actions.andDo(print())
-                .andExpect(status().isOk())
+        actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
                 .andExpect(jsonPath("$.data.description").value(requestDto.getDescription()))
-                .andExpect(jsonPath("$.data.maxSurveyee").value(requestDto.getMaxSurveyee()));
+                .andExpect(jsonPath("$.data.maxSurveyee").value(requestDto.getMaxSurveyee()))
+                .andDo(document("survey/update-survey-info",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        pathParameters(
+                                parameterWithName("id").description("설문 ID")
+                        ),
+                        requestFields(
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("설문 제목"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("설문 상세정보"),
+                                fieldWithPath("maxSurveyee").type(JsonFieldType.NUMBER).description("설문 참여 가능 인원"),
+                                fieldWithPath("pointPerPerson").type(JsonFieldType.NUMBER).description("설문 참여 시 인당 지급 포인트"),
+                                fieldWithPath("deadline").type(JsonFieldType.STRING).description("설문 마감 기한"),
+                                fieldWithPath("expectedTime").type(JsonFieldType.NUMBER).description("설문 예상 소요 시간")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("설문 ID"),
+                                fieldWithPath("data.title").type(JsonFieldType.STRING).description("설문 제목"),
+                                fieldWithPath("data.description").type(JsonFieldType.STRING).description("설문 상세설명"),
+                                fieldWithPath("data.maxSurveyee").type(JsonFieldType.NUMBER).description("설문 참여 가능 인원"),
+                                fieldWithPath("data.pointPerPerson").type(JsonFieldType.NUMBER).description("설문 참여 시 인당 지급 포인트"),
+                                fieldWithPath("data.totalPoint").type(JsonFieldType.NUMBER).description("설문 참여 마감 시 지급되는 포인트 총액"),
+                                fieldWithPath("data.deadline").type(JsonFieldType.STRING).description("설문 마감 기한"),
+                                fieldWithPath("data.expectedTime").type(JsonFieldType.NUMBER).description("설문 예상 소요 시간"),
+                                fieldWithPath("data.status").type(JsonFieldType.STRING).description("설문 상태"),
+                                fieldWithPath("data.surveyeeCount").type(JsonFieldType.NUMBER).description("설문 참여 인원")
+                        )
+                ));
     }
 
     @Test
@@ -254,15 +319,34 @@ public class SurveyControllerTest {
                 .thenReturn(responseDto);
 
         ResultActions actions = mockMvc.perform(patch("/api/survey/{id}/status", surveyId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)));
 
         verify(surveyService, times(1))
                 .updateSurveyStatus(eq(userId), eq(surveyId), any(SurveyStatusUpdateRequestDto.class));
 
-        actions.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.status").value(requestDto.getStatus().name()));
+        actions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value(requestDto.getStatus().name()))
+                .andDo(document("survey/update-survey-status",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        pathParameters(
+                                parameterWithName("id").description("설문 ID")
+                        ),
+                        requestFields(
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("설문 상태")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.status").type(JsonFieldType.STRING).description("설문 상태")
+                        )
+                ));
     }
 
     @Test
@@ -274,13 +358,30 @@ public class SurveyControllerTest {
 
         doNothing().when(surveyService).deleteSurvey(eq(userId), eq(surveyId));
 
-        ResultActions actions = mockMvc.perform(delete("/api/survey/{id}", surveyId));
+        ResultActions actions = mockMvc.perform(delete("/api/survey/{id}", surveyId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}"));
 
         verify(surveyService, times(1))
                 .deleteSurvey(eq(userId), eq(surveyId));
 
         actions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isEmpty());
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andDo(document("survey/delete-survey",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        pathParameters(
+                                parameterWithName("id").description("설문 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("요청 결과 Data")
+                        )
+                ));
     }
 
     @Test
@@ -304,16 +405,41 @@ public class SurveyControllerTest {
 
         when(surveyService.getSurvey(eq(surveyId))).thenReturn(responseDto);
 
-        ResultActions actions = mockMvc.perform(get("/api/survey/{id}", surveyId));
+        ResultActions actions = mockMvc.perform(get("/api/survey/{id}", surveyId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}"));
 
         verify(surveyService, times(1))
                 .getSurvey(eq(surveyId));
 
-        actions.andDo(print())
-                .andExpect(status().isOk())
+        actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.title").value("테스트설문제목"))
                 .andExpect(jsonPath("$.data.description").value("테스트설문내용"))
-                .andExpect(jsonPath("$.data.maxSurveyee").value(responseDto.getMaxSurveyee()));
+                .andExpect(jsonPath("$.data.maxSurveyee").value(responseDto.getMaxSurveyee()))
+                .andDo(document("survey/get-survey",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        pathParameters(
+                                parameterWithName("id").description("설문 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("설문 ID"),
+                                fieldWithPath("data.title").type(JsonFieldType.STRING).description("설문 제목"),
+                                fieldWithPath("data.description").type(JsonFieldType.STRING).description("설문 상세설명"),
+                                fieldWithPath("data.maxSurveyee").type(JsonFieldType.NUMBER).description("설문 참여 가능 인원"),
+                                fieldWithPath("data.pointPerPerson").type(JsonFieldType.NUMBER).description("설문 참여 시 인당 지급 포인트"),
+                                fieldWithPath("data.totalPoint").type(JsonFieldType.NUMBER).description("설문 참여 시 지급되는 포인트 총액"),
+                                fieldWithPath("data.deadline").type(JsonFieldType.STRING).description("설문 마감 기한"),
+                                fieldWithPath("data.expectedTime").type(JsonFieldType.NUMBER).description("설문 예상 소요 시간"),
+                                fieldWithPath("data.status").type(JsonFieldType.STRING).description("설문 상태"),
+                                fieldWithPath("data.surveyeeCount").type(JsonFieldType.NUMBER).description("설문 참여 인원")
+                        )
+                ));
     }
 
     @Test
@@ -353,19 +479,49 @@ public class SurveyControllerTest {
 
         when(surveyService.startSurvey(eq(userId), eq(surveyId))).thenReturn(responseDto);
 
-        ResultActions actions = mockMvc.perform(get("/api/survey/{id}/start", surveyId));
+        ResultActions actions = mockMvc.perform(get("/api/survey/{id}/start", surveyId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}"));
 
         verify(surveyService, times(1))
                 .startSurvey(eq(userId), eq(surveyId));
 
-        actions.andDo(print())
-                .andExpect(status().isOk())
+        actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.title").value("테스트설문제목"))
                 .andExpect(jsonPath("$.data.questions[0].content").value("테스트질문내용"))
                 .andExpect(jsonPath("$.data.questions[0].options[0].number").value(1L))
                 .andExpect(jsonPath("$.data.questions[0].options[1].number").value(2L))
                 .andExpect(jsonPath("$.data.questions[0].options[0].content").value("테스트선택지내용1"))
-                .andExpect(jsonPath("$.data.questions[0].options[1].content").value("테스트선택지내용2"));
+                .andExpect(jsonPath("$.data.questions[0].options[1].content").value("테스트선택지내용2"))
+                .andDo(document("survey/start-survey",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        pathParameters(
+                                parameterWithName("id").description("설문 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("설문 ID"),
+                                fieldWithPath("data.title").type(JsonFieldType.STRING).description("설문 제목"),
+                                fieldWithPath("data.description").type(JsonFieldType.STRING).description("설문 내용"),
+                                fieldWithPath("data.maxSurveyee").type(JsonFieldType.NUMBER).description("설문 참여 가능 인원"),
+                                fieldWithPath("data.pointPerPerson").type(JsonFieldType.NUMBER).description("설문 참여 시 인당 지급 포인트"),
+                                fieldWithPath("data.totalPoint").type(JsonFieldType.NUMBER).description("설문 참여시 지급 포인트 총액"),
+                                fieldWithPath("data.deadline").type(JsonFieldType.STRING).description("설문 마감 기한"),
+                                fieldWithPath("data.expectedTime").type(JsonFieldType.NUMBER).description("설문 예상 소요시간"),
+                                fieldWithPath("data.questions[].id").type(JsonFieldType.NUMBER).description("질문 ID"),
+                                fieldWithPath("data.questions[].number").type(JsonFieldType.NUMBER).description("질문 번호"),
+                                fieldWithPath("data.questions[].content").type(JsonFieldType.STRING).description("질문 내용"),
+                                fieldWithPath("data.questions[].type").type(JsonFieldType.STRING).description("질문 종류"),
+                                fieldWithPath("data.questions[].options[].id").type(JsonFieldType.NUMBER).description("선택지 ID"),
+                                fieldWithPath("data.questions[].options[].number").type(JsonFieldType.NUMBER).description("선택지 번호"),
+                                fieldWithPath("data.questions[].options[].content").type(JsonFieldType.STRING).description("선택지 내용")
+                        )
+                ));
     }
 
 }

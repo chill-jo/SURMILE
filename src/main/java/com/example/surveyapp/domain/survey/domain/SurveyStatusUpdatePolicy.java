@@ -9,7 +9,7 @@ public class SurveyStatusUpdatePolicy {
         if(currentStatus.equals(newStatus)){
             throw new SurveyException(SurveyErrorCode.INVALID_SURVEY_STATUS_TRANSITION);
         }
-        if(newStatus.isNotStarted()){
+        if(newStatus.isNotStarted() && !currentStatus.isPending()){
             throw new SurveyException(SurveyErrorCode.INVALID_SURVEY_STATUS_TRANSITION);
         }
         if(currentStatus.isDone() && newStatus.isInProgress()){

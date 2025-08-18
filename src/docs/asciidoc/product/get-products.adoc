@@ -1,0 +1,12 @@
+== Read All Product API
+
+[example]
+`GET` 요청을 사용하여 모든 상품을 조회할 수 있습니다.
+
+
+
+
+=== Http Response
+include::{snippets}/get-products/http-response.adoc[]
+include::{snippets}/get-products/query-parameters.adoc[]
+include::{snippets}/get-products/response-fields.adoc[]

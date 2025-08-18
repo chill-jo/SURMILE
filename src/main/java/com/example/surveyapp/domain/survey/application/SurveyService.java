@@ -45,7 +45,11 @@ public class SurveyService {
         Survey saved = surveyRepository.save(survey);
 
         if(userReader.validateUserRole(userId, UserRoleEnum.SURVEYOR)){
-            eventPublisher.publishEvent(new SurveyCreateEvent(saved, userId));
+            eventPublisher.publishEvent(new SurveyCreateEvent(
+                    saved.getId(),
+                    saved.getSurveyInfo().getTotalPoint().getValue(),
+                    userId)
+            );
         }
 
         return surveyMapper.toResponseDto(saved);

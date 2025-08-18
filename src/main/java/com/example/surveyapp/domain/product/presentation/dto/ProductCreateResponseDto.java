@@ -13,6 +13,8 @@ public class ProductCreateResponseDto {
 
     private final String title;
 
+    private final String content;
+
     private final Long price;
 
     private final String status;
@@ -20,6 +22,7 @@ public class ProductCreateResponseDto {
     public ProductCreateResponseDto(Product product) {
         this.id =product.getId();
         this.title = product.getTitle();
+        this.content = product.getContent();
         this.price = product.getPrice().getValue();
         this.status = product.getStatus().getStatus();
     }

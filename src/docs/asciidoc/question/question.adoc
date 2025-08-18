@@ -1,0 +1,8 @@
+[[question-resource]]
+= Question API
+
+include::create-question.adoc[]
+include::get-questions.adoc[]
+include::get-question.adoc[]
+include::delete-question.adoc[]
+include::update-question.adoc[]
