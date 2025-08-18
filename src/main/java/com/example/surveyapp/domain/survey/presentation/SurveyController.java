@@ -35,7 +35,10 @@ public class SurveyController {
         SurveyResponseDto responseDto = surveyService.createSurvey(userId, requestDto);
 
         URI location = URI.create("/api/survey/" + responseDto.getId());
-        return ResponseEntity.created(location).body(responseDto);
+        return ResponseEntity
+                .accepted()
+                .location(location)
+                .body(responseDto);
     }
 
     //설문 목록 조회(정렬 없이 삭제된 설문만 제외)

@@ -1,0 +1,18 @@
+== Get Participated Surveys API
+
+[example]
+`GET` 요청을 사용하여 참여한 설문 목록을 조회할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/surveyanswer/get-participated-surveys/http-request.adoc[]
+include::{snippets}/surveyanswer/get-participated-surveys/request-headers.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/surveyanswer/get-participated-surveys/http-response.adoc[]
+include::{snippets}/surveyanswer/get-participated-surveys/response-fields.adoc[]
+====

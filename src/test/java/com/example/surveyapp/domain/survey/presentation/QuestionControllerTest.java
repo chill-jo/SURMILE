@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
@@ -24,6 +26,13 @@ import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -60,16 +69,44 @@ public class QuestionControllerTest extends WebMvcTestBase {
                 .thenReturn(responseDto);
 
         ResultActions actions = mockMvc.perform(post("/api/survey/{surveyId}", surveyId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)));
 
         verify(questionService, times(1))
                 .createQuestion(eq(userId), eq(surveyId), any(QuestionCreateRequestDto.class));
 
-        actions.andDo(print())
-                .andExpect(status().isCreated())
+        actions.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.number").value(requestDto.getNumber()))
-                .andExpect(jsonPath("$.data.content").value(requestDto.getContent()));
+                .andExpect(jsonPath("$.data.content").value(requestDto.getContent()))
+                .andDo(document("question/create-question",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        pathParameters(
+                                parameterWithName("surveyId").description("설문 ID")
+                        ),
+                        requestFields(
+                                fieldWithPath("number").type(JsonFieldType.NUMBER).description("질문 번호"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("질문 내용"),
+                                fieldWithPath("type").type(JsonFieldType.STRING).description("질문 유형")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("생성된 질문 위치")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("질문 ID"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("질문 번호"),
+                                fieldWithPath("data.content").type(JsonFieldType.STRING).description("질문 내용"),
+                                fieldWithPath("data.type").type(JsonFieldType.STRING).description("질문 유형")
+                        )
+                ))
+        ;
     }
 
     @Test
@@ -101,16 +138,44 @@ public class QuestionControllerTest extends WebMvcTestBase {
         when(questionService.getQuestions(page, size, userId, surveyId)).thenReturn(pageQuestionResponseDto);
 
         ResultActions actions = mockMvc.perform(get("/api/survey/{surveyId}/question", surveyId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .param("page", String.valueOf(page))
                 .param("size", String.valueOf(size)));
 
         verify(questionService, times(1))
                 .getQuestions(page, size, userId, surveyId);
 
-        actions.andDo(print())
-                .andExpect(status().isOk())
+        actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content[0].content").value("테스트질문내용1"))
-                .andExpect(jsonPath("$.data.content[1].content").value("테스트질문내용2"));
+                .andExpect(jsonPath("$.data.content[1].content").value("테스트질문내용2"))
+                .andDo(document("question/get-questions",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        pathParameters(
+                                parameterWithName("surveyId").description("설문 ID")
+                        ),
+                        queryParameters(
+                                parameterWithName("page").description("페이지 번호").optional(),
+                                parameterWithName("size").description("페이지 크기").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("질문 ID"),
+                                fieldWithPath("data.content[].number").type(JsonFieldType.NUMBER).description("질문 번호"),
+                                fieldWithPath("data.content[].content").type(JsonFieldType.STRING).description("질문 내용"),
+                                fieldWithPath("data.content[].type").type(JsonFieldType.STRING).description("질문 유형"),
+                                fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 결과 수"),
+                                fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("페이지 수"),
+                                fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 size"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("페이지 number")
+                        )
+                ))
+        ;
     }
 
     @Test
@@ -130,7 +195,8 @@ public class QuestionControllerTest extends WebMvcTestBase {
 
         when(questionService.getQuestion(eq(userId), eq(surveyId), eq(questionId))).thenReturn(responseDto);
 
-        ResultActions actions = mockMvc.perform(get("/api/survey/{surveyId}/question/{questionId}", surveyId, questionId));
+        ResultActions actions = mockMvc.perform(get("/api/survey/{surveyId}/question/{questionId}", surveyId, questionId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}"));
 
         verify(questionService, times(1))
                 .getQuestion(eq(userId), eq(surveyId), eq(questionId));
@@ -139,7 +205,28 @@ public class QuestionControllerTest extends WebMvcTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content").value("테스트질문내용"))
                 .andExpect(jsonPath("$.data.number").value(responseDto.getNumber()))
-                .andExpect(jsonPath("$.data.type").value(responseDto.getType().name()));
+                .andExpect(jsonPath("$.data.type").value(responseDto.getType().name()))
+                .andDo(document("question/get-question",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        pathParameters(
+                                parameterWithName("surveyId").description("설문 ID"),
+                                parameterWithName("questionId").description("질문 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("질문 ID"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("질문 번호"),
+                                fieldWithPath("data.content").type(JsonFieldType.STRING).description("질문 내용"),
+                                fieldWithPath("data.type").type(JsonFieldType.STRING).description("질문 유형")
+                        )
+                ))
+        ;
     }
 
     @Test
@@ -150,9 +237,9 @@ public class QuestionControllerTest extends WebMvcTestBase {
         Long questionId = 1L;
         Long userId = 1L;
         QuestionUpdateRequestDto requestDto = new QuestionUpdateRequestDto(
-                null,
+                1L,
                 "테스트질문내용수정",
-                null
+                QuestionType.SINGLE_CHOICE
         );
 
         QuestionResponseDto responseDto = new QuestionResponseDto(
@@ -166,15 +253,41 @@ public class QuestionControllerTest extends WebMvcTestBase {
                 .thenReturn(responseDto);
 
         ResultActions actions = mockMvc.perform(patch("/api/survey/{surveyId}/question/{questionId}", surveyId, questionId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)));
 
         verify(questionService, times(1))
                 .updateQuestion(eq(userId), eq(surveyId), eq(questionId), any(QuestionUpdateRequestDto.class));
 
-        actions.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.content").value(requestDto.getContent()));
+        actions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content").value(requestDto.getContent()))
+                .andDo(document("question/update-question",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        pathParameters(
+                                parameterWithName("surveyId").description("설문 ID"),
+                                parameterWithName("questionId").description("질문 ID")
+                        ),
+                        requestFields(
+                                fieldWithPath("number").type(JsonFieldType.NUMBER).description("질문 번호"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("질문 내용"),
+                                fieldWithPath("type").type(JsonFieldType.STRING).description("질문 유형")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("질문 ID"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("질문 번호"),
+                                fieldWithPath("data.content").type(JsonFieldType.STRING).description("질문 내용"),
+                                fieldWithPath("data.type").type(JsonFieldType.STRING).description("질문 유형")
+                        )
+                ))
+        ;
     }
 
     @Test
@@ -187,12 +300,31 @@ public class QuestionControllerTest extends WebMvcTestBase {
 
         doNothing().when(questionService).deleteQuestion(eq(userId), eq(surveyId), eq(questionId));
 
-        ResultActions actions = mockMvc.perform(delete("/api/survey/{surveyId}/question/{questionId}", surveyId, questionId));
+        ResultActions actions = mockMvc.perform(delete("/api/survey/{surveyId}/question/{questionId}", surveyId, questionId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}"));
 
         verify(questionService, times(1))
                 .deleteQuestion(eq(userId), eq(surveyId), eq(questionId));
 
         actions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isEmpty());
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andDo(document("question/delete-question",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        pathParameters(
+                                parameterWithName("surveyId").description("설문 ID"),
+                                parameterWithName("questionId").description("질문 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                        )
+                ))
+        ;
     }
 }

@@ -1,0 +1,19 @@
+== Get Survey API
+
+[example]
+`GET` 요청을 사용하여 설문을 단건 조회할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/survey/get-survey/http-request.adoc[]
+include::{snippets}/survey/get-survey/request-headers.adoc[]
+include::{snippets}/survey/get-survey/path-parameters.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/survey/get-survey/http-response.adoc[]
+include::{snippets}/survey/get-survey/response-fields.adoc[]
+====

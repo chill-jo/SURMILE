@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.point.application.event;
+package com.example.surveyapp.domain.point.application.eventhandler;
 
 import com.example.surveyapp.domain.order.domain.event.OrderCreateEvent;
 import com.example.surveyapp.domain.point.application.PointEarnRedeemService;

@@ -14,6 +14,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.http.MediaType;
@@ -22,6 +24,12 @@ import org.springframework.http.MediaType;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -40,12 +48,14 @@ class ProductControllerTest extends WebMvcTestBase {
         // Given
 
         Product product = ProductFixtureGenerator.generateProductFixture();
+        ReflectionTestUtils.setField(product,"id",1L);
         ProductCreateRequestDto requestDto = new ProductCreateRequestDto(product.getTitle(),
                 product.getContent(),
                 product.getPrice().getValue(),
                 product.getStatus());
         ProductCreateResponseDto responseDto = new ProductCreateResponseDto(product.getId(),
                 product.getTitle(),
+                product.getContent(),
                 product.getPrice().getValue(),
                 product.getStatus().getStatus());
 
@@ -53,6 +63,7 @@ class ProductControllerTest extends WebMvcTestBase {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(post("/api/products")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)));
 
@@ -60,9 +71,36 @@ class ProductControllerTest extends WebMvcTestBase {
         //검증 사항
         verify(productService,times(1)).createProduct(any(ProductCreateRequestDto.class),eq(1L));
 
-        actions.andDo(print())
+        actions
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()));
+                .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
+                .andDo(document("create-product",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("생성된 상품 위치")
+                        ),
+                        requestFields(
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("상품 제목"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("상품 설명"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("상품 가격"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("상품 상태")
+
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("상품 ID"),
+                                fieldWithPath("data.title").type(JsonFieldType.STRING).description("상품 제목"),
+                                fieldWithPath("data.content").type(JsonFieldType.STRING).description("상품 설명"),
+                                fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("상품 가격"),
+                                fieldWithPath("data.status").type(JsonFieldType.STRING).description("상품 상태"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
+
+                                )));
 
     }
 
@@ -80,7 +118,8 @@ class ProductControllerTest extends WebMvcTestBase {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(get("/api/products")
-                        .param("page", "0")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
+                .param("page", "0")
                         .param("size", "10")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(productList)));
@@ -89,10 +128,32 @@ class ProductControllerTest extends WebMvcTestBase {
 
         verify(productService, times(1)).readAllProduct(0,10);
 
-          actions.andDo(print())
+          actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title").value("상품1"))
-                .andExpect(jsonPath("$.data[1].title").value("상품2"));
+                .andExpect(jsonPath("$.data[1].title").value("상품2"))
+                  .andDo(document("get-products",
+                          requestHeaders(
+                                  headerWithName(HttpHeaders.AUTHORIZATION)
+                                          .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                          .attributes(key("format").value("Bearer {jwt_token"))
+                          ),
+                          // /api/products?page=1&size=10
+                          queryParameters(
+                                  parameterWithName("page").description("페이지 번호").optional(),
+                                  parameterWithName("size").description("페이지 크기").optional()
+                          ),
+                          responseFields(
+                                  fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                  fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                  fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("상품 ID"),
+                                  fieldWithPath("data[].title").type(JsonFieldType.STRING).description("상품 제목"),
+                                  fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("상품 가격"),
+                                  fieldWithPath("data[].status").type(JsonFieldType.STRING).description("상품 상태"),
+                                  fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
+
+                          )));
+
     }
 
     @Test
@@ -118,7 +179,7 @@ class ProductControllerTest extends WebMvcTestBase {
 
         verify(productService, times(1)).readAllProduct(0,10);
 
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title").value("상품1"))
                 .andExpect(jsonPath("$.data[1].title").value("상품2"));
@@ -139,35 +200,35 @@ class ProductControllerTest extends WebMvcTestBase {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(get("/api/products/{id}",product.getId())
-                .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
+                        .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productResponseDto)));
-//                .andDo(document("GET-200-상품-단건-조회-API",
-////                        requestHeaders(
-////                                headerWithName("Authorization")
-////                                        .description("JWT 인증 토큰 (Bearer + 토큰값)")
-////                                        .attributes(key("format").value("Bearer {jwt_token}")),
-////                                headerWithName("Accept").description("응답 데이터 타입")
-////                        ),
-////                        responseHeaders(
-////                                headerWithName(LOCATION).description("생성된 주문 위치")
-////                        ),
-//                        responseFields(
-//                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
-//                                fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
-//                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("주문 ID"),
-//                                fieldWithPath("data.orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
-//                                fieldWithPath("data.title").type(JsonFieldType.STRING).description("주문 상품 제목"),
-//                                fieldWithPath("data.status").type(JsonFieldType.STRING).description("주문 상품 상태"),
-//                                fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
-//                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("주문 생성일"))));
-
 
         // Then
         //검증 사항
         verify(productService, times(1)).readOneProduct(product.getId());
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.title").value("상품명"));
+                .andExpect(jsonPath("$.data.title").value("상품명"))
+                .andDo(document("get-product",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        // /api/orders/{id}
+                        pathParameters(
+                                parameterWithName("id").description("주문 ID")),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("상품 ID"),
+                                fieldWithPath("data.title").type(JsonFieldType.STRING).description("상품 제목"),
+                                fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("상품 가격"),
+                                fieldWithPath("data.status").type(JsonFieldType.STRING).description("상품 상태"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
+
+                        )));
 
     }
 
@@ -186,6 +247,7 @@ class ProductControllerTest extends WebMvcTestBase {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(patch("/api/products/{id}", productId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)));
 
@@ -195,7 +257,33 @@ class ProductControllerTest extends WebMvcTestBase {
                 .updateProduct(eq(productId), any(ProductUpdateRequestDto.class));
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.title").value("변경된 상품명"));
+                .andExpect(jsonPath("$.data.title").value("변경된 상품명"))
+                .andDo(document("update-product",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        // /api/products/{id}
+                        pathParameters(
+                                parameterWithName("id").description("주문 ID")),
+                        requestFields(
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("상품 제목"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("상품 설명"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("상품 가격"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("상품 상태")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("상품 ID"),
+                                fieldWithPath("data.title").type(JsonFieldType.STRING).description("변경 된 상품 제목"),
+                                fieldWithPath("data.content").type(JsonFieldType.STRING).description("변경 된 상품 설명"),
+                                fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("변경 된 상품 가격"),
+                                fieldWithPath("data.status").type(JsonFieldType.STRING).description("변경 된 상품 상태"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
+
+                        )));
     }
 
     @Test
@@ -215,19 +303,34 @@ class ProductControllerTest extends WebMvcTestBase {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(delete("/api/products/{id}", productId)
-                .param("userId", "1")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
+                        .param("userId", "1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)));
-
 
         // Then
         //검증 사항
         verify(productService, times(1)).deleteProduct(productId,userId);
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isEmpty());
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andDo(document("delete-product",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        // /api/products/{id}
+                        pathParameters(
+                                parameterWithName("id").description("주문 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("data").description("null"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
 
-
+                        )));
     }
 
     @Test
@@ -247,6 +350,7 @@ class ProductControllerTest extends WebMvcTestBase {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(patch("/api/products/{id}/status", product.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)));
 
@@ -256,7 +360,26 @@ class ProductControllerTest extends WebMvcTestBase {
 
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.newStatus").value(Status.STOPPED_SALE.getStatus()));
+                .andExpect(jsonPath("$.data.newStatus").value(Status.STOPPED_SALE.getStatus()))
+                .andDo(document("update-status-product",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        // /api/products/{id}
+                        pathParameters(
+                                parameterWithName("id").description("주문 ID")),
+                        requestFields(
+                                fieldWithPath("newStatus").type(JsonFieldType.STRING).description("상품 상태")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("data.newStatus").type(JsonFieldType.STRING).description("변경 된 상품 상태"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
+
+                        )));
     }
 
 }

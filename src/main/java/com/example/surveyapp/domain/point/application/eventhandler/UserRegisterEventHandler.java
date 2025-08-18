@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.point.application.event;
+package com.example.surveyapp.domain.point.application.eventhandler;
 
 import com.example.surveyapp.domain.point.application.PointService;
 import com.example.surveyapp.domain.user.domain.event.RegisterEvent;

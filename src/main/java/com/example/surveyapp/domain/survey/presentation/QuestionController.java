@@ -14,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/survey")
@@ -21,7 +23,6 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    //***인증인가 추가 후 userId 부분 수정***
     @PostMapping("/{surveyId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<QuestionResponseDto> createQuestion(
@@ -32,8 +33,9 @@ public class QuestionController {
         Long userId = userDetails.getId();
         QuestionResponseDto responseDto = questionService.createQuestion(userId, surveyId, requestDto);
 
+        URI location = URI.create("/api/survey/" + surveyId + "/question/" + responseDto.getId());
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .created(location)
                 .body(responseDto);
     }
 

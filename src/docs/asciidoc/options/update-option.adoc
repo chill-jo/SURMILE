@@ -1,0 +1,19 @@
+== Update Option API
+
+[example]
+`PATCH` 요청을 사용하여 선택지를 수정할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/options/update-option/http-request.adoc[]
+include::{snippets}/options/update-option/request-headers.adoc[]
+include::{snippets}/options/update-option/path-parameters.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/options/update-option/http-response.adoc[]
+include::{snippets}/options/update-option/response-fields.adoc[]
+====
