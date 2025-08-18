@@ -1,0 +1,19 @@
+== Get Survey Statistics API
+
+[example]
+`GET` 요청을 사용하여 출제한 설문의 통계를 조회할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/surveyanswer/get-survey-statistics/http-request.adoc[]
+include::{snippets}/surveyanswer/get-survey-statistics/request-headers.adoc[]
+include::{snippets}/surveyanswer/get-survey-statistics/path-parameters.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/surveyanswer/get-survey-statistics/http-response.adoc[]
+include::{snippets}/surveyanswer/get-survey-statistics/response-fields.adoc[]
+====

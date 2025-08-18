@@ -1,0 +1,20 @@
+== Update Survey Info API
+
+[example]
+`PATCH` 요청을 사용하여 설문 상세정보를 수정할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/survey/update-survey-info/http-request.adoc[]
+include::{snippets}/survey/update-survey-info/request-headers.adoc[]
+include::{snippets}/survey/update-survey-info/path-parameters.adoc[]
+include::{snippets}/survey/update-survey-info/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/survey/update-survey-info/http-response.adoc[]
+include::{snippets}/survey/update-survey-info/response-fields.adoc[]
+====
