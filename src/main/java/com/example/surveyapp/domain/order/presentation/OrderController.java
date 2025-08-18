@@ -13,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -29,7 +31,8 @@ public class OrderController {
                                                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getId();
         OrderCreateResponseDto order = orderService.createOrder(requestDto,userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(order);
+        URI location = URI.create("/api/orders" + order.getId());
+        return ResponseEntity.created(location).body(order);
     }
 
     @GetMapping
@@ -68,7 +71,7 @@ public class OrderController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getId();
         OrderResponseDto responseDto = orderService.readOneMyOrder(id,userId);
-       return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @DeleteMapping("/{id}")
@@ -79,6 +82,7 @@ public class OrderController {
     ){
         Long userId = userDetails.getId();
         orderService.deleteOrder(id,userId);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        return ResponseEntity
+                .status(HttpStatus.OK).body(null);
     }
 }
