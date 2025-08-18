@@ -27,11 +27,13 @@ public class OrderResponseDto {
 
     private String status;
 
+    private String orderStatus;
+
     private LocalDateTime createAt;
 
 
     public static OrderResponseDto from(Order order, String username, String status) {
-        OrderItem orderItem = order.getOneOrderItemOrThrow();
+        OrderItem orderItem = order.getOrderItem();
         return new OrderResponseDto(
             order.getId(),
             order.getOrderNumber().getValue(),
@@ -41,6 +43,7 @@ public class OrderResponseDto {
             orderItem.getTitle(),
             orderItem.getPrice().getValue(),
             status,
+            order.getOrderStatus().getOrderStatus(),
             order.getCreatedAt()
 
     );
