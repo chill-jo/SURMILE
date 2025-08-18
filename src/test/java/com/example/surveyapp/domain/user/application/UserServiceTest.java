@@ -1,6 +1,8 @@
 package com.example.surveyapp.domain.user.application;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.vo.AiModerationResult;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;
 import com.example.surveyapp.domain.user.presentation.dto.UserRequestDto;
@@ -35,7 +37,10 @@ public class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private AiModerationService aiModerationService;
+    private AiModerationFacade aiModerationFacade;
+
+    @Mock
+    private AiModerationResult aiModerationResult;
 
     @Test
     @DisplayName("기능_테스트_회원_정보를_조회한다")
@@ -64,8 +69,8 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(requestDto.getEmail())).thenReturn(false);
         when(userRepository.existsByNickname(requestDto.getNickname())).thenReturn(false);
         when(passwordEncoder.encode(requestDto.getPassword())).thenReturn("encodedPw123!");
-        when(aiModerationService.moderate(eq("nickname"), eq("newNickname")))
-                .thenReturn(AiModerationResultStatusEnum.APPROVED);
+        when(aiModerationFacade.checkNicknameModeration(eq("newNickname")))
+                .thenReturn(aiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         // When
         UserResponseDto updatedUser = userService.updateMyInfo(ID, requestDto);
