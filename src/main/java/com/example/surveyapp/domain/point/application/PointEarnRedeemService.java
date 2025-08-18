@@ -3,6 +3,7 @@ package com.example.surveyapp.domain.point.application;
 import com.example.surveyapp.domain.point.domain.event.PointRedeemSuccessEvent;
 import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
 import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
+import com.example.surveyapp.domain.point.domain.model.entity.event.PointRedeemSucceededEvent;
 import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
 import com.example.surveyapp.domain.point.domain.model.enums.PointType;
 import com.example.surveyapp.domain.point.domain.model.enums.Target;
@@ -28,15 +29,24 @@ public class PointEarnRedeemService {
 
     @Transactional
     public void decreasePoint(Long userId, PointBalance amount, Long orderId){
+        log.info("[decreasePoint] start userId={}, amount={}, orderId={}", userId, amount.getValue(), orderId);
 
         PointWallet point = pointRepository.findByUserId(userId)
                 .orElseThrow(() -> new PointException(PointErrorCode.POINT_NOT_FOUND));
+        log.info("[decreasePoint] loaded wallet balance={}, userId={}", point.getPointBalance().getValue(), userId);
 
         //차감 전 포인트
         PointBalance currentBalance = point.getPointBalance();
 
         //포인트 차감 (dirty checking)
         point.redeem(amount);
+        log.info("[decreasePoint] redeem OK. newBalance={}", point.getPointBalance().getValue());
+
+        eventPublisher.publishEvent(new PointRedeemSucceededEvent(orderId,
+                userId));
+        log.info("포인트 차감 메서드 성공 후 이벤트 발행");
+        log.info("[decreasePoint] 성공 이벤트 발행");
+
 
         //포인트 내역 기록
         PointHistory history = PointHistory.of(
@@ -50,6 +60,9 @@ public class PointEarnRedeemService {
                 userId,
                 point
         );
+        log.info("[decreasePoint] history saved");
+
+        log.info("포인트 차감 메서드 실행");
 
         pointHistoryRepository.save(history);
     }

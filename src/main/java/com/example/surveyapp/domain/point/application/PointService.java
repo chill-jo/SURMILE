@@ -38,7 +38,6 @@ public class PointService {
     }
 
     // 충전
-    @PreAuthorize("hasAnyRole('SURVEYOR')")
     @Transactional
     public void charge(Long userId, PointChargeRequestDto dto){
         //요청받은 금액
