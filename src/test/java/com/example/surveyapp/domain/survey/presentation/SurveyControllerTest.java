@@ -107,7 +107,7 @@ public class SurveyControllerTest {
         actions.andDo(print())
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
-                .andExpect(jsonPath("$.data.status").value(SurveyStatus.NOT_STARTED.name()))
+                .andExpect(jsonPath("$.data.status").value(SurveyStatus.PENDING.name()))
                 .andDo(document("survey/create-survey",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
