@@ -12,13 +12,10 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.OptionRespo
 import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -99,7 +96,6 @@ public class OptionsServiceTest{
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
-        when(userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE)).thenReturn(true);
         when(questionMock.getOptions()).thenReturn(optionsMockList);
 
         when(optionMock1.getId()).thenReturn(1L);
@@ -117,8 +113,8 @@ public class OptionsServiceTest{
         verify(userReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
         verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
-        verify(userReader).validateUserRole(userId, UserRoleEnum.SURVEYEE);
-        verify(surveyValidator).validateQuestionAccess(userId, surveyMock, true);
+        verify(userReader).validateUserRoleToSurveyee(userId);
+        verify(surveyValidator).validateQuestionAccess(userId, surveyMock, false);
         verify(questionMock).getOptions();
 
         assertThat(responseDtoList.size()).isEqualTo(2);

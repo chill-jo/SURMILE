@@ -12,7 +12,6 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuest
 import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
 import com.example.surveyapp.domain.survey.domain.event.SurveyCreateEvent;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -44,7 +43,7 @@ public class SurveyService {
         Survey survey = Survey.of(userId, surveyInfo);
         Survey saved = surveyRepository.save(survey);
 
-        if(userReader.validateUserRole(userId, UserRoleEnum.SURVEYOR)){
+        if(userReader.validateUserRoleToSurveyor(userId)){
             eventPublisher.publishEvent(new SurveyCreateEvent(
                     saved.getId(),
                     saved.getSurveyInfo().getTotalPoint().getValue(),

@@ -52,7 +52,7 @@ public class QuestionService {
 
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
-        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE));
+        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRoleToSurveyee(userId));
 
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
 
@@ -68,7 +68,7 @@ public class QuestionService {
 
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
-        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE));
+        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRoleToSurveyee(userId));
 
         Pageable pageable = PageRequest.of(page, size);
         Page<QuestionReadEntity> questionReadEntityPage = questionReadRepository.findAllBySurveyId(surveyId, pageable);

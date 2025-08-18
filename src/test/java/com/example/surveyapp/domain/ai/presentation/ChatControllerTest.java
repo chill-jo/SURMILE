@@ -59,7 +59,7 @@ public class ChatControllerTest extends WebMvcTestBase {
     @DisplayName("기능_테스트_인덱싱_API를_관리자가_호출하면_문서가_인덱싱된다")
     public void 인덱싱_API를_관리자가_호출하면_성공() throws Exception {
         // Given
-        IndexRequestDto dto = new IndexRequestDto("이 문서를 인덱싱합니다.");
+        IndexRequestDto dto = new IndexRequestDto("성공");
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -73,7 +73,7 @@ public class ChatControllerTest extends WebMvcTestBase {
 
         resultActions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("문서가 인덱싱되었습니다."))
+                .andExpect(jsonPath("$.message").value("성공"))
         ;
     }
 }
