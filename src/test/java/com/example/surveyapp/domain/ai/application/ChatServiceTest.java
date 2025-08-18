@@ -4,8 +4,6 @@ import com.example.surveyapp.domain.ai.chat.prompt.ChatPromptTemplate;
 import com.example.surveyapp.domain.ai.chat.rag.DocumentIndexer;
 import com.example.surveyapp.domain.ai.chat.rag.DocumentSearcher;
 import com.example.surveyapp.domain.ai.chat.application.ChatService;
-import com.example.surveyapp.domain.user.domain.model.User;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +19,6 @@ import org.springframework.ai.vectorstore.VectorStore;
 
 import java.util.List;
 
-import static com.example.surveyapp.config.generator.UserFixtureGenerator.generateUserFixture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -85,13 +82,13 @@ public class ChatServiceTest {
     void 관리자가_문서를_추가하면_인덱싱된다() {
         // Given
         String doc = "이 문서를 인덱싱합니다.";
-        when(userReader.validateUserRole(1L, UserRoleEnum.ADMIN)).thenReturn(true);
+        when(userReader.validateUserRoleToAdmin(1L)).thenReturn(true);
 
         // When
         indexer.indexText(1L, doc);
 
         // Then
-        verify(userReader).validateUserRole(1L, UserRoleEnum.ADMIN);
+        verify(userReader).validateUserRoleToAdmin(1L);
         verify(vectorStore).add(argThat(list ->
                 list != null && list.size() == 1 && doc.equals(list.get(0).getText())
         ));

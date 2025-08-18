@@ -83,7 +83,7 @@ public class SurveyServiceTest {
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         when(surveyMapper.toSurveyInfo(requestDto)).thenReturn(surveyInfo);
         when(surveyRepository.save(any(Survey.class))).thenReturn(savedSurvey);
-        when(userReader.validateUserRole(userId, UserRoleEnum.SURVEYOR)).thenReturn(true);
+        when(userReader.validateUserRoleToSurveyor(userId)).thenReturn(true);
         when(surveyMapper.toResponseDto(savedSurvey)).thenReturn(responseDto);
 
         // when
@@ -93,7 +93,7 @@ public class SurveyServiceTest {
         verify(userReader).validateUserIdOrThrow(userId);
         verify(surveyMapper).toSurveyInfo(requestDto);
         verify(surveyRepository).save(any(Survey.class));
-        verify(userReader).validateUserRole(userId, UserRoleEnum.SURVEYOR);
+        verify(userReader).validateUserRoleToSurveyor(userId);
         verify(eventPublisher).publishEvent(any(SurveyCreateEvent.class));
         verify(surveyMapper).toResponseDto(savedSurvey);
 
