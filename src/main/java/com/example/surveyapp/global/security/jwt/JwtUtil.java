@@ -1,8 +1,7 @@
 package com.example.surveyapp.global.security.jwt;
 
+import com.example.surveyapp.global.common.redis.application.RedisTemplateFacade;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
@@ -10,33 +9,37 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
+
 
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplateFacade redisTemplateFacade;
 
     private static final String BEARER_PREFIX = "Bearer ";
 //    private static final long TOKEN_TIME = 30 * 60 * 1000L; // 30분
     private static final String REFRESH_TOKEN_KEY_PREFIX = "refresh_token_user_id_";
+    private static final String EXPIRED_TOKEN_KEY_PREFIX = "expired_token_user_id_";
 
 
     @Value("${jwt.secret.key}")
     private String secretKey;
 
+    @Value("${spring.data.redis.cache-access-token}")
+    private String ACCESS_TOKEN;
     @Value("${jwt.access-token.expiration.access-token}")
     private long ACCESS_TOKEN_TIME;
 
+    @Value("${spring.data.redis.cache-refresh-token}")
+    private String REFRESH_TOKEN;
     @Value("${jwt.access-token.expiration.refresh-token}")
     private long REFRESH_TOKEN_TIME;
 
@@ -75,35 +78,23 @@ public class JwtUtil {
     }
 
     // Refresh Token 발급
-    public String createRefreshToken(Long userId, UserRoleEnum userRole) {
+    public String createRefreshToken(Long userId) {
         Date now = new Date();
 
-        String token = BEARER_PREFIX + Jwts.builder()
+        return BEARER_PREFIX + Jwts.builder()
                 .setSubject(String.valueOf(userId)) // id : 1
-                .claim("role", userRole.name()) // role: SURVEYEE
                 .issuedAt(now) // 2025-07-26T16:21:47
                 .expiration(new Date(now.getTime() + REFRESH_TOKEN_TIME)) // 발급일로부터 14일
                 .signWith(key)
                 .compact();
-
-        redisTemplate.opsForValue().set(REFRESH_TOKEN_KEY_PREFIX + userId, substringToken(token), Duration.ofMillis(REFRESH_TOKEN_TIME));
-
-        return token;
 
     }
 
     // Refresh Token 유효 검증
     public boolean isValidRefreshToken(String refreshToken) {
 
-        if (!validateToken(refreshToken)) {
-            return false;
-        }
-
-        String subject = extractUserId(refreshToken);
-        Long userId = Long.parseLong(subject);
-        String foundRefreshToken = redisTemplate.opsForValue().get(REFRESH_TOKEN_KEY_PREFIX + userId);
-
-        return refreshToken.equals(foundRefreshToken);
+        Long userId = Long.parseLong(extractUserId(refreshToken));
+        return refreshToken.equals(redisTemplateFacade.read(REFRESH_TOKEN + ":" + userId, String.class));
 
     }
 
@@ -143,6 +134,13 @@ public class JwtUtil {
      */
 
     public boolean validateToken(String token) {
+
+        Long userId = Long.parseLong(extractUserId(token));
+        String expiredToken = redisTemplateFacade.read(ACCESS_TOKEN + ":" + userId, String.class);
+        if (expiredToken != null && expiredToken.equals(token) ) {
+            return false;
+        }
+
         try {
             Claims claims = extractAllClaims(token);
             return !claims.getExpiration().before(new Date());

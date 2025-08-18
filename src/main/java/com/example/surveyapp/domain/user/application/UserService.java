@@ -1,7 +1,6 @@
 package com.example.surveyapp.domain.user.application;
 
-import com.example.surveyapp.domain.ai.moderation.config.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.application.ModerationService;
+import com.example.surveyapp.domain.user.application.provider.JwtProvider;
 import com.example.surveyapp.domain.user.domain.event.RegisterEvent;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;
@@ -14,25 +13,40 @@ import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.model.UserBaseData;
 import com.example.surveyapp.domain.user.domain.repository.UserBaseDataRepository;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
-import com.example.surveyapp.global.security.jwt.JwtUtil;
+import com.example.surveyapp.global.common.redis.application.RedisTemplateFacade;
+import com.example.surveyapp.global.response.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
     private final UserBaseDataRepository userBaseDataRepository;
-    private final ModerationService moderationService;
     private final ApplicationEventPublisher eventPublisher;
+    private final RedisTemplateFacade redisTemplateFacade;
+
+    private final JwtProvider jwtProvider;
+
+    @Value("${spring.data.redis.cache-access-token}")
+    private String ACCESS_TOKEN;
+    @Value("${jwt.access-token.expiration.access-token}")
+    private long ACCESS_TOKEN_TIME;
+
+    @Value("${spring.data.redis.cache-refresh-token}")
+    private String REFRESH_TOKEN;
+    @Value("${jwt.access-token.expiration.refresh-token}")
+    private long REFRESH_TOKEN_TIME;
 
     @Transactional
     public void register(RegisterRequestDto requestDto) {
@@ -73,9 +87,9 @@ public class UserService {
             throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
         }
 
-        String accessToken = jwtUtil.createAccessToken(user.getId(), user.getUserRole());
-
-        String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getUserRole());
+        String accessToken = jwtProvider.createAccessToken(user.getId(), user.getUserRole());
+        String refreshToken = jwtProvider.createRefreshToken(user.getId());
+        redisTemplateFacade.write(REFRESH_TOKEN + ":" + user.getId(), jwtProvider.substringToken(refreshToken), Duration.ofMillis(REFRESH_TOKEN_TIME));
 
         return LoginResponseDto.builder()
                 .id(String.valueOf(user.getId()))
@@ -83,6 +97,38 @@ public class UserService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Transactional
+    public void logout(String accessToken) {
+        Long userId = Long.parseLong(jwtProvider.extractUserId(jwtProvider.substringToken(accessToken)));
+        redisTemplateFacade.write(ACCESS_TOKEN + ":" + userId, jwtProvider.substringToken(accessToken), Duration.ofMillis(ACCESS_TOKEN_TIME));
+    }
+
+    @Transactional
+    public LoginResponseDto refresh(String requestToken) {
+        String token = jwtProvider.substringToken(requestToken);
+
+        if (!jwtProvider.isValidRefreshToken(token)) {
+            throw new UnauthorizedException("유효하지 않은 JWT 토큰입니다.");
+        }
+
+        Long userId = Long.parseLong(jwtProvider.extractUserId(token));
+
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
+
+        String accessToken = jwtProvider.createAccessToken(userId, user.getUserRole());
+        String refreshToken = jwtProvider.createRefreshToken(userId);
+        redisTemplateFacade.write(REFRESH_TOKEN + ":" + userId, jwtProvider.substringToken(refreshToken), Duration.ofMillis(REFRESH_TOKEN_TIME));;
+
+        return LoginResponseDto.builder()
+                .id(String.valueOf(user.getId()))
+                .name(user.getName())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
     }
 
     @Transactional
@@ -129,11 +175,11 @@ public class UserService {
 
     // 닉네임 적절성 검사
     private void validateNicknameModeration(String nickname){
-        ModerationResultStatusEnum status = moderationService.moderate("nickname", nickname);
-
-        if(status == ModerationResultStatusEnum.DENIED){
-            throw new UserException(UserErrorCode.INVALID_NICKNAME);
-        }
+//        ModerationResultStatusEnum status = moderationService.moderate("nickname", nickname);
+//
+//        if(status == ModerationResultStatusEnum.DENIED){
+//            throw new UserException(UserErrorCode.INVALID_NICKNAME);
+//        }
     }
 
     // ID로 유저 찾기
@@ -199,11 +245,4 @@ public class UserService {
         return new BaseDataListResponseDto(baseDataResponseDtoList);
 
     }
-
-    // 참여자 기초 정보 가져오는 메서드
-//    private UserBaseData getUserBaseData(CustomUserDetails user) {
-//
-//        user.getId();
-//
-//    }
 }

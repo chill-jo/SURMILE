@@ -54,6 +54,9 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor' // (3)
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc' // (4)
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation "com.redis:testcontainers-redis:2.2.4"
 
     // jwt
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.5'

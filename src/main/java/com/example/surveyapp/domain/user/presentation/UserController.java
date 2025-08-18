@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.user.presentation;
 
+import com.example.surveyapp.domain.user.application.provider.JwtProvider;
 import com.example.surveyapp.domain.user.presentation.dto.*;
 import com.example.surveyapp.domain.user.presentation.dto.RegisterRequestDto;
 import com.example.surveyapp.domain.user.presentation.dto.UserRequestDto;
@@ -7,6 +8,8 @@ import com.example.surveyapp.domain.user.presentation.dto.UserResponseDto;
 import com.example.surveyapp.domain.user.application.UserService;
 import com.example.surveyapp.global.response.ApiResponse;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
+    private final JwtProvider jwtProvider;
 
     // 회원 정보 조회
     @GetMapping("/my-page")
@@ -58,6 +62,24 @@ public class UserController {
             @RequestBody @Valid LoginRequestDto requestDto
     ) {
         LoginResponseDto response = userService.login(requestDto);
+        return ResponseEntity.ok(response);
+    }
+
+    //로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @RequestHeader("Authorization") String accessToken
+    ) {
+        userService.logout(accessToken);
+        return ResponseEntity.ok(null);
+    }
+
+    //토큰재발급
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponseDto> refresh(
+            @RequestHeader("Authorization") String refreshToken
+    ) {
+        LoginResponseDto response = userService.refresh(refreshToken);
         return ResponseEntity.ok(response);
     }
 
