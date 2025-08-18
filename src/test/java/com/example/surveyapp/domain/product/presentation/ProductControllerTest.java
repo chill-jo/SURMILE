@@ -2,28 +2,21 @@ package com.example.surveyapp.domain.product.presentation;
 
 import com.example.surveyapp.config.generator.ProductFixtureGenerator;
 import com.example.surveyapp.config.custommockuser.WithCustomMockUser;
+import com.example.surveyapp.config.testbase.WebMvcTestBase;
+import com.example.surveyapp.config.testmockbeans.TestMockBeans;
 import com.example.surveyapp.domain.product.presentation.dto.*;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.application.ProductService;
 import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
-import com.example.surveyapp.global.filter.JwtFilter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.http.MediaType;
 
@@ -41,26 +34,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ActiveProfiles("test")
-@DisplayName("controller: Product 컨트롤러 테스트")
-@WebMvcTest(controllers = ProductController.class,
-        excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class))
-// 웹계층 테스트에 필요한 Bean들만 등록해주는 Annotations
-// 당연히 데이터 접근 계층에 관련된 JPA와 연관된 Bean은 등록되질 않아야 하는데
-// 왜 JPA 관련된, Audting 관련된 Bean 생성을 시도했을까
-@AutoConfigureMockMvc(addFilters = false)
-@AutoConfigureRestDocs
-class ProductControllerTest {
+@DisplayName("controller: Product 컨트롤 테스트")
+@Import(TestMockBeans.class)
+class ProductControllerTest extends WebMvcTestBase {
 
     @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @MockitoBean
     private ProductService productService;
-
 
     @Test
     @DisplayName("기능_테스트_상품을 생성한다")
