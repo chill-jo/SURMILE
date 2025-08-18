@@ -32,7 +32,7 @@ public class OrderController {
         Long userId = userDetails.getId();
         OrderCreateResponseDto order = orderService.createOrder(requestDto,userId);
         URI location = URI.create("/api/orders" + order.getId());
-        return ResponseEntity.created(location).body(order);
+        return ResponseEntity.accepted().location(location).body(order);
     }
 
     @GetMapping

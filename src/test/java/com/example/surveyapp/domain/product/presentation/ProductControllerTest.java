@@ -95,7 +95,7 @@ class ProductControllerTest {
         actions
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
-                .andDo(document("create-product",
+                .andDo(document("product/create-product",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값")
@@ -153,7 +153,7 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title").value("상품1"))
                 .andExpect(jsonPath("$.data[1].title").value("상품2"))
-                  .andDo(document("get-products",
+                  .andDo(document("product/get-products",
                           requestHeaders(
                                   headerWithName(HttpHeaders.AUTHORIZATION)
                                           .description("JWT 인증 토큰 (Bearer + 토큰 값")
@@ -231,7 +231,7 @@ class ProductControllerTest {
         actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.title").value("상품명"))
-                .andDo(document("get-product",
+                .andDo(document("product/get-product",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값")
@@ -276,10 +276,10 @@ class ProductControllerTest {
         //검증 사항
         verify(productService,times(1))
                 .updateProduct(eq(productId), any(ProductUpdateRequestDto.class));
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.title").value("변경된 상품명"))
-                .andDo(document("update-product",
+                .andDo(document("product/update-product",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값")
@@ -332,10 +332,10 @@ class ProductControllerTest {
         // Then
         //검증 사항
         verify(productService, times(1)).deleteProduct(productId,userId);
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isEmpty())
-                .andDo(document("delete-product",
+                .andDo(document("product/delete-product",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값")
@@ -379,10 +379,10 @@ class ProductControllerTest {
         //검증 사항
         verify(productService, times(1)).statusUpdate(eq(userId),eq(product.getId()),any(ProductStatusUpdateRequestDto.class));
 
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.newStatus").value(Status.STOPPED_SALE.getStatus()))
-                .andDo(document("update-status-product",
+                .andDo(document("product/update-status-product",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값")

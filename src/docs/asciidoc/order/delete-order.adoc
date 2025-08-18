@@ -5,10 +5,10 @@
 
 === Http Request
 
-include::{snippets}/delete-order/path-parameters.adoc[]
+include::{snippets}/order/delete-order/path-parameters.adoc[]
 
 === Http Response
-include::{snippets}/get-orders/http-response.adoc[]
-include::{snippets}/delete-order/response-fields.adoc[]
+include::{snippets}/order/get-orders/http-response.adoc[]
+include::{snippets}/order/delete-order/response-fields.adoc[]
 
 

@@ -5,6 +5,6 @@
 
 
 === Http Response
-include::{snippets}/get-product/http-response.adoc[]
-include::{snippets}/get-product/response-fields.adoc[]
+include::{snippets}/product/get-product/http-response.adoc[]
+include::{snippets}/product/get-product/response-fields.adoc[]
 

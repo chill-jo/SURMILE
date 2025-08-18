@@ -6,8 +6,8 @@
 === Http Request
 
 === Http Response
-include::{snippets}/get-orders/http-response.adoc[]
-include::{snippets}/get-my-orders/query-parameters.adoc[]
-include::{snippets}/get-my-orders/response-fields.adoc[]
+include::{snippets}/order/get-orders/http-response.adoc[]
+include::{snippets}/order/get-my-orders/query-parameters.adoc[]
+include::{snippets}/order/get-my-orders/response-fields.adoc[]
 
 

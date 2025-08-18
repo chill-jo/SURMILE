@@ -6,6 +6,6 @@
 
 
 === Http Response
-include::{snippets}/get-orders/http-response.adoc[]
-include::{snippets}/get-order/response-fields.adoc[]
+include::{snippets}/order/get-orders/http-response.adoc[]
+include::{snippets}/order/get-order/response-fields.adoc[]
 
