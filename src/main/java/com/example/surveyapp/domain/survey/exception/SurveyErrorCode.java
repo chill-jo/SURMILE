@@ -22,7 +22,7 @@ public enum SurveyErrorCode implements ErrorCode {
     QUESTION_NOT_FROM_SURVEY(HttpStatus.NOT_FOUND, "질문이 설문에 존재하지 않습니다."),
     OPTIONS_NOT_FROM_SURVEY(HttpStatus.NOT_FOUND, "선택지가 질문에 존재하지 않습니다."),
     SURVEY_NOT_IN_PROGRESS(HttpStatus.BAD_REQUEST, "진행 중이 아닌 설문에는 참여할 수 없습니다."),
-
+    NO_QUESTIONS_IN_SURVEY(HttpStatus.NO_CONTENT, "설문에 질문이 존재하지 않아 설문 참여를 시작할 수 없습니다."),
     //선택지 에러
     OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 선택지입니다."),
     OPTION_INVALID_FOR_SUBJECTIVE_QUESTION(HttpStatus.BAD_REQUEST, "주관식 질문에는 선택지를 생성할 수 없습니다.");

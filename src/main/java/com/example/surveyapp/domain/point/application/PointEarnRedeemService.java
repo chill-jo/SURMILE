@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.point.application;
 
+import com.example.surveyapp.domain.point.domain.event.PointRedeemSuccessEvent;
 import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
 import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
 import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
@@ -11,15 +12,19 @@ import com.example.surveyapp.domain.point.exception.PointErrorCode;
 import com.example.surveyapp.domain.point.exception.PointException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PointEarnRedeemService {
 
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void decreasePoint(Long userId, PointBalance amount, Long orderId){
@@ -58,6 +63,15 @@ public class PointEarnRedeemService {
         PointBalance currentBalance = point.getPointBalance();
 
         point.redeem(amount);
+
+        eventPublisher.publishEvent(
+                new PointRedeemSuccessEvent(
+                        userId,
+                        surveyId
+                )
+        );
+
+        log.info("포인트 차감 성공 이벤트 발행");
 
         PointHistory history = PointHistory.of(
                 currentBalance,

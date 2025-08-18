@@ -16,6 +16,10 @@ public class SurveyValidator {
         if(survey.getSurveyInfo().getDeadline().isBefore(LocalDateTime.now())){
             throw new SurveyException(SurveyErrorCode.SURVEY_NOT_IN_PROGRESS);
         }
+
+        if (survey.getQuestions().isEmpty()) {
+            throw new SurveyException(SurveyErrorCode.NO_QUESTIONS_IN_SURVEY);
+        }
     }
 
     public void validateUpdatable(Long userId, Survey survey){

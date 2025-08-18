@@ -42,7 +42,7 @@ public class Survey extends BaseEntity {
     public Survey(Long userId, SurveyInfo surveyInfo) {
         this.userId = userId;
         this.surveyInfo = surveyInfo;
-        this.status = SurveyStatus.NOT_STARTED;
+        this.status = SurveyStatus.PENDING;
         this.isDeleted = false;
     }
 
