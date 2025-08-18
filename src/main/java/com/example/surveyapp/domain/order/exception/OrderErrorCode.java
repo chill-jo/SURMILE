@@ -18,7 +18,9 @@ public enum OrderErrorCode implements ErrorCode {
     NOT_YOUR_ORDER(HttpStatus.UNAUTHORIZED,"본인 주문만 확인 할 수 있습니다." ),
     NOT_SAME_ORDER_USER(HttpStatus.BAD_REQUEST,"본인이 주문한 주문만 삭제할 수 있습니다." ),
     ONE_ORDER_ONE_PRODUCT(HttpStatus.BAD_REQUEST, "한개의 상품만 있어야 주문이 가능합니다." ),
-    INVALID_PRICE_ORDERITEM(HttpStatus.BAD_REQUEST, "유효 하지 않는 상품 금액입니다." );
+    INVALID_PRICE_ORDERITEM(HttpStatus.BAD_REQUEST, "유효 하지 않는 상품 금액입니다." ),
+    INVALID_ORDER_STATUS(HttpStatus.UNAUTHORIZED,"허용되지 않는 주문 상태입니다."),
+    FAILED_ORDER_STATUS(HttpStatus.UNAUTHORIZED,"이벤트 실패로 결제 취소 되었습니다." );
 
     private final HttpStatus status;
 

@@ -2,6 +2,7 @@ package com.example.surveyapp.domain.order.presentation;
 
 import com.example.surveyapp.config.generator.OrderFixtureGenerator;
 import com.example.surveyapp.config.custommockuser.WithCustomMockUser;
+import com.example.surveyapp.domain.order.domain.model.vo.OrderStatus;
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto;
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateResponseDto;
 import com.example.surveyapp.domain.order.presentation.dto.OrderResponseDto;
@@ -69,14 +70,15 @@ public class OrderControllerTest {
         Long userId = 1L;
         Order order = OrderFixtureGenerator.generateOrderFixture(userId);
         ReflectionTestUtils.setField(order, "id", 1L);
-        OrderItem item = order.getOneOrderItemOrThrow();
+        OrderItem item = order.getOrderItem();
 
         OrderCreateRequestDto requestDto = new OrderCreateRequestDto(item.getProductId());
         OrderCreateResponseDto responseDto = new OrderCreateResponseDto(1L,
                 order.getOrderNumber().getValue(),
                 item.getTitle(),
                 Status.ON_SALE.getStatus(),
-                order.orderAmount()
+                order.orderAmount(),
+                order.getOrderStatus().getOrderStatus()
         );
         // When
         //실행할 행동
@@ -92,10 +94,10 @@ public class OrderControllerTest {
         verify(orderService, times(1))
                 .createOrder(any(OrderCreateRequestDto.class), eq(userId));
         actions
-                .andExpect(status().isCreated())
+                .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.data.orderNumber").isString())
                 .andExpect(jsonPath("$.data.title").value(item.getTitle()))
-                .andDo(document("create-order",
+                .andDo(document("order/create-order",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰값)")
@@ -115,6 +117,7 @@ public class OrderControllerTest {
                                 fieldWithPath("data.title").type(JsonFieldType.STRING).description("주문 상품 제목"),
                                 fieldWithPath("data.status").type(JsonFieldType.STRING).description("주문 상품 상태"),
                                 fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("data.orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("주문 생성일"))));
 
     }
@@ -126,8 +129,8 @@ public class OrderControllerTest {
         // Given
         //테스트 전제 조건 및 환경 설정
         List<OrderResponseDto> orderList = List.of(
-                new OrderResponseDto(1L, "uuid1", 1L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), LocalDateTime.now()),
-                new OrderResponseDto(2L, "uuid1", 3L, "dohan2", 2L, "pizza", 3500L, Status.ON_SALE.getStatus(), LocalDateTime.now())
+                new OrderResponseDto(1L, "uuid1", 1L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), OrderStatus.PENDING_PAYMENT.getOrderStatus(), LocalDateTime.now()),
+                new OrderResponseDto(2L, "uuid1", 3L, "dohan2", 2L, "pizza", 3500L, Status.ON_SALE.getStatus(), OrderStatus.PENDING_PAYMENT.getOrderStatus(), LocalDateTime.now())
         );
 
         when(orderService.readAllOrder(0, 10)).thenReturn(orderList);
@@ -147,7 +150,7 @@ public class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].username").value("dohan1"))
                 .andExpect(jsonPath("$.data[1].username").value("dohan2"))
-                .andDo(document("get-orders",
+                .andDo(document("order/get-orders",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값")
@@ -169,6 +172,7 @@ public class OrderControllerTest {
                                 fieldWithPath("data[].title").type(JsonFieldType.STRING).description("주문 상품 제목"),
                                 fieldWithPath("data[].status").type(JsonFieldType.STRING).description(" 상품 상태"),
                                 fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("data[].orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
                                 fieldWithPath("data[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
 
@@ -182,8 +186,8 @@ public class OrderControllerTest {
         // Given
         //테스트 전제 조건 및 환경 설정
         List<OrderResponseDto> orderList = List.of(
-                new OrderResponseDto(1L, "uuid1", 3L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), LocalDateTime.now()),
-                new OrderResponseDto(2L, "uuid1", 3L, "dohan1", 1L, "pizza", 3500L, Status.ON_SALE.getStatus(), LocalDateTime.now())
+                new OrderResponseDto(1L, "uuid1", 3L, "dohan2", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), OrderStatus.PENDING_PAYMENT.getOrderStatus(), LocalDateTime.now()),
+                new OrderResponseDto(2L, "uuid1", 3L, "dohan2", 2L, "pizza", 3500L, Status.ON_SALE.getStatus(), OrderStatus.PENDING_PAYMENT.getOrderStatus(), LocalDateTime.now())
         );
 
         when(orderService.readMyOrderList(0, 10, 3L)).thenReturn(orderList);
@@ -199,9 +203,9 @@ public class OrderControllerTest {
         verify(orderService, times(1)).readMyOrderList(anyInt(), anyInt(), anyLong());
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].username").value("dohan1"))
-                .andExpect(jsonPath("$.data[1].username").value("dohan1"))
-                .andDo(document("get-my-orders",
+                .andExpect(jsonPath("$.data[0].username").value("dohan2"))
+                .andExpect(jsonPath("$.data[1].username").value("dohan2"))
+                .andDo(document("order/get-my-orders",
                           requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값")
@@ -223,6 +227,7 @@ public class OrderControllerTest {
                                 fieldWithPath("data[].title").type(JsonFieldType.STRING).description("주문 상품 제목"),
                                 fieldWithPath("data[].status").type(JsonFieldType.STRING).description(" 상품 상태"),
                                 fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("data[].orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
                                 fieldWithPath("data[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
 
@@ -235,7 +240,7 @@ public class OrderControllerTest {
     void 주문자_주문내역_삭제() throws Exception {
         // Given
         //테스트 전제 조건 및 환경 설정
-        OrderResponseDto responseDto = new OrderResponseDto(1L, "uuid1", 3L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), LocalDateTime.now());
+        OrderResponseDto responseDto = new OrderResponseDto(1L, "uuid1", 3L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(),OrderStatus.PENDING_PAYMENT.getOrderStatus(), LocalDateTime.now());
 
         doNothing().when(orderService).deleteOrder(responseDto.getOrderId(), responseDto.getUserId());
         // When
@@ -252,7 +257,7 @@ public class OrderControllerTest {
         actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isEmpty())
-                .andDo(document("delete-order",
+                .andDo(document("order/delete-order",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값")
@@ -275,7 +280,7 @@ public class OrderControllerTest {
     void 관리자_주문_단건_조회() throws Exception {
         // Given
         //테스트 전제 조건 및 환경 설정
-        OrderResponseDto responseDto = new OrderResponseDto(1L, "uuid1", 1L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), LocalDateTime.now());
+        OrderResponseDto responseDto = new OrderResponseDto(1L, "uuid1", 1L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(),OrderStatus.PENDING_PAYMENT.getOrderStatus(), LocalDateTime.now());
 
         when(orderService.readOneOrder(responseDto.getOrderId())).thenReturn(responseDto);
         // When
@@ -292,7 +297,7 @@ public class OrderControllerTest {
         actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.orderNumber").value(responseDto.getOrderNumber()))
-                .andDo(document("get-order",
+                .andDo(document("order/get-order",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("JWT 인증 토큰 (Bearer + 토큰 값")
@@ -312,6 +317,7 @@ public class OrderControllerTest {
                                 fieldWithPath("data.title").type(JsonFieldType.STRING).description("주문 상품 제목"),
                                 fieldWithPath("data.status").type(JsonFieldType.STRING).description(" 상품 상태"),
                                 fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("data.orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
                                 fieldWithPath("data.createAt").type(JsonFieldType.STRING).description("주문 생성일"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
 
@@ -323,7 +329,7 @@ public class OrderControllerTest {
     void 참여자_본인_주문_단건_조회() throws Exception {
         // Given
         //테스트 전제 조건 및 환경 설정
-        OrderResponseDto responseDto = new OrderResponseDto(1L, "uuid1", 3L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), LocalDateTime.now());
+        OrderResponseDto responseDto = new OrderResponseDto(1L, "uuid1", 3L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(),OrderStatus.CONFIRMED.getOrderStatus(), LocalDateTime.now());
 
         when(orderService.readOneMyOrder(responseDto.getOrderId(), responseDto.getUserId())).thenReturn(responseDto);
         // When
@@ -338,7 +344,7 @@ public class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.orderNumber").value(responseDto.getOrderNumber()))
                 .andExpect(jsonPath("$.data.userId").value(responseDto.getUserId()))
-                .andDo(document("get-my-order",
+                .andDo(document("order/get-my-order",
 
 //                         /api/orders/{id}
                         pathParameters(
@@ -354,6 +360,7 @@ public class OrderControllerTest {
                                 fieldWithPath("data.title").type(JsonFieldType.STRING).description("주문 상품 제목"),
                                 fieldWithPath("data.status").type(JsonFieldType.STRING).description(" 상품 상태"),
                                 fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("data.orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
                                 fieldWithPath("data.createAt").type(JsonFieldType.STRING).description("주문 생성일"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
 

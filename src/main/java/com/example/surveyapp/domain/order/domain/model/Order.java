@@ -2,14 +2,12 @@ package com.example.surveyapp.domain.order.domain.model;
 
 import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderNumber;
+import com.example.surveyapp.domain.order.domain.model.vo.OrderStatus;
 import com.example.surveyapp.domain.order.exception.OrderErrorCode;
 import com.example.surveyapp.domain.order.exception.OrderException;
 import com.example.surveyapp.global.config.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -26,25 +24,20 @@ public class Order extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @ElementCollection
-    @CollectionTable(name = "order_items", joinColumns = @JoinColumn(name = "order_id"))
-    private final List<OrderItem> orderItems = new ArrayList<>();
+    @Embedded
+    private OrderItem orderItem;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
 
     @Column(nullable = false)
     private boolean isDeleted = false;
 
     //총 금액 구하기 (1:1 주문)
     public Long orderAmount() {
-        return getOneOrderItemOrThrow().getPrice().getValue();
-    }
 
-    //수량 1개만 주문 가능 외 예외처리
-    public OrderItem getOneOrderItemOrThrow(){
-        if (orderItems.size() != 1) {
-            throw new OrderException(OrderErrorCode.ONE_ORDER_ONE_PRODUCT);
-        }
-        return orderItems.stream().findFirst()
-                .orElseThrow(() -> new OrderException(OrderErrorCode.ONE_ORDER_ONE_PRODUCT));
+        return orderItem.getPrice().getValue();
     }
 
     //본인 주문 외 조회 시 예외처리
@@ -58,22 +51,37 @@ public class Order extends BaseEntity {
     }
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Order(OrderNumber orderNumber, Long userId, List<OrderItem> orderItems) {
+    private Order(OrderNumber orderNumber, Long userId, OrderItem orderItem, OrderStatus orderStatus) {
+
         this.orderNumber = orderNumber;
         this.userId = userId;
-        this.orderItems.addAll(orderItems);
+        this.orderItem =orderItem;
+        this.orderStatus = orderStatus;
     }
 
-    public static Order of(Long userId, List<OrderItem> orderItems) {
-        if (orderItems == null || orderItems.size() != 1){
-            throw new OrderException(OrderErrorCode.ONE_ORDER_ONE_PRODUCT);
-        }
+    public static Order of(Long userId, OrderItem orderItem) {
+        if (orderItem == null) throw new OrderException(OrderErrorCode.ONE_ORDER_ONE_PRODUCT);
+
         Order order = Order.builder()
                 .userId(userId)
                 .orderNumber(OrderNumber.generator())
-                .orderItems(orderItems)
+                .orderItem(orderItem)
+                .orderStatus(OrderStatus.PENDING_PAYMENT)
                 .build();
         return order;
     }
 
+    public void confirm(){
+        if (orderStatus != OrderStatus.PENDING_PAYMENT) {
+            throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
+        }
+        this.orderStatus = OrderStatus.CONFIRMED;
+    }
+
+    public void cancel() {
+        if (orderStatus != OrderStatus.PENDING_PAYMENT) {
+            throw new OrderException(OrderErrorCode.FAILED_ORDER_STATUS);
+        }
+        this.orderStatus = OrderStatus.CANCEL;
+    }
 }
