@@ -1,30 +1,20 @@
 package com.example.surveyapp.domain.surveyanswer.presentation;
 import com.example.surveyapp.config.custommockuser.WithCustomMockUser;
+import com.example.surveyapp.config.testbase.WebMvcTestBase;
+import com.example.surveyapp.config.testmockbeans.TestMockBeans;
 import com.example.surveyapp.domain.surveyanswer.application.SurveyAnswerService;
 import com.example.surveyapp.domain.surveyanswer.application.SurveyAnswerStatisticsService;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.request.QuestionAnswerRequestDto;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.request.SurveyAnswerRequestDto;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.*;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
-import com.example.surveyapp.global.filter.JwtFilter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
@@ -42,25 +32,16 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-@ActiveProfiles("test")
+
 @DisplayName("controller : SurveyAnswerController 테스트")
-@WebMvcTest(controllers = SurveyAnswerController.class,
-        excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class))
-@AutoConfigureMockMvc(addFilters = false)
-@AutoConfigureRestDocs
-public class SurveyAnswerControllerTest {
-    @Autowired
-    ObjectMapper objectMapper;
+@Import(TestMockBeans.class)
+public class SurveyAnswerControllerTest extends WebMvcTestBase {
 
     @Autowired
-    MockMvc mockMvc;
-
-    @MockitoBean
     private SurveyAnswerService surveyAnswerService;
 
-    @MockitoBean
+    @Autowired
     private SurveyAnswerStatisticsService surveyAnswerStatisticsService;
 
     @Test
