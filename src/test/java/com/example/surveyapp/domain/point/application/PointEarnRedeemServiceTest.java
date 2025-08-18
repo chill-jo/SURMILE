@@ -1,11 +1,9 @@
 package com.example.surveyapp.domain.point.application;
 
-import com.example.surveyapp.config.generator.PointFixtureGenerator;
 import com.example.surveyapp.domain.point.domain.event.PointRedeemSuccessEvent;
 import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
 import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
 import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
-import com.example.surveyapp.domain.point.domain.repository.PaymentRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointHistoryRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.point.exception.PointErrorCode;
