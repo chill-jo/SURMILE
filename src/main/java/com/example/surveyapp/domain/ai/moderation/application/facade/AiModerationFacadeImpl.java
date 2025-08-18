@@ -15,4 +15,24 @@ public class AiModerationFacadeImpl implements AiModerationFacade {
     public AiModerationResult checkNicknameModeration(String nickname) {
         return aiModerationService.moderate(AiModerationTargetType.USER_NICKNAME, nickname);
     }
+
+    @Override
+    public AiModerationResult checkSurveyModeration(String title, String description) {
+        return aiModerationService.moderate(Ai)
+    }
+
+    @Override
+    public AiModerationResult checkQuestionModeration(String question) {
+        return aiModerationService.moderate(AiModerationTargetType.SURVEY_QUESTION, question);
+    }
+
+    @Override
+    public AiModerationResult checkOptionsModeration(String options) {
+        return aiModerationService.moderate(AiModerationTargetType.SURVEY_OPTIONS, options);
+    }
+
+    @Override
+    public AiModerationResult checkTextAnswerModeration(String answer) {
+        return aiModerationService.moderate(AiModerationTargetType.SURVEY_TEXT_ANSWER, answer);
+    }
 }
