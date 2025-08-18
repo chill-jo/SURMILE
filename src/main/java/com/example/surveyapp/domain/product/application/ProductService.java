@@ -8,7 +8,6 @@ import com.example.surveyapp.domain.product.domain.model.ProductPoints;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
 import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 
 import lombok.AllArgsConstructor;
@@ -37,7 +36,7 @@ public class ProductService {
     @Transactional
     public ProductCreateResponseDto createProduct(ProductCreateRequestDto requestDto, Long userId) {
         userReader.validateUserIdOrThrow(userId);
-        userReader.validateUserRole(userId,UserRoleEnum.ADMIN);
+        userReader.validateUserRoleToAdmin(userId);
 
         if (productRepository.existsByTitleAndIsDeletedFalse(requestDto.getTitle())){
             throw new ProductException(ProductErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE);
@@ -108,7 +107,7 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long id, Long userId) {
         userReader.validateUserIdOrThrow(userId);
-        userReader.validateUserRole(userId,UserRoleEnum.ADMIN);
+        userReader.validateUserRoleToAdmin(userId);
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
 
@@ -118,7 +117,7 @@ public class ProductService {
     @Transactional
     public ProductStatusUpdateResponseDto statusUpdate(Long userId, Long id, ProductStatusUpdateRequestDto requestDto) {
         userReader.validateUserIdOrThrow(userId);
-        userReader.validateUserRole(userId,UserRoleEnum.ADMIN);
+        userReader.validateUserRoleToAdmin(userId);
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
         product.changeStatus(requestDto.getNewStatus());
