@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ModerationTargetType {
+public enum AiModerationTargetType {
     USER_NICKNAME("사용자 닉네임"),
     SURVEY_TITLE("설문 제목"),
     SURVEY_DESCRIPTION("설문 부제목"),

@@ -1,7 +1,7 @@
 package com.example.surveyapp.domain.user.application;
 
-import com.example.surveyapp.domain.ai.moderation.domain.model.ModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.application.ModerationService;
+import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.application.AiModerationService;
 import com.example.surveyapp.domain.user.domain.event.RegisterEvent;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;
@@ -31,7 +31,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final UserBaseDataRepository userBaseDataRepository;
-    private final ModerationService moderationService;
+    private final AiModerationService aiModerationService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -126,9 +126,9 @@ public class UserService {
 
     // 닉네임 적절성 검사
     private void validateNicknameModeration(String nickname){
-        ModerationResultStatusEnum status = moderationService.moderate("nickname", nickname);
+        AiModerationResultStatusEnum status = aiModerationService.moderate("nickname", nickname);
 
-        if(status == ModerationResultStatusEnum.DENIED){
+        if(status == AiModerationResultStatusEnum.DENIED){
             throw new UserException(UserErrorCode.INVALID_NICKNAME);
         }
     }

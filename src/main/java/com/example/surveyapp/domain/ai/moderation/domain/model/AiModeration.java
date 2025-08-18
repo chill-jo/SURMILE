@@ -1,7 +1,5 @@
 package com.example.surveyapp.domain.ai.moderation.domain.model;
 
-import com.example.surveyapp.domain.user.domain.model.User;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.config.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -13,14 +11,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "moderation_events")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Moderation extends BaseEntity {
+public class AiModeration extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ModerationTargetType targetType;
+    private AiModerationTargetType targetType;
 
     @Column(nullable = false)
     private String content;
@@ -28,13 +26,13 @@ public class Moderation extends BaseEntity {
     private boolean isDeleted = false;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Moderation(ModerationTargetType targetType, String content) {
+    private AiModeration(AiModerationTargetType targetType, String content) {
         this.targetType = targetType;
         this.content = content;
     }
 
-    public static Moderation of(ModerationTargetType targetType, String content) {
-        return Moderation.builder()
+    public static AiModeration of(AiModerationTargetType targetType, String content) {
+        return AiModeration.builder()
                 .targetType(targetType)
                 .content(content)
                 .build();

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ModerationResultStatusEnum {
+public enum AiModerationResultStatusEnum {
     APPROVED,
     DENIED;
 }

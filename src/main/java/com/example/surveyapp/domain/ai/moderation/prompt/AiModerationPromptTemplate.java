@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.ai.moderation.prompt;
 
-public class ModerationPromptTemplate {
+public class AiModerationPromptTemplate {
     public static final String promptTemplate = """
             You are a content moderation assistant.
             Determine if the following {targetType} is inappropriate.
