@@ -2,6 +2,7 @@ package com.example.surveyapp.domain.ai.moderation.application;
 
 import com.example.surveyapp.domain.ai.moderation.domain.model.Moderation;
 import com.example.surveyapp.domain.ai.moderation.domain.model.ModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.model.ModerationTargetType;
 import com.example.surveyapp.domain.ai.moderation.domain.repository.ModerationRepository;
 import com.example.surveyapp.domain.ai.moderation.prompt.ModerationPromptTemplate;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class ModerationService {
     private final ModerationRepository moderationRepository;
 
     @Transactional
-    public ModerationResultStatusEnum moderate(String userId, String targetType, String content) {
+    public ModerationResultStatusEnum moderate(ModerationTargetType targetType, String content) {
         // 프롬프트 구성
         PromptTemplate prompt = new PromptTemplate(ModerationPromptTemplate.promptTemplate);
         prompt.add("targetType", targetType);

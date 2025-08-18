@@ -19,7 +19,8 @@ public class Moderation extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String targetType; // user_nickname, survey_title, survey_description, survey_question, survey_options, survey_text_answer
+    @Enumerated(EnumType.STRING)
+    private ModerationTargetType targetType;
 
     @Column(nullable = false)
     private String content;
@@ -27,12 +28,12 @@ public class Moderation extends BaseEntity {
     private boolean isDeleted = false;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Moderation(String targetType, String content) {
+    private Moderation(ModerationTargetType targetType, String content) {
         this.targetType = targetType;
         this.content = content;
     }
 
-    public static Moderation of(String targetType, String content) {
+    public static Moderation of(ModerationTargetType targetType, String content) {
         return Moderation.builder()
                 .targetType(targetType)
                 .content(content)
