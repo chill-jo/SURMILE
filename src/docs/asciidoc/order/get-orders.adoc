@@ -4,7 +4,7 @@
 `GET` 요청을 사용하여 관리자는 모든 주문을 조회할 수 있습니다.
 
 === Http Response
-include::{snippets}/get-orders/http-response.adoc[]
-include::{snippets}/get-orders/query-parameters.adoc[]
-include::{snippets}/get-orders/response-fields.adoc[]
+include::{snippets}/order/get-orders/http-response.adoc[]
+include::{snippets}/order/get-orders/query-parameters.adoc[]
+include::{snippets}/order/get-orders/response-fields.adoc[]
 

@@ -7,6 +7,6 @@
 
 
 === Http Response
-include::{snippets}/get-products/http-response.adoc[]
-include::{snippets}/get-products/query-parameters.adoc[]
-include::{snippets}/get-products/response-fields.adoc[]
+include::{snippets}/product/get-products/http-response.adoc[]
+include::{snippets}/product/get-products/query-parameters.adoc[]
+include::{snippets}/product/get-products/response-fields.adoc[]
