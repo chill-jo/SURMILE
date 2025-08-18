@@ -25,12 +25,7 @@ public class DocumentIndexer {
     }
 
     public void validateIndexerAccess(Long userId){
-        if (userId == null) {
-            throw new CustomException(AiErrorCode.NOT_MATCH_ADMIN);
-        }
-        try {
-            userReader.validateUserRole(userId, UserRoleEnum.ADMIN);
-        } catch (Exception ex) {
+        if (userId == null || !userReader.validateUserRole(userId, UserRoleEnum.ADMIN)) {
             throw new CustomException(AiErrorCode.NOT_MATCH_ADMIN);
         }
     }
