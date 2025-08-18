@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.ai.moderation.domain.model;
+package com.example.surveyapp.domain.ai.moderation.domain.model.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

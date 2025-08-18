@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.ai.moderation.domain.model;
 
+import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationTargetType;
 import com.example.surveyapp.global.config.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

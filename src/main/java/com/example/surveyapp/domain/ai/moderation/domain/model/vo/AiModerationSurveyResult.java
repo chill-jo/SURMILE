@@ -1,6 +1,5 @@
-package com.example.surveyapp.domain.ai.moderation.domain.vo;
+package com.example.surveyapp.domain.ai.moderation.domain.model.vo;
 
-import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

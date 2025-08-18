@@ -1,13 +1,12 @@
 package com.example.surveyapp.domain.user.application;
 
 import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
-import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.domain.vo.AiModerationResult;
+import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;
 import com.example.surveyapp.domain.user.presentation.dto.UserRequestDto;
 import com.example.surveyapp.domain.user.presentation.dto.UserResponseDto;
-import com.example.surveyapp.domain.ai.moderation.application.AiModerationService;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;

@@ -1,8 +1,6 @@
 package com.example.surveyapp.domain.user.application;
 
 import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
-import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.application.AiModerationService;
 import com.example.surveyapp.domain.user.domain.event.RegisterEvent;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;

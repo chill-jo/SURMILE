@@ -1,10 +1,10 @@
 package com.example.surveyapp.domain.ai.moderation.application;
 
 import com.example.surveyapp.domain.ai.moderation.domain.model.AiModeration;
-import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationTargetType;
+import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationTargetType;
 import com.example.surveyapp.domain.ai.moderation.domain.repository.AiModerationRepository;
-import com.example.surveyapp.domain.ai.moderation.domain.vo.AiModerationResult;
+import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
 import com.example.surveyapp.domain.ai.moderation.prompt.AiModerationPromptTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

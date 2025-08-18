@@ -1,6 +1,6 @@
-package com.example.surveyapp.domain.ai.moderation.domain.vo;
+package com.example.surveyapp.domain.ai.moderation.domain.model.vo;
 
-import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
 import lombok.*;
 
 @Getter

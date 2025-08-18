@@ -3,8 +3,8 @@ package com.example.surveyapp.domain.survey.application;
 import static org.assertj.core.api.Assertions.*;
 
 import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
-import com.example.surveyapp.domain.ai.moderation.domain.model.AiModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.domain.vo.AiModerationResult;
+import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionReadRepository;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
@@ -16,8 +16,6 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.QuestionRes
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.model.enums.QuestionType;
-import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
