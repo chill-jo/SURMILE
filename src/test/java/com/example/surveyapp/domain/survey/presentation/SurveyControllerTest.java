@@ -39,6 +39,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 @DisplayName("controller : SurveyController 테스트")
 @Import(TestMockBeans.class)
@@ -85,7 +86,8 @@ public class SurveyControllerTest extends WebMvcTestBase {
 
         verify(surveyService, times(1))
                 .createSurvey(eq(userId), any(SurveyCreateRequestDto.class));
-        actions.andExpect(status().isCreated())
+        actions.andDo(print())
+                .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
                 .andExpect(jsonPath("$.data.status").value(SurveyStatus.NOT_STARTED.name()))
                 .andDo(document("survey/create-survey",

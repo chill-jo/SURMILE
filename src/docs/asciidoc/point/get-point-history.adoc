@@ -1,0 +1,19 @@
+== Get Point History API
+
+[example]
+`GET` 요청을 사용하여 포인트 내역을 조회할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/point/get-point-history/http-request.adoc[]
+include::{snippets}/point/get-point-history/request-headers.adoc[]
+include::{snippets}/point/get-point-history/query-parameters.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/point/get-point-history/http-response.adoc[]
+include::{snippets}/point/get-point-history/response-fields.adoc[]
+====
