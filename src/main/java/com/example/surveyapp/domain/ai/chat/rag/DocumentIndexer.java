@@ -1,7 +1,6 @@
 package com.example.surveyapp.domain.ai.chat.rag;
 
 import com.example.surveyapp.domain.ai.exception.AiErrorCode;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import com.example.surveyapp.global.response.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class DocumentIndexer {
     }
 
     public void validateIndexerAccess(Long userId){
-        if (userId == null || !userReader.validateUserRole(userId, UserRoleEnum.ADMIN)) {
+        if (userId == null || !userReader.validateUserRoleToAdmin(userId)) {
             throw new CustomException(AiErrorCode.NOT_MATCH_ADMIN);
         }
     }

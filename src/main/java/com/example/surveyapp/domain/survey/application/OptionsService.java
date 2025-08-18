@@ -8,7 +8,6 @@ import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 
 import lombok.RequiredArgsConstructor;
@@ -55,7 +54,7 @@ public class OptionsService {
         Survey survey = surveyQueryService.findSurvey(surveyId);
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
 
-        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE));
+        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRoleToSurveyee(userId));
 
         List<Options> optionsList = question.getOptions();
 

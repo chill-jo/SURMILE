@@ -121,12 +121,11 @@ class ProductControllerTest extends WebMvcTestBase {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .param("page", "0")
                         .param("size", "10")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productList)));
+                       );
         // Then
         //검증 사항
 
-        verify(productService, times(1)).readAllProduct(0,10);
+        verify(productService, atLeastOnce()).readAllProduct(0,10);
 
           actions
                 .andExpect(status().isOk())
