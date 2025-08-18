@@ -5,12 +5,12 @@
 
 === Http Request
 
-include::{snippets}/get-my-order/path-parameters.adoc[]
+include::{snippets}/order/get-my-order/path-parameters.adoc[]
 
 === Http Response
 
 
-include::{snippets}/get-my-order/http-response.adoc[]
-include::{snippets}/get-my-order/response-fields.adoc[]
+include::{snippets}/order/get-my-order/http-response.adoc[]
+include::{snippets}/order/get-my-order/response-fields.adoc[]
 
 

@@ -5,12 +5,12 @@
 
 
 === Http Request
-include::{snippets}/delete-product/path-parameters.adoc[]
+include::{snippets}/product/delete-product/path-parameters.adoc[]
 
 === Http Response
-include::{snippets}/get-product/http-response.adoc[]
+include::{snippets}/product/delete-product/http-response.adoc[]
 
-include::{snippets}/delete-product/response-fields.adoc[]
+include::{snippets}/product/delete-product/response-fields.adoc[]
 
 
 

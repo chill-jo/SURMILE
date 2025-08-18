@@ -33,6 +33,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @DisplayName("controller : SurveyAnswerController 테스트")
 @Import(TestMockBeans.class)
 public class SurveyAnswerControllerTest extends WebMvcTestBase {
