@@ -1,0 +1,5 @@
+[[point-resource]]
+= Point API
+
+include::charge-point.adoc[]
+include::get-point-history.adoc[]

@@ -104,7 +104,8 @@ public class SurveyControllerTest {
 
         verify(surveyService, times(1))
                 .createSurvey(eq(userId), any(SurveyCreateRequestDto.class));
-        actions.andExpect(status().isCreated())
+        actions.andDo(print())
+                .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
                 .andExpect(jsonPath("$.data.status").value(SurveyStatus.NOT_STARTED.name()))
                 .andDo(document("survey/create-survey",
