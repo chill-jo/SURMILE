@@ -26,19 +26,32 @@ public class UserReaderImpl implements UserReader {
         }
     }
 
-    public boolean validateUserRole(Long userId, UserRoleEnum userRole){
-        User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(
-                        () -> new UserException(UserErrorCode.NOT_FOUND_USER)
-                );
-
-        return user.hasRole(userRole);
-    }
 
     @Override
     public String usernameById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
         return user.getName();
+    }
+
+    @Override
+    public boolean validateUserRoleToAdmin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
+        return user.hasRole(UserRoleEnum.ADMIN);
+    }
+
+    @Override
+    public boolean validateUserRoleToSurveyee(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
+        return user.hasRole(UserRoleEnum.SURVEYEE);
+    }
+
+    @Override
+    public boolean validateUserRoleToSurveyor(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
+        return user.hasRole(UserRoleEnum.SURVEYOR);
     }
 }
