@@ -105,7 +105,7 @@ public class QuestionServiceTest {
         Question questionMock = mock(Question.class);
 
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
-        when(userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE)).thenReturn(false);
+        when(userReader.validateUserRoleToSurveyee(userId)).thenReturn(true);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
 
         when(questionMock.getId()).thenReturn(questionId);
@@ -124,8 +124,8 @@ public class QuestionServiceTest {
 
         verify(userReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
-        verify(userReader).validateUserRole(userId, UserRoleEnum.SURVEYEE);
-        verify(surveyValidator).validateQuestionAccess(userId, surveyMock, false);
+        verify(userReader).validateUserRoleToSurveyee(userId);
+        verify(surveyValidator).validateQuestionAccess(userId, surveyMock, true);
         verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
 
     }
@@ -151,8 +151,6 @@ public class QuestionServiceTest {
 
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
-        when(userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE)).thenReturn(false);
-
         Pageable pageable = PageRequest.of(page, size);
         Page<QuestionReadEntity> questionReadEntityMockPage = new PageImpl<>(
                 List.of(questionReadEntityMock1, questionReadEntityMock2),
@@ -189,7 +187,7 @@ public class QuestionServiceTest {
 
         verify(userReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
-        verify(userReader).validateUserRole(userId, UserRoleEnum.SURVEYEE);
+        verify(userReader).validateUserRoleToSurveyee(userId);
         verify(surveyValidator).validateQuestionAccess(userId, surveyMock, false);
         verify(questionReadRepository).findAllBySurveyId(surveyId, pageable);
         verify(questionReadEntityMock1).toQuestion();
