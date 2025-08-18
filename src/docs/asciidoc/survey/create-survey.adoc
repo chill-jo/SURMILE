@@ -6,14 +6,15 @@
 === Http Request
 
 ====
-include::{snippets}/create-survey/http-request.adoc[]
-include::{snippets}/create-survey/request-headers.adoc[]
-include::{snippets}/create-survey/request-fields.adoc[]
+include::{snippets}/survey/create-survey/http-request.adoc[]
+include::{snippets}/survey/create-survey/request-headers.adoc[]
+include::{snippets}/survey/create-survey/request-fields.adoc[]
 ====
 
 === Http Response
 
 ====
-include::{snippets}/create-survey/http-response.adoc[]
-include::{snippets}/create-survey/response-headers.adoc[]
+include::{snippets}/survey/create-survey/http-response.adoc[]
+include::{snippets}/survey/create-survey/response-headers.adoc[]
+include::{snippets}/survey/create-survey/response-fields.adoc[]
 ====

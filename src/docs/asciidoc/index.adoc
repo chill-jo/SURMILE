@@ -12,3 +12,8 @@ toc-title: 목차
 include::survey/survey.adoc[]
 include::admin/admin.adoc[]
 include::point/point.adoc[]
+include::question/question.adoc[]
+include::options/options.adoc[]
+include::surveyanswer/surveyanswer.adoc[]
+include::order/order.adoc[]
+include::product/product.adoc[]

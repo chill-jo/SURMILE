@@ -20,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,8 +36,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -83,6 +83,7 @@ public class OrderControllerTest {
         when(orderService.createOrder(any(OrderCreateRequestDto.class), eq(userId))).thenReturn(responseDto);
 
         ResultActions actions = mockMvc.perform(post("/api/orders")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)));
 
@@ -90,20 +91,22 @@ public class OrderControllerTest {
         //검증 사항
         verify(orderService, times(1))
                 .createOrder(any(OrderCreateRequestDto.class), eq(userId));
-        actions.andDo(print())
+        actions
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.orderNumber").isString())
                 .andExpect(jsonPath("$.data.title").value(item.getTitle()))
-                .andDo(document("POST-201-주문-생성-API",
-//                        requestHeaders(
-//                                headerWithName("Authorization")
-//                                        .description("JWT 인증 토큰 (Bearer + 토큰값)")
-//                                        .attributes(key("format").value("Bearer {jwt_token}")),
-//                                headerWithName("Accept").description("응답 데이터 타입")
-//                        ),
-//                        responseHeaders(
-//                                headerWithName(LOCATION).description("생성된 주문 위치")
-//                        ),
+                .andDo(document("create-order",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        responseHeaders(
+                                headerWithName(LOCATION).description("생성된 주문 위치")
+                        ),
+                        requestFields(
+                                fieldWithPath("productId").type(JsonFieldType.NUMBER).description("주문 ID")
+                        ),
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
@@ -131,6 +134,7 @@ public class OrderControllerTest {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(get("/api/orders")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .param("page", "0")
                 .param("size", "10")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -139,15 +143,17 @@ public class OrderControllerTest {
         // Then
         //검증 사항
         verify(orderService, times(1)).readAllOrder(0, 10);
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].username").value("dohan1"))
                 .andExpect(jsonPath("$.data[1].username").value("dohan2"))
-                .andDo(document("GET-200-관리자-전체-주문-조회-API",
-//                       responseHeaders(
-//                                headerWithName(LOCATION).description("관리자 전체 주문 조회 위치")
-//                        ),
-//                        // /api/board?page=1&size=10
+                .andDo(document("get-orders",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        // /api/orders?page=1&size=10
                         queryParameters(
                                 parameterWithName("page").description("페이지 번호").optional(),
                                 parameterWithName("size").description("페이지 크기").optional()
@@ -184,6 +190,7 @@ public class OrderControllerTest {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(get("/api/orders/my")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(orderList)));
 
@@ -194,11 +201,13 @@ public class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].username").value("dohan1"))
                 .andExpect(jsonPath("$.data[1].username").value("dohan1"))
-                .andDo(document("GET-200-참여자-본인-주문-목록-조회-API",
-//                        responseHeaders(
-//                                headerWithName(LOCATION).description("관리자 전체 주문 조회 위치")
-//                        ),
-                        // /api/board?page=1&size=10
+                .andDo(document("get-my-orders",
+                          requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        // /api/orders?page=1&size=10
                         queryParameters(
                                 parameterWithName("page").description("페이지 번호").optional(),
                                 parameterWithName("size").description("페이지 크기").optional()
@@ -232,6 +241,7 @@ public class OrderControllerTest {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(delete("/api/orders/{id}", responseDto.getOrderId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(responseDto)));
 
@@ -239,18 +249,23 @@ public class OrderControllerTest {
         //검증 사항
         verify(orderService, times(1)).deleteOrder(responseDto.getOrderId(),
                 responseDto.getUserId());
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isEmpty())
-                .andDo(document("DEL-200-참여자본인-주문-내역-삭제",
+                .andDo(document("delete-order",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
                         pathParameters(
                                 parameterWithName("id").description("주문 ID")
-                        )
-//                        ,
-//                        responseHeaders(
-//                                headerWithName(LOCATION).description("삭제된 주문 위치")
-//                        )
-                ));
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
+                                fieldWithPath("data").description("null"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
 
     }
 
@@ -266,6 +281,7 @@ public class OrderControllerTest {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(get("/api/orders/{id}", responseDto.getOrderId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(responseDto)));
 
@@ -273,14 +289,16 @@ public class OrderControllerTest {
         //검증 사항
         verify(orderService, times(1)).readOneOrder(responseDto.getOrderId());
 
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.orderNumber").value(responseDto.getOrderNumber()))
-                .andDo(document("GET-200-관리자-주문-단건-조회-API",
-//                        responseHeaders(
-//                                headerWithName(LOCATION).description("관리자 전체 주문 조회 위치")
-//                        ),
-                        // /api/board/{id}
+                .andDo(document("get-order",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        // /api/orders/{id}
                         pathParameters(
                                 parameterWithName("id").description("주문 ID")),
                         responseFields(
@@ -320,11 +338,9 @@ public class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.orderNumber").value(responseDto.getOrderNumber()))
                 .andExpect(jsonPath("$.data.userId").value(responseDto.getUserId()))
-                .andDo(document("GET-200-참여자-본인-주문-단건-조회-API",
-//                        responseHeaders(
-//                                headerWithName(LOCATION).description("관리자 전체 주문 조회 위치")
-//                        ),
-                        // /api/board/{id}
+                .andDo(document("get-my-order",
+
+//                         /api/orders/{id}
                         pathParameters(
                                 parameterWithName("id").description("주문 ID")),
                         responseFields(
