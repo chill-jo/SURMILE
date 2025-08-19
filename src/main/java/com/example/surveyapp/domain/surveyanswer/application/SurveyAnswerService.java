@@ -2,7 +2,7 @@ package com.example.surveyapp.domain.surveyanswer.application;
 
 import com.example.surveyapp.domain.survey.application.dto.QuestionIdAndTypeDto;
 import com.example.surveyapp.domain.surveyanswer.application.facade.SurveyFacade;
-import com.example.surveyapp.domain.surveyanswer.application.factory.SurveyAnswerFactory;
+import com.example.surveyapp.domain.surveyanswer.application.mapper.SurveyAnswerMapper;
 import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyAnswerEvent;
 import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyDoneEvent;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.request.SurveyAnswerRequestDto;
@@ -26,7 +26,7 @@ public class SurveyAnswerService {
     private final SurveyFacade surveyFacade;
     private final ApplicationEventPublisher eventPublisher;
     private final List<SurveyQuestionStrategy> surveyQuestionStrategies;
-    private final SurveyAnswerFactory surveyAnswerFactory;
+    private final SurveyAnswerMapper surveyAnswerFactory;
     private final SurveyAnswerRepository surveyAnswerRepository;
     private final SurveyAnswerQueryService surveyAnswerQueryService;
 
@@ -34,7 +34,7 @@ public class SurveyAnswerService {
     public void saveSurveyAnswer(Long surveyId, SurveyAnswerRequestDto requestDto, Long userId) {
 
         userReader.validateUserIdOrThrow(userId);
-
+        surveyFacade.validateAndReserveSlot(surveyId,surveyAnswerRepository.countBySurveyId(surveyId));
         surveyFacade.validateSurveyStartable(surveyId);
         surveyAnswerQueryService.validateParticipated(userId, surveyId);
 

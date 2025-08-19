@@ -8,7 +8,6 @@ import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
 import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import com.example.surveyapp.global.response.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +27,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.*;
 
 @DisplayName("service: Product 서비스 테스트")
@@ -59,7 +57,7 @@ class ProductServiceTest {
                 product.getStatus());
 
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        when(userReader.validateUserRole(userId,UserRoleEnum.ADMIN)).thenReturn(true);
+        when(userReader.validateUserRoleToAdmin(userId)).thenReturn(true);
         when(productRepository.save(any(Product.class))).thenReturn(product);
         // When
         //실행할 행동
@@ -67,7 +65,7 @@ class ProductServiceTest {
 
         // Then
         //검증 사항
-        verify(userReader, times((1))).validateUserRole(userId,UserRoleEnum.ADMIN);
+        verify(userReader, times((1))).validateUserRoleToAdmin(userId);
         verify(productRepository,times(1)).save(any(Product.class));
         assertEquals(product.getTitle(), productCreateResponseDto.getTitle());
         assertEquals(product.getPrice().getValue(),productCreateResponseDto.getPrice());
@@ -92,7 +90,7 @@ class ProductServiceTest {
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         doThrow(new CustomException(ProductErrorCode.NOT_ADMIN_USER_ERROR))
                 .when(userReader)
-                .validateUserRole(userId,UserRoleEnum.ADMIN);
+                .validateUserRoleToAdmin(userId);
 
         // Then
         //검증 사항
@@ -108,6 +106,7 @@ class ProductServiceTest {
         //테스트 전제 조건 및 환경 설정
         Product product = ProductFixtureGenerator.generateProductFixture();
         Long userId = 1L;
+        ReflectionTestUtils.setField(product,"id",1L);
 
         ProductCreateRequestDto requestDto = new ProductCreateRequestDto(product.getTitle(),
                 product.getContent(),
@@ -115,14 +114,14 @@ class ProductServiceTest {
                 product.getStatus());
         // When
         //실행할 행동
-        doThrow(new CustomException(ProductErrorCode.NOT_ADMIN_USER_ERROR))
+        doThrow(new ProductException(ProductErrorCode.NOT_ADMIN_USER_ERROR))
                 .when(userReader)
-                .validateUserRole(userId,UserRoleEnum.ADMIN);
+                .validateUserRoleToAdmin(userId);
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         // Then
         //검증 사항
         assertThatThrownBy(() -> productService.createProduct(requestDto, userId))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(ProductException.class)
                 .hasMessageContaining(ProductErrorCode.NOT_ADMIN_USER_ERROR.getMessage());
     }
 
@@ -142,7 +141,7 @@ class ProductServiceTest {
         // When
         //실행할 행동
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        when(userReader.validateUserRole(userId,UserRoleEnum.ADMIN)).thenReturn(true);
+        when(userReader.validateUserRoleToAdmin(userId)).thenReturn(true);
         when(productRepository.existsByTitleAndIsDeletedFalse(product.getTitle())).thenReturn(true);
 
         // Then
@@ -236,7 +235,7 @@ class ProductServiceTest {
         ReflectionTestUtils.setField(product,"status",Status.STOPPED_SALE);
         when(productRepository.findByIdAndIsDeletedFalse(product.getId())).thenReturn(Optional.of(product));
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        when(userReader.validateUserRole(userId,UserRoleEnum.ADMIN)).thenReturn(true);
+        when(userReader.validateUserRoleToAdmin(userId)).thenReturn(true);
 
 
         // When
@@ -258,7 +257,7 @@ class ProductServiceTest {
         ReflectionTestUtils.setField(product,"id",1L);
         when(productRepository.findByIdAndIsDeletedFalse(product.getId())).thenReturn(Optional.of(product));
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        when(userReader.validateUserRole(userId,UserRoleEnum.ADMIN)).thenReturn(true);
+        when(userReader.validateUserRoleToAdmin(userId)).thenReturn(true);
 
 
         // When
@@ -282,7 +281,7 @@ class ProductServiceTest {
         ReflectionTestUtils.setField(product,"id",1L);
 
         when(productRepository.findByIdAndIsDeletedFalse(product.getId())).thenReturn(Optional.of(product));
-        when(userReader.validateUserRole(userId,UserRoleEnum.ADMIN)).thenReturn(true);
+        when(userReader.validateUserRoleToAdmin(userId)).thenReturn(true);
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         // When
         //실행할 행동

@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.survey.application;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.survey.application.facade.SurveyAnswerFacade;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.application.mapper.SurveyMapper;
@@ -12,7 +13,6 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuest
 import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
 import com.example.surveyapp.domain.survey.domain.event.SurveyCreateEvent;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,19 +33,25 @@ public class SurveyService {
     private final SurveyQueryService surveyQueryService;
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyAnswerFacade surveyAnswerFacade;
+    private final AiModerationFacade aiModerationFacade;
 
     @Transactional
     public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
 
         userReader.validateUserIdOrThrow(userId);
+        aiModerationFacade.checkSurveyModeration(requestDto.getTitle(), requestDto.getDescription());
 
         SurveyInfo surveyInfo = surveyMapper.toSurveyInfo(requestDto);
 
         Survey survey = Survey.of(userId, surveyInfo);
         Survey saved = surveyRepository.save(survey);
 
-        if(userReader.validateUserRole(userId, UserRoleEnum.SURVEYOR)){
-            eventPublisher.publishEvent(new SurveyCreateEvent(saved, userId));
+        if(userReader.validateUserRoleToSurveyor(userId)){
+            eventPublisher.publishEvent(new SurveyCreateEvent(
+                    saved.getId(),
+                    saved.getSurveyInfo().getTotalPoint().getValue(),
+                    userId)
+            );
         }
 
         return surveyMapper.toResponseDto(saved);
@@ -69,6 +75,7 @@ public class SurveyService {
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
+        aiModerationFacade.checkSurveyModeration(requestDto.getTitle(), requestDto.getDescription());
 
         SurveyInfo oldSurveyInfo = survey.getSurveyInfo();
         SurveyInfo newSurveyInfo = requestDto.toNewSurveyInfo(oldSurveyInfo);

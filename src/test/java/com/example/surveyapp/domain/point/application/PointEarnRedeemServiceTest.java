@@ -1,21 +1,20 @@
 package com.example.surveyapp.domain.point.application;
 
-import com.example.surveyapp.config.generator.PointFixtureGenerator;
+import com.example.surveyapp.domain.point.domain.event.PointRedeemSuccessEvent;
 import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
 import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
 import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
-import com.example.surveyapp.domain.point.domain.repository.PaymentRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointHistoryRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.point.exception.PointErrorCode;
 import com.example.surveyapp.domain.point.exception.PointException;
-import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Optional;
 
@@ -34,6 +33,9 @@ public class PointEarnRedeemServiceTest {
     @Mock
     private PointHistoryRepository pointHistoryRepository;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private PointEarnRedeemService pointEarnRedeemService;
 
@@ -47,6 +49,7 @@ public class PointEarnRedeemServiceTest {
 
         PointWallet point = mock(PointWallet.class);
         PointBalance currentBalance = PointBalance.of(10000L);
+        PointRedeemSuccessEvent event = new PointRedeemSuccessEvent(userId, surveyId);
 
         when(pointRepository.findByUserId(userId)).thenReturn(Optional.of(point));
         when(point.getPointBalance()).thenReturn(currentBalance);
@@ -64,6 +67,7 @@ public class PointEarnRedeemServiceTest {
         // then
         assertThat(point.getPointBalance().getValue()).isEqualTo(8000L);
 
+        verify(eventPublisher).publishEvent(any(PointRedeemSuccessEvent.class));
         verify(pointHistoryRepository, times(1)).save(any(PointHistory.class));
     }
 
@@ -87,6 +91,7 @@ public class PointEarnRedeemServiceTest {
                 .hasMessage(PointErrorCode.POINT_NOT_ENOUGH.getMessage());
 
         verify(pointHistoryRepository, never()).save(any(PointHistory.class));
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test

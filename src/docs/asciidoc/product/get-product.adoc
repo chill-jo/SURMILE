@@ -1,0 +1,10 @@
+== Read One Product API
+
+[example]
+`GET` 요청을 사용하여 단건 상품을 조회할 수 있습니다.
+
+
+=== Http Response
+include::{snippets}/product/get-product/http-response.adoc[]
+include::{snippets}/product/get-product/response-fields.adoc[]
+

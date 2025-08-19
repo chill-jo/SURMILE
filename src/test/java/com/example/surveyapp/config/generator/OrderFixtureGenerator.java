@@ -12,7 +12,7 @@ public class OrderFixtureGenerator {
     public static Order generateOrderFixture(Long userId) {
         OrderItem item = OrderItemFixtureGenerator.generatorOrderItemFixture();
 
-        Order order = Order.of(userId, List.of(item));
+        Order order = Order.of(userId,item);
 
         return order;
 

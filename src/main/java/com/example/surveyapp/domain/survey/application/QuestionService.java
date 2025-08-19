@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.survey.application;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionReadRepository;
 import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionCreateRequestDto;
 import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionUpdateRequestDto;
@@ -28,6 +29,7 @@ public class QuestionService {
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
     private final UserReader userReader;
+    private final AiModerationFacade aiModerationFacade;
 
     @Transactional
     public QuestionResponseDto createQuestion(Long userId, Long surveyId, QuestionCreateRequestDto requestDto){
@@ -35,6 +37,7 @@ public class QuestionService {
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
+        aiModerationFacade.checkQuestionModeration(requestDto.getContent());
 
         Question question = Question.from(requestDto, surveyId);
 
@@ -52,7 +55,7 @@ public class QuestionService {
 
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
-        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE));
+        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRoleToSurveyee(userId));
 
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
 
@@ -68,7 +71,7 @@ public class QuestionService {
 
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
-        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE));
+        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRoleToSurveyee(userId));
 
         Pageable pageable = PageRequest.of(page, size);
         Page<QuestionReadEntity> questionReadEntityPage = questionReadRepository.findAllBySurveyId(surveyId, pageable);
@@ -91,6 +94,7 @@ public class QuestionService {
 
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
+        aiModerationFacade.checkQuestionModeration(requestDto.getContent());
 
         Question question = surveyQuestionService.updateQuestion(
                 survey,

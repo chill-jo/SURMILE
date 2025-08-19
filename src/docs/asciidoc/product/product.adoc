@@ -1,0 +1,9 @@
+[[Product-resource]]
+= Product API
+
+include::create-product.adoc[]
+include::get-products.adoc[]
+include::get-product.adoc[]
+include::update-product.adoc[]
+include::update-status-product.adoc[]
+include::delete-product.adoc[]

@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -29,7 +30,8 @@ public class ProductController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getId();
         ProductCreateResponseDto product =  productService.createProduct(dto,userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(product);
+        URI location = URI.create("/api/products" + product.getId());
+        return ResponseEntity.created(location).body(product);
     }
 
     /**

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItemPoints {
-    @Column(name = "order_items_points_amount", nullable = false)
+    @Column(name = "orders_item_point", nullable = false)
     private Long value;
 
     public static OrderItemPoints of(Long value) {

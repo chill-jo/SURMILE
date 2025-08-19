@@ -1,0 +1,19 @@
+= Service API Guide Document
+[team service-dev];
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+toc-title: 목차
+:toclevels: 5
+:sectlinks:
+:docinfo: shared-head
+
+include::survey/survey.adoc[]
+include::admin/admin.adoc[]
+include::point/point.adoc[]
+include::question/question.adoc[]
+include::options/options.adoc[]
+include::surveyanswer/surveyanswer.adoc[]
+include::order/order.adoc[]
+include::product/product.adoc[]

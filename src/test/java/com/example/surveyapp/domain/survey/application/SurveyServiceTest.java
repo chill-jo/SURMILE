@@ -3,17 +3,21 @@ package com.example.surveyapp.domain.survey.application;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
+import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
+import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationSurveyResult;
 import com.example.surveyapp.domain.survey.application.facade.SurveyAnswerFacade;
 import com.example.surveyapp.domain.survey.application.mapper.SurveyMapper;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.event.SurveyCreateEvent;
 import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
+import com.example.surveyapp.domain.survey.domain.model.vo.SurveyPoints;
 import com.example.surveyapp.domain.survey.presentation.dto.request.*;
 import com.example.surveyapp.domain.survey.presentation.dto.response.*;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +25,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import com.example.surveyapp.config.generator.SurveyFixtureGenerator;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
@@ -58,22 +64,37 @@ public class SurveyServiceTest {
     @InjectMocks
     private SurveyService surveyService;
 
+    @Mock
+    private AiModerationFacade aiModerationFacade;
+
     @Test
     @DisplayName("기능_설문 생성을 성공한다")
     void 설문을_생성한다(){
         //Given
         Long userId = 1L;
         SurveyCreateRequestDto requestDto = mock(SurveyCreateRequestDto.class);
-        SurveyInfo surveyInfo = mock(SurveyInfo.class);
-        Survey savedSurvey = mock(Survey.class);
+        SurveyInfo surveyInfo = new SurveyInfo(
+                "테스트설문제목",
+                "테스트설문내용",
+                10L,
+                SurveyPoints.of(1000L),
+                LocalDateTime.of(2025, 12, 25, 11, 30),
+                10L
+        );
+        Survey savedSurvey = Survey.of(userId, surveyInfo);
         SurveyResponseDto responseDto = mock(SurveyResponseDto.class);
+        AiModerationResult approvedTitle = AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED);
+        AiModerationResult approvedDesc = AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED);
 
         doNothing().when(userReader).validateUserIdOrThrow(userId);
+        when(requestDto.getTitle()).thenReturn("테스트설문제목");
+        when(requestDto.getDescription()).thenReturn("테스트설문내용");
         when(surveyMapper.toSurveyInfo(requestDto)).thenReturn(surveyInfo);
         when(surveyRepository.save(any(Survey.class))).thenReturn(savedSurvey);
-        when(userReader.validateUserRole(userId, UserRoleEnum.SURVEYOR)).thenReturn(true);
-        doNothing().when(eventPublisher).publishEvent(any(SurveyCreateEvent.class));
+        when(userReader.validateUserRoleToSurveyor(userId)).thenReturn(true);
         when(surveyMapper.toResponseDto(savedSurvey)).thenReturn(responseDto);
+        when(aiModerationFacade.checkSurveyModeration(eq("테스트설문제목"), eq("테스트설문내용")))
+                .thenReturn(AiModerationSurveyResult.of(approvedTitle, approvedDesc));
 
         // when
         SurveyResponseDto result = surveyService.createSurvey(userId, requestDto);
@@ -82,7 +103,7 @@ public class SurveyServiceTest {
         verify(userReader).validateUserIdOrThrow(userId);
         verify(surveyMapper).toSurveyInfo(requestDto);
         verify(surveyRepository).save(any(Survey.class));
-        verify(userReader).validateUserRole(userId, UserRoleEnum.SURVEYOR);
+        verify(userReader).validateUserRoleToSurveyor(userId);
         verify(eventPublisher).publishEvent(any(SurveyCreateEvent.class));
         verify(surveyMapper).toResponseDto(savedSurvey);
 
@@ -173,12 +194,16 @@ public class SurveyServiceTest {
 
         Survey surveyMock = mock(Survey.class);
         SurveyInfo surveyInfoMock = mock(SurveyInfo.class);
+        AiModerationResult approvedTitle = AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED);
+        AiModerationResult approvedDesc = AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED);
 
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyMock.isNotStarted()).thenReturn(true);
         when(surveyMock.isUserSurveyCreator(anyLong())).thenReturn(true);
         when(surveyMock.getSurveyInfo()).thenReturn(surveyInfoMock);
+        when(aiModerationFacade.checkSurveyModeration(eq("테스트설문제목수정"), eq("테스트설문내용수정")))
+                .thenReturn(AiModerationSurveyResult.of(approvedTitle, approvedDesc));
 
         doNothing().when(surveyMock).updateSurveyInfo(any(SurveyInfo.class));
 
@@ -301,18 +326,19 @@ public class SurveyServiceTest {
         Long userId = 1L;
         Long surveyId = 100L;
 
+        SurveyValidator surveyValidator = new SurveyValidator();
         Survey survey = mock(Survey.class);
         SurveyInfo surveyInfo = mock(SurveyInfo.class);
         SurveyQuestionDto expectedDto = mock(SurveyQuestionDto.class);
-
+        List<Question> questions = Collections.singletonList(mock(Question.class));
         doNothing().when(userReader).validateUserIdOrThrow(userId);
 
         when(surveyQueryService.findSurvey(surveyId))
                 .thenReturn(survey);
-
-        when(survey.isInProgress()).thenReturn(true);
         when(survey.getSurveyInfo()).thenReturn(surveyInfo);
-        when(surveyInfo.getDeadline()).thenReturn(LocalDateTime.of(2025, 9, 10, 11, 20));
+        when(survey.getQuestions()).thenReturn(questions);
+        when(survey.isInProgress()).thenReturn(true);
+        when(surveyInfo.getDeadline()).thenReturn(LocalDateTime.now().plusDays(1));
 
         doNothing().when(surveyAnswerFacade).validateParticipated(userId, surveyId);
 
@@ -329,72 +355,4 @@ public class SurveyServiceTest {
         verify(surveyAnswerFacade).validateParticipated(userId, surveyId);
         verify(surveyMapper).toSurveyQuestionDto(survey);
     }
-
-//    @Test
-//    @DisplayName("기능: 설문 응답을 저장한다.")
-//    void success_saveSurveyAnswer() {
-//
-//        //given
-//        Long userId = 1L;
-//        Long surveyId = 1L;
-//        Long questionId = 1L;
-//
-//        User user = UserFixtureGenerator.generateUserFixture();
-//        Survey survey = SurveyFixtureGenerator.generateSurveyFixture();
-//        ReflectionTestUtils.setField(survey, "status", SurveyStatus.IN_PROGRESS);
-//        ReflectionTestUtils.setField(survey, "deadline", LocalDateTime.now().plusDays(1));
-//
-//        Question question = mock(Question.class);
-//
-//        QuestionAnswerRequestDto questionAnswerRequestDto = mock(QuestionAnswerRequestDto.class);
-//        ReflectionTestUtils.setField(questionAnswerRequestDto, "number", questionId);
-//        List<QuestionAnswerRequestDto> answers = List.of(questionAnswerRequestDto);
-//        SurveyAnswerRequestDto surveyAnswerRequestDto = new SurveyAnswerRequestDto(answers);
-//
-//        SurveyQuestionStrategy surveyQuestionStrategy = mock(SurveyQuestionStrategy.class);
-//        when(surveyQuestionStrategy.isSupport(question.getType())).thenReturn(true);
-//        when(surveyQuestionStrategies.stream()).thenReturn(Stream.of(surveyQuestionStrategy));
-//
-//        when(surveyRepository.findByIdAndIsDeletedFalse(surveyId)).thenReturn(Optional.of(survey));
-//        when(userFacade.findUser(userId)).thenReturn(user);
-//        when(surveyAnswerRepository.existsBySurveyIdAndUserId(surveyId, userId)).thenReturn(false);
-//        when(surveyAnswerRepository.save(any(SurveyAnswer.class))).thenReturn(mock(SurveyAnswer.class));
-//        when(questionRepository.findById(questionAnswerRequestDto.getNumber())).thenReturn(Optional.of(question));
-//        when(surveyAnswerRepository.countBySurveyId(surveyId)).thenReturn(survey.getMaxSurveyee()-1);
-//
-//        //when
-//        surveyService.saveSurveyAnswer(surveyId, surveyAnswerRequestDto, userId);
-//
-//        //then
-//        verify(surveyRepository).findByIdAndIsDeletedFalse(surveyId);
-//        verify(userFacade).findUser(userId);
-//        verify(surveyAnswerRepository).existsBySurveyIdAndUserId(surveyId, userId);
-//        verify(surveyAnswerRepository).save(any(SurveyAnswer.class));
-//        verify(questionRepository).findById(questionAnswerRequestDto.getNumber());
-//        verify(surveyAnswerRepository).countBySurveyId(surveyId);
-//
-//    }
-//
-//    @Test
-//    @DisplayName("기능: 참여한 설문 목록을 조회한다.")
-//    void success_getSurveyeeSurveyList() {
-//
-//        // given
-//        Long userId = 1L;
-//        User user = UserFixtureGenerator.generateUserFixture();
-//        Survey survey = SurveyFixtureGenerator.generateSurveyFixture();
-//        SurveyAnswer surveyAnswer = mock(SurveyAnswer.class);
-//
-//        //when(surveyAnswer.getSurveyId()).thenReturn(survey);
-//
-//        when(userFacade.findUser(userId)).thenReturn(user);
-//        when(surveyAnswerRepository.findAllByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(surveyAnswer));
-//
-//        // when
-//        SurveyeeSurveyListDto result = surveyService.getUserSurveyAnswerHistory(userId);
-//
-//        // then
-//        assertThat(result).isNotNull();
-//
-//    }
 }

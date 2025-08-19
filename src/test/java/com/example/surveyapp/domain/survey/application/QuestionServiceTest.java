@@ -2,6 +2,9 @@ package com.example.surveyapp.domain.survey.application;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
+import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionReadRepository;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
@@ -13,8 +16,6 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.QuestionRes
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.model.enums.QuestionType;
-import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,9 @@ public class QuestionServiceTest {
     @InjectMocks
     private QuestionService questionService;
 
+    @Mock
+    private AiModerationFacade aiModerationFacade;
+
     @Test
     @DisplayName("기능_질문 생성을 성공한다")
     void 질문을_생성한다(){
@@ -66,6 +70,8 @@ public class QuestionServiceTest {
 
         when(surveyQueryService.findSurvey(anyLong())).thenReturn(surveyMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
+        when(aiModerationFacade.checkQuestionModeration(eq("테스트질문내용")))
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
         Question question = Question.from(requestDto, surveyId);
 
         doNothing().when(surveyQuestionService).addQuestion(any(Survey.class), any(Question.class));
@@ -105,7 +111,7 @@ public class QuestionServiceTest {
         Question questionMock = mock(Question.class);
 
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
-        when(userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE)).thenReturn(false);
+        when(userReader.validateUserRoleToSurveyee(userId)).thenReturn(true);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
 
         when(questionMock.getId()).thenReturn(questionId);
@@ -124,8 +130,8 @@ public class QuestionServiceTest {
 
         verify(userReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
-        verify(userReader).validateUserRole(userId, UserRoleEnum.SURVEYEE);
-        verify(surveyValidator).validateQuestionAccess(userId, surveyMock, false);
+        verify(userReader).validateUserRoleToSurveyee(userId);
+        verify(surveyValidator).validateQuestionAccess(userId, surveyMock, true);
         verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
 
     }
@@ -151,8 +157,6 @@ public class QuestionServiceTest {
 
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
-        when(userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE)).thenReturn(false);
-
         Pageable pageable = PageRequest.of(page, size);
         Page<QuestionReadEntity> questionReadEntityMockPage = new PageImpl<>(
                 List.of(questionReadEntityMock1, questionReadEntityMock2),
@@ -189,7 +193,7 @@ public class QuestionServiceTest {
 
         verify(userReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
-        verify(userReader).validateUserRole(userId, UserRoleEnum.SURVEYEE);
+        verify(userReader).validateUserRoleToSurveyee(userId);
         verify(surveyValidator).validateQuestionAccess(userId, surveyMock, false);
         verify(questionReadRepository).findAllBySurveyId(surveyId, pageable);
         verify(questionReadEntityMock1).toQuestion();

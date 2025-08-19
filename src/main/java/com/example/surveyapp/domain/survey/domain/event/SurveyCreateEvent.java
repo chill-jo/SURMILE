@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class SurveyCreateEvent {
-    private final Survey survey;
+    private final Long surveyId;
+    private final Long totalPoint;
     private final Long userId;
 }

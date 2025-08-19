@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
+import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import com.example.surveyapp.domain.survey.presentation.dto.request.OptionCreateRequestDto;
@@ -12,13 +15,10 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.OptionRespo
 import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,6 +38,9 @@ public class OptionsServiceTest{
 
     @InjectMocks
     private OptionsService optionsService;
+
+    @Mock
+    private AiModerationFacade aiModerationFacade;
 
     @Test
     @DisplayName("기능_선택지 생성을 성공한다")
@@ -62,6 +65,9 @@ public class OptionsServiceTest{
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
+        when(aiModerationFacade.checkOptionsModeration(eq("테스트선택지내용")))
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
+
         // when
         OptionResponseDto responseDto = optionsService.createOption(userId, surveyId, questionId, requestDto);
 
@@ -99,7 +105,6 @@ public class OptionsServiceTest{
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
-        when(userReader.validateUserRole(userId, UserRoleEnum.SURVEYEE)).thenReturn(true);
         when(questionMock.getOptions()).thenReturn(optionsMockList);
 
         when(optionMock1.getId()).thenReturn(1L);
@@ -117,8 +122,8 @@ public class OptionsServiceTest{
         verify(userReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
         verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
-        verify(userReader).validateUserRole(userId, UserRoleEnum.SURVEYEE);
-        verify(surveyValidator).validateQuestionAccess(userId, surveyMock, true);
+        verify(userReader).validateUserRoleToSurveyee(userId);
+        verify(surveyValidator).validateQuestionAccess(userId, surveyMock, false);
         verify(questionMock).getOptions();
 
         assertThat(responseDtoList.size()).isEqualTo(2);
@@ -153,6 +158,8 @@ public class OptionsServiceTest{
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
         when(questionMock.updateOption(optionId, requestDto.getNumber(), requestDto.getContent())).thenReturn(optionMock);
+        when(aiModerationFacade.checkOptionsModeration(eq("테스트질문지내용수정")))
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         when(optionMock.getId()).thenReturn(optionId);
         when(optionMock.getNumber()).thenReturn(number);

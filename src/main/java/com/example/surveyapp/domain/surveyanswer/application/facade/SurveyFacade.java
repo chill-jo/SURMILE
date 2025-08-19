@@ -4,6 +4,8 @@ import com.example.surveyapp.domain.survey.application.dto.OptionDto;
 import com.example.surveyapp.domain.survey.application.dto.QuestionIdAndTypeDto;
 import com.example.surveyapp.domain.survey.application.dto.QuestionDto;
 import com.example.surveyapp.domain.survey.application.dto.SurveyInfoDto;
+import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
+
 
 import java.util.List;
 
@@ -14,5 +16,6 @@ public interface SurveyFacade {
     SurveyInfoDto getSurveyInfo(Long surveyId);
     List<QuestionDto> getQuestionDtos(Long surveyId);
     List<OptionDto> getOptionDtos(Long surveyId, Long questionId);
-
+    Survey findByIdAndIsDeletedFalseWithPessimisticLock(Long surveyId);
+    void validateAndReserveSlot(Long surveyId, Long count);
 }
