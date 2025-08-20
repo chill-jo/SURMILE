@@ -6,7 +6,7 @@ import com.example.surveyapp.domain.ai.moderation.application.facade.AiModeratio
 import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
 import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
-import com.example.surveyapp.domain.survey.domain.repository.QuestionReadRepository;
+import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import com.example.surveyapp.domain.survey.infrastructure.QuestionReadEntity;
 import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionCreateRequestDto;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class QuestionServiceTest {
     @Mock
-    private QuestionReadRepository  questionReadRepository;
+    private QuestionRepository questionReadRepository;
 
     @Mock
     private SurveyQueryService surveyQueryService;

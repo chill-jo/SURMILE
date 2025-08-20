@@ -1,6 +1,7 @@
 package com.example.surveyapp.domain.order.application;
 
 import com.example.surveyapp.config.generator.OrderFixtureGenerator;
+import com.example.surveyapp.domain.order.application.mapper.OrderResponseMapper;
 import com.example.surveyapp.domain.order.domain.event.OrderCreateEvent;
 import com.example.surveyapp.domain.order.exception.OrderErrorCode;
 import com.example.surveyapp.domain.order.exception.OrderException;
@@ -20,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +50,9 @@ class OrderServiceTest {
 
     @Mock
     private ProductFacade productFacade;
+
+    @Mock
+    private OrderResponseMapper orderResponseMapper;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -101,18 +106,19 @@ class OrderServiceTest {
         PageImpl<Order> orders = new PageImpl<>(orderList, pageable, orderList.size());
 
         when(orderRepository.findAll(any(Pageable.class))).thenReturn(orders);
-        when(userReader.usernameById(1L)).thenReturn("dohan1");
-        when(userReader.usernameById(2L)).thenReturn("dohan2");
-        when(userReader.usernameById(3L)).thenReturn("dohan3");
-        when(productFacade.findProductInfo(any()))
-                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
+        when(orderResponseMapper.toDto(order1)).thenReturn(OrderResponseDto.from(
+                order1,"dohan1",Status.ON_SALE.getStatus()));
+        when(orderResponseMapper.toDto(order2)).thenReturn(OrderResponseDto.from(
+                order2,"dohan2",Status.ON_SALE.getStatus()));
+        when(orderResponseMapper.toDto(order3)).thenReturn(OrderResponseDto.from(
+                order3,"dohan3",Status.ON_SALE.getStatus()));
         // When
         //실행할 행동
-        List<OrderResponseDto> orderResponseDtos = orderService.readAllOrder(page, size);
+        Page<OrderResponseDto> orderResponseDtos = orderService.readAllOrder(page, size);
 
         // Then
         //검증 사항
-        assertThat(orderResponseDtos.size()).isEqualTo(orderResponseDtos.size());
+        assertThat(orderResponseDtos.getContent().size()).isEqualTo(orderList.size());
         assertThat(order1.getUserId()).isEqualTo(1L);
         assertThat(order2.getUserId()).isEqualTo(2L);
         assertThat(order3.getUserId()).isEqualTo(3L);
@@ -130,7 +136,7 @@ class OrderServiceTest {
         Order order = OrderFixtureGenerator.generateOrderFixture(userId);
         ReflectionTestUtils.setField(order, "id", 1L);
 
-        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+        when(orderRepository.findByIdAndIsDeletedFalse(order.getId())).thenReturn(Optional.of(order));
         when(productFacade.findProductInfo(any()))
                 .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
 
@@ -140,7 +146,7 @@ class OrderServiceTest {
 
         // Then
         //검증 사항
-        verify(orderRepository).findById(order.getId());
+        verify(orderRepository).findByIdAndIsDeletedFalse(order.getId());
         assertThat(orderResponseDto.getOrderId()).isEqualTo(orderResponseDto.getOrderId());
         assertThat(orderResponseDto.getOrderNumber()).isEqualTo(orderResponseDto.getOrderNumber());
 
@@ -160,17 +166,17 @@ class OrderServiceTest {
         Pageable pageable = PageRequest.of(page, size);
 
         PageImpl<Order> orders = new PageImpl<>(List.of(order), pageable, 1);
-        when(orderRepository.findByUserIdAndIsDeletedFalse(userId, pageable)).thenReturn(orders);
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        when(productFacade.findProductInfo(any()))
-                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
 
+        when(orderRepository.findByUserIdAndIsDeletedFalse(userId, pageable)).thenReturn(orders);
+        when(orderResponseMapper.toDto(order)).thenReturn(OrderResponseDto.from(
+                order,"dohan1",Status.ON_SALE.getStatus()));
 
         // When
-        List<OrderResponseDto> responseDto = orderService.readMyOrderList(page, size, userId);
+        Page<OrderResponseDto> responseDto = orderService.readMyOrderList(page, size, userId);
 
         // Then
-        assertThat(responseDto.stream().map(OrderResponseDto::getOrderId)
+        assertThat(responseDto.getContent().stream().map(OrderResponseDto::getOrderId)
                 .toList()).isEqualTo(List.of(1L));
     }
 
