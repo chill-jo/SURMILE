@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface SurveyAnswerRepository extends JpaRepository<SurveyAnswer, Long> {
+public interface SurveyAnswerRepository{
+
+    SurveyAnswer save(SurveyAnswer surveyAnswer);
 
     List<SurveyAnswer> findAllByUserIdOrderByCreatedAtDesc(Long userId);
 
