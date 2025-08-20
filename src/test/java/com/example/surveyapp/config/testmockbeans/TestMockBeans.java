@@ -15,6 +15,8 @@ import com.example.surveyapp.domain.surveyanswer.application.SurveyAnswerQuerySe
 import com.example.surveyapp.domain.surveyanswer.application.SurveyAnswerService;
 import com.example.surveyapp.domain.surveyanswer.application.SurveyAnswerStatisticsService;
 import com.example.surveyapp.domain.user.application.UserService;
+import com.example.surveyapp.domain.user.application.provider.JwtProvider;
+import com.example.surveyapp.global.security.jwt.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,4 +39,5 @@ public class TestMockBeans {
     @Bean public ChatService chatService() {return mock(ChatService.class);}
     @Bean public DocumentIndexer documentIndexer() {return mock(DocumentIndexer.class);}
     @Bean public DocumentSearcher documentSearcher() {return mock(DocumentSearcher.class);}
+    @Bean public JwtProvider jwtProvider() {return mock(JwtProvider.class);}
 }

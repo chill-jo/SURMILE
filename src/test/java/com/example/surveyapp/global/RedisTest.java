@@ -14,10 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
@@ -25,41 +28,31 @@ import java.util.Optional;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-
 @SpringBootTest
 @ExtendWith(RedisTestContainersExtension.class)
-@MockitoBean(types = {UserRepository.class, PasswordEncoder.class, JwtProvider.class, RedisTemplateFacade.class})
 @ActiveProfiles("test")
 @DisplayName("Redis::Auth")
 public class RedisTest {
 
-    @Mock
+    @Autowired
     private UserRepository userRepository;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
+    @Autowired
     private JwtProvider jwtProvider;
 
-    @Mock
+    @Autowired
     private RedisTemplateFacade redisTemplateFacade;
 
-    @InjectMocks
+    @Autowired
     private UserService userService;
 
     @Test
+    @Sql("classpath:test-auth.sql")
     @DisplayName("기능: 로그인을 성공한다")
     public void success_login() {
 
         // Given
-        User user = UserFixtureGenerator.generateUserFixture();
-        ReflectionTestUtils.setField(user, "id", 1L);
-        LoginRequestDto requestDto = mock(LoginRequestDto.class);
-        when(userRepository.findByEmailAndIsDeletedFalse(requestDto.getEmail())).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(requestDto.getPassword(), user.getPassword())).thenReturn(true);
-        when(jwtProvider.createAccessToken(user.getId(), user.getUserRole())).thenReturn("access_token");
-        when(jwtProvider.createRefreshToken(user.getId())).thenReturn("refresh_token");
+        LoginRequestDto requestDto = new LoginRequestDto("test@example.com", "password123!");
 
         // When
         LoginResponseDto result = userService.login(requestDto);
@@ -74,33 +67,22 @@ public class RedisTest {
     public void success_logout() {
 
         //Given
-        String accessToken = "access_token";
-        when(jwtProvider.extractUserId(jwtProvider.substringToken(accessToken))).thenReturn("1");
+        String accessToken = "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyIiwicm9sZSI6IlNVUlZFWU9SIiwiaWF0IjoxNzU1NTE4MzM5LCJleHAiOjE3NTU1MjAxMzl9.73bn6HxpToCns02lstvHmKUUntyY3OLRKuxkZCKT9b7y6jPnVqdUHZPjPZ4evu7p";
 
         //When
         userService.logout(accessToken);
 
         //Then
-        System.out.println("테스트성공");
+        System.out.println(redisTemplateFacade.read("accessToken:2", String.class));
     }
 
     @Test
+    @Sql("classpath:test-auth.sql")
     @DisplayName("기능: 리프레시 토큰을 재발급 받는다")
     public void success_refreshToken() {
 
         //Given
         String refreshToken = "refresh_token";
-        String userId = "1";
-        User user = UserFixtureGenerator.generateUserFixture();
-        ReflectionTestUtils.setField(user, "id", 1L);
-
-        when(jwtProvider.substringToken(refreshToken)).thenReturn(refreshToken);
-        when(jwtProvider.isValidRefreshToken(refreshToken)).thenReturn(true);
-        when(jwtProvider.extractUserId(refreshToken)).thenReturn(userId);
-        when(userRepository.findByIdAndIsDeletedFalse(Long.parseLong(userId))).thenReturn(Optional.of(user));
-        when(jwtProvider.createAccessToken(user.getId(), user.getUserRole())).thenReturn("access_token");
-        when(jwtProvider.createRefreshToken(user.getId())).thenReturn("refresh_token");
-
 
         //when
         LoginResponseDto result = userService.refresh(refreshToken);
