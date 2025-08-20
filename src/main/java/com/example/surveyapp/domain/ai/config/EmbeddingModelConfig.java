@@ -1,25 +1,15 @@
 package com.example.surveyapp.domain.ai.config;
 
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import redis.clients.jedis.JedisPooled;
 
 @Configuration
 public class EmbeddingModelConfig {
     @Bean
-    public JedisPooled jedisPooled() {
-        return new JedisPooled("localhost", 6379);
-    }
-
-    @Bean
-    public VectorStore vectorStore(JedisPooled jedis, EmbeddingModel embeddingModel) {
-        return RedisVectorStore.builder(jedis, embeddingModel)
-                .indexName("spring-ai-index")
-                .prefix("embedding:")
-                .initializeSchema(true)
-                .build();
+    VectorStore vectorStore(EmbeddingModel embeddingModel) {
+        return SimpleVectorStore.builder(embeddingModel).build();
     }
 }
