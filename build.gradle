@@ -67,6 +67,12 @@ dependencies {
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    //AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    //redisson
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.2'
+
     testRuntimeOnly 'com.h2database:h2'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
