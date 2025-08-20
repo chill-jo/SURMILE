@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.survey.application;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.survey.application.facade.SurveyAnswerFacade;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.application.mapper.SurveyMapper;
@@ -32,11 +33,13 @@ public class SurveyService {
     private final SurveyQueryService surveyQueryService;
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyAnswerFacade surveyAnswerFacade;
+    private final AiModerationFacade aiModerationFacade;
 
     @Transactional
     public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
 
         userReader.validateUserIdOrThrow(userId);
+        aiModerationFacade.checkSurveyModeration(requestDto.getTitle(), requestDto.getDescription());
 
         SurveyInfo surveyInfo = surveyMapper.toSurveyInfo(requestDto);
 
@@ -72,6 +75,7 @@ public class SurveyService {
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
+        aiModerationFacade.checkSurveyModeration(requestDto.getTitle(), requestDto.getDescription());
 
         SurveyInfo oldSurveyInfo = survey.getSurveyInfo();
         SurveyInfo newSurveyInfo = requestDto.toNewSurveyInfo(oldSurveyInfo);

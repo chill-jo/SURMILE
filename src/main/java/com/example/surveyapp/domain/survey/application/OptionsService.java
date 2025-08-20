@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.survey.application;
 
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.survey.presentation.dto.request.OptionCreateRequestDto;
 import com.example.surveyapp.domain.survey.presentation.dto.request.OptionUpdateRequestDto;
 import com.example.surveyapp.domain.survey.presentation.dto.response.OptionResponseDto;
@@ -25,6 +26,7 @@ public class OptionsService {
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyQueryService surveyQueryService;
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
+    private final AiModerationFacade aiModerationFacade;
 
     @Transactional
     public OptionResponseDto createOption(Long userId, Long surveyId, Long questionId, OptionCreateRequestDto requestDto){
@@ -32,6 +34,7 @@ public class OptionsService {
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
+        aiModerationFacade.checkOptionsModeration(requestDto.getContent());
 
         surveyValidator.validateUpdatable(userId, survey);
 
@@ -75,6 +78,7 @@ public class OptionsService {
         Survey survey = surveyQueryService.findSurvey(surveyId);
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
         surveyValidator.validateUpdatable(userId, survey);
+        aiModerationFacade.checkOptionsModeration(requestDto.getContent());
 
         Options option = question.updateOption(optionId, requestDto.getNumber(), requestDto.getContent());
 
