@@ -5,9 +5,11 @@ import java.util.Date;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.security.jwt.JwtUtil;
@@ -19,7 +21,9 @@ import io.jsonwebtoken.Jwts;
 @SpringBootTest
 @ActiveProfiles("test")
 public class JwtUtilTest {
-
+	@MockitoBean
+	private RedissonClient redissonClient;
+	
 	@Autowired
 	private JwtUtil jwtUtil;
 
