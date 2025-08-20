@@ -201,8 +201,7 @@ public class QuestionControllerTest extends WebMvcTestBase {
         verify(questionService, times(1))
                 .getQuestion(eq(userId), eq(surveyId), eq(questionId));
 
-        actions.andDo(print())
-                .andExpect(status().isOk())
+        actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content").value("테스트질문내용"))
                 .andExpect(jsonPath("$.data.number").value(responseDto.getNumber()))
                 .andExpect(jsonPath("$.data.type").value(responseDto.getType().name()))
