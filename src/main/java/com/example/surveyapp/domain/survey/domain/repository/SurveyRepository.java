@@ -13,21 +13,16 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface SurveyRepository extends JpaRepository<Survey, Long> {
+public interface SurveyRepository {
 
-    Optional<Survey> findByIdAndIsDeletedFalse(Long id);
+    Survey save(Survey survey);
 
-//    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT s FROM Survey s WHERE s.id = :id AND s.isDeleted = false")
-    Optional<Survey> findByIdAndIsDeletedFalseWithPessimisticLock(@Param("id") Long id);
+    Survey findByIdAndIsDeletedFalse(Long id);
 
-    @Query("SELECT s FROM Survey s WHERE s.isDeleted = false")
+    Survey findByIdAndIsDeletedFalseWithPessimisticLock(@Param("id") Long id);
+
     Page<Survey> findAllSurveyPaged(Pageable pageable);
 
-    @Query("SELECT s FROM Survey s "+
-            "LEFT JOIN FETCH s.questions q " +
-            "LEFT JOIN FETCH q.options o " +
-            "WHERE s.id = :surveyId")
-    Optional<Survey> findSurveyWithQuestionsAndOptions(@Param("surveyId") Long surveyId);
+    Survey findSurveyWithQuestionsAndOptions(@Param("surveyId") Long surveyId);
 
 }
