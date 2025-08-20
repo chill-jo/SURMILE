@@ -1,6 +1,8 @@
 package com.example.surveyapp.domain.surveyanswer.application;
 
 import com.example.surveyapp.domain.survey.application.dto.QuestionIdAndTypeDto;
+import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
+import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import com.example.surveyapp.domain.surveyanswer.application.facade.SurveyFacade;
 import com.example.surveyapp.domain.surveyanswer.application.mapper.SurveyAnswerMapper;
 import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyAnswerEvent;
@@ -10,12 +12,16 @@ import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.Surve
 import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
 import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.surveyanswer.domain.strategy.SurveyQuestionStrategy;
+import com.example.surveyapp.global.aop.LockAnnotation;
 import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.response.exception.CustomException;
+import com.example.surveyapp.global.response.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,6 +37,7 @@ public class SurveyAnswerService {
     private final SurveyAnswerQueryService surveyAnswerQueryService;
 
     @Transactional
+    @LockAnnotation(key = "'survey:' + #surveyId")
     public void saveSurveyAnswer(Long surveyId, SurveyAnswerRequestDto requestDto, Long userId) {
 
         userReader.validateUserIdOrThrow(userId);
@@ -73,6 +80,31 @@ public class SurveyAnswerService {
         List<SurveyAnswer> surveyAnswerList = surveyAnswerRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
 
         return surveyAnswerFactory.createParticipatedSurveyListDto(surveyAnswerList);
+    }
+
+    @Transactional
+    @LockAnnotation(key = "'survey:' + #surveyId")
+    public void testSaveSurveyAnswer(Long surveyId, SurveyAnswerRequestDto requestDto) {
+
+        Long userId = 2L;
+        userReader.validateUserIdOrThrow(userId);
+        surveyFacade.validateAndReserveSlot(surveyId,surveyAnswerRepository.countBySurveyId(surveyId));
+        surveyFacade.validateSurveyStartable(surveyId);
+        surveyAnswerQueryService.validateParticipated(userId, surveyId);
+
+        SurveyAnswer surveyAnswer = surveyAnswerRepository.save(SurveyAnswer.of(surveyId, userId));
+
+        saveAnswerWithStrategy(requestDto, surveyId, surveyAnswer);
+
+        eventPublisher.publishEvent(new SurveyAnswerEvent(
+                userId,
+                surveyFacade.getPointPerPersonBySurveyId(surveyId),
+                surveyAnswer.getId()
+        ));
+
+        if (surveyAnswerRepository.countBySurveyId(surveyId) >= surveyFacade.getSurveyInfo(surveyId).getMaxSurveyee()) {
+            eventPublisher.publishEvent(new SurveyDoneEvent(surveyId));
+        }
     }
 
 }

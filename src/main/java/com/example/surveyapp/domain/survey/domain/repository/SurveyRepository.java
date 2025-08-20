@@ -17,7 +17,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Long> {
 
     Optional<Survey> findByIdAndIsDeletedFalse(Long id);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+//    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM Survey s WHERE s.id = :id AND s.isDeleted = false")
     Optional<Survey> findByIdAndIsDeletedFalseWithPessimisticLock(@Param("id") Long id);
 

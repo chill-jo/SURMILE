@@ -1,8 +1,7 @@
 package com.example.surveyapp.domain.survey.presentation.dto.response;
 
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,22 +9,23 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
+@NoArgsConstructor
 public class SurveyQuestionDto {
-    private final Long id;
+    private Long id;
 
-    private final String title;
+    private String title;
 
-    private final String description;
+    private String description;
 
-    private final Long maxSurveyee;
+    private Long maxSurveyee;
 
-    private final Long pointPerPerson;
+    private Long pointPerPerson;
 
-    private final Long totalPoint;
+    private Long totalPoint;
 
-    private final LocalDateTime deadline;
+    private LocalDateTime deadline;
 
-    private final Long expectedTime;
+    private Long expectedTime;
 
     private List<QuestionOptionsDto> questions;
 
