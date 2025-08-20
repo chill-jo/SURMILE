@@ -12,6 +12,9 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+      cache-access-token: accessToken
+      cache-refresh-token: refreshToken
+      default-ttl-sec: 1000
 
   datasource:
     url: ${DB_URL}
@@ -39,10 +42,12 @@ logging:
               BasicBinder: info
         org:
           hibernate: debug
+    org.springframework.cache: trace
 
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
   access-token:
       expiration:
-        mills: 1800000
+        access-token: 1800000 # 30 minutes
+        refresh-token: 1209600000 # 14 days

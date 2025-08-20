@@ -1,196 +1,252 @@
 package com.example.surveyapp.domain.user.application;
 
-import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
-import com.example.surveyapp.domain.user.domain.event.RegisterEvent;
-import com.example.surveyapp.domain.user.exception.UserErrorCode;
-import com.example.surveyapp.domain.user.exception.UserException;
-import com.example.surveyapp.domain.user.presentation.dto.*;
-import com.example.surveyapp.domain.user.presentation.dto.RegisterRequestDto;
-import com.example.surveyapp.domain.user.presentation.dto.UserRequestDto;
-import com.example.surveyapp.domain.user.presentation.dto.UserResponseDto;
-import com.example.surveyapp.domain.user.domain.model.CategoryEnum;
-import com.example.surveyapp.domain.user.domain.model.User;
-import com.example.surveyapp.domain.user.domain.model.UserBaseData;
-import com.example.surveyapp.domain.user.domain.repository.UserBaseDataRepository;
-import com.example.surveyapp.domain.user.domain.repository.UserRepository;
-import com.example.surveyapp.global.security.jwt.JwtUtil;
-import lombok.RequiredArgsConstructor;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
+import com.example.surveyapp.domain.user.application.provider.JwtProvider;
+import com.example.surveyapp.domain.user.domain.event.RegisterEvent;
+import com.example.surveyapp.domain.user.domain.model.CategoryEnum;
+import com.example.surveyapp.domain.user.domain.model.User;
+import com.example.surveyapp.domain.user.domain.model.UserBaseData;
+import com.example.surveyapp.domain.user.domain.repository.UserBaseDataRepository;
+import com.example.surveyapp.domain.user.domain.repository.UserRepository;
+import com.example.surveyapp.domain.user.exception.UserErrorCode;
+import com.example.surveyapp.domain.user.exception.UserException;
+import com.example.surveyapp.domain.user.presentation.dto.BaseDataInfoResponseDto;
+import com.example.surveyapp.domain.user.presentation.dto.BaseDataListRequestDto;
+import com.example.surveyapp.domain.user.presentation.dto.BaseDataListResponseDto;
+import com.example.surveyapp.domain.user.presentation.dto.BaseDataResponseDto;
+import com.example.surveyapp.domain.user.presentation.dto.LoginRequestDto;
+import com.example.surveyapp.domain.user.presentation.dto.LoginResponseDto;
+import com.example.surveyapp.domain.user.presentation.dto.RegisterRequestDto;
+import com.example.surveyapp.domain.user.presentation.dto.UserRequestDto;
+import com.example.surveyapp.domain.user.presentation.dto.UserResponseDto;
+import com.example.surveyapp.domain.user.presentation.dto.WithdrawRequestDto;
+import com.example.surveyapp.global.redis.application.RedisTemplateFacade;
+import com.example.surveyapp.global.response.exception.UnauthorizedException;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
-    private final UserBaseDataRepository userBaseDataRepository;
-    private final ApplicationEventPublisher eventPublisher;
-    private final AiModerationFacade aiModerationFacade;
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final UserBaseDataRepository userBaseDataRepository;
+	private final ApplicationEventPublisher eventPublisher;
+	private final RedisTemplateFacade redisTemplateFacade;
+	private final AiModerationFacade aiModerationFacade;
+	private final JwtProvider jwtProvider;
 
-    @Transactional
-    public void register(RegisterRequestDto requestDto) {
-        if (userRepository.existsByEmail(requestDto.getEmail())) {
-            throw new UserException(UserErrorCode.EXISTS_EMAIL);
-        }
+	@Value("${spring.data.redis.cache-access-token}")
+	private String ACCESS_TOKEN;
+	@Value("${jwt.access-token.expiration.access-token}")
+	private long ACCESS_TOKEN_TIME;
 
-        if (userRepository.existsByNickname(requestDto.getNickname())) {
-            throw new UserException(UserErrorCode.EXISTS_NICKNAME);
-        }
+	@Value("${spring.data.redis.cache-refresh-token}")
+	private String REFRESH_TOKEN;
+	@Value("${jwt.access-token.expiration.refresh-token}")
+	private long REFRESH_TOKEN_TIME;
 
-        if (!requestDto.getPassword().equals(requestDto.getConfirmPassword())) {
-            throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
-        }
-        aiModerationFacade.checkNicknameModeration(requestDto.getNickname());
+	@Transactional
+	public void register(RegisterRequestDto requestDto) {
+		if (userRepository.existsByEmail(requestDto.getEmail())) {
+			throw new UserException(UserErrorCode.EXISTS_EMAIL);
+		}
 
-        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
+		if (userRepository.existsByNickname(requestDto.getNickname())) {
+			throw new UserException(UserErrorCode.EXISTS_NICKNAME);
+		}
 
-        User user = User.of(
-                requestDto.getEmail(),
-                encodedPassword,
-                requestDto.getName(),
-                requestDto.getNickname(),
-                requestDto.getUserRole()
-        );
+		if (!requestDto.getPassword().equals(requestDto.getConfirmPassword())) {
+			throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
+		}
+		aiModerationFacade.checkNicknameModeration(requestDto.getNickname());
 
-        userRepository.save(user);
+		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
-        eventPublisher.publishEvent(new RegisterEvent(user.getId()));
-    }
+		User user = User.of(
+			requestDto.getEmail(),
+			encodedPassword,
+			requestDto.getName(),
+			requestDto.getNickname(),
+			requestDto.getUserRole()
+		);
 
-    @Transactional(readOnly = true)
-    public LoginResponseDto login(LoginRequestDto requestDto) {
-        User user = userRepository.findByEmailAndIsDeletedFalse(requestDto.getEmail())
-                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
+		userRepository.save(user);
 
-        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
-        }
+		eventPublisher.publishEvent(new RegisterEvent(user.getId()));
+	}
 
-        String accessToken = jwtUtil.createAccessToken(user.getId(), user.getUserRole());
+	@Transactional(readOnly = true)
+	public LoginResponseDto login(LoginRequestDto requestDto) {
+		User user = userRepository.findByEmailAndIsDeletedFalse(requestDto.getEmail())
+			.orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
 
-        return LoginResponseDto.builder()
-                .id(String.valueOf(user.getId()))
-                .name(user.getName())
-                .token(accessToken)
-                .build();
-    }
+		if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+			throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
+		}
 
-    @Transactional
-    public void withdraw(Long userId, WithdrawRequestDto requestDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
+		String accessToken = jwtProvider.createAccessToken(user.getId(), user.getUserRole());
+		String refreshToken = jwtProvider.createRefreshToken(user.getId());
+		redisTemplateFacade.write(REFRESH_TOKEN + ":" + user.getId(), jwtProvider.substringToken(refreshToken),
+			Duration.ofMillis(REFRESH_TOKEN_TIME));
 
-        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
-        }
+		return LoginResponseDto.builder()
+			.id(String.valueOf(user.getId()))
+			.name(user.getName())
+			.accessToken(accessToken)
+			.refreshToken(refreshToken)
+			.build();
+	}
 
-        user.softDelete();
-    }
+	@Transactional
+	public void logout(String accessToken) {
+		Long userId = Long.parseLong(jwtProvider.extractUserId(jwtProvider.substringToken(accessToken)));
+		redisTemplateFacade.write(ACCESS_TOKEN + ":" + userId, jwtProvider.substringToken(accessToken),
+			Duration.ofMillis(ACCESS_TOKEN_TIME));
+	}
 
-    @Transactional(readOnly = true)
-    public UserResponseDto getMyInfo(Long userId){
-        User user = findUser(userId);
-        return UserResponseDto.from(user);
-    }
+	@Transactional
+	public LoginResponseDto refresh(String requestToken) {
+		String token = jwtProvider.substringToken(requestToken);
 
-    @Transactional
-    public UserResponseDto updateMyInfo(Long userId, UserRequestDto requestDto){
-        User user = findUser(userId);
+		if (!jwtProvider.isValidRefreshToken(token)) {
+			throw new UnauthorizedException("유효하지 않은 JWT 토큰입니다.");
+		}
 
-        validateDuplicatedUser(requestDto);
+		Long userId = Long.parseLong(jwtProvider.extractUserId(token));
 
-        aiModerationFacade.checkNicknameModeration(requestDto.getNickname());
+		User user = userRepository.findByIdAndIsDeletedFalse(userId)
+			.orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
 
-        user.updateInfo(requestDto.getEmail(), requestDto.getName(), requestDto.getNickname(), requestDto.getPassword(), passwordEncoder);
+		String accessToken = jwtProvider.createAccessToken(userId, user.getUserRole());
+		String refreshToken = jwtProvider.createRefreshToken(userId);
+		redisTemplateFacade.write(REFRESH_TOKEN + ":" + userId, jwtProvider.substringToken(refreshToken),
+			Duration.ofMillis(REFRESH_TOKEN_TIME));
+		;
 
-        return UserResponseDto.from(user);
-    }
+		return LoginResponseDto.builder()
+			.id(String.valueOf(user.getId()))
+			.name(user.getName())
+			.accessToken(accessToken)
+			.refreshToken(refreshToken)
+			.build();
 
-    // 유저 정보 중복 여부 검사
-    private void validateDuplicatedUser(UserRequestDto userRequestDto) {
-        if (userRepository.existsByEmail(userRequestDto.getEmail())) {
-            throw new UserException(UserErrorCode.EXISTS_EMAIL);
-        }
+	}
 
-        if (userRepository.existsByNickname(userRequestDto.getNickname())) {
-            throw new UserException(UserErrorCode.EXISTS_NICKNAME);
-        }
-    }
+	@Transactional
+	public void withdraw(Long userId, WithdrawRequestDto requestDto) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
 
-    // ID로 유저 찾기
-    private User findUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
-    }
+		if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+			throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
+		}
 
+		user.softDelete();
+	}
 
-    // 참여자 로그인 시 기초 정보 체크하여 없을 경우 기초정보 입력 메서드 호출
-    // 참여자 기초 정보 작성 선택지 보여주는 메서드
-    @Transactional(readOnly = true)
-    public BaseDataInfoResponseDto getBaseDataInfo() {
+	@Transactional(readOnly = true)
+	public UserResponseDto getMyInfo(Long userId) {
+		User user = findUser(userId);
+		return UserResponseDto.from(user);
+	}
 
-        return new BaseDataInfoResponseDto();
-    }
+	@Transactional
+	public UserResponseDto updateMyInfo(Long userId, UserRequestDto requestDto) {
+		User user = findUser(userId);
 
-    // 참여자 기초 정보 C,U
-    @Transactional
-    public void saveBaseDatas(Long userId, BaseDataListRequestDto requestDto) {
+		validateDuplicatedUser(requestDto);
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_FOUND_USER)
-        );
+		aiModerationFacade.checkNicknameModeration(requestDto.getNickname());
 
-        if (CategoryEnum.values().length != requestDto.getList().size()) {
-            throw new UserException(UserErrorCode.MISSING_BASE_DATA_CATEGORIES);
-        }
+		user.updateInfo(requestDto.getEmail(), requestDto.getName(), requestDto.getNickname(), requestDto.getPassword(),
+			passwordEncoder);
 
-        requestDto.getList().forEach(
-                item -> {
-                    UserBaseData existingData = userBaseDataRepository.findByUserIdAndCategory(user, item.getCategory())
-                            .orElse(null);
+		return UserResponseDto.from(user);
+	}
 
-                    if (existingData != null) {
-                        existingData.update(item.getAnswer());
-                    } else {
-                        UserBaseData userBaseData = UserBaseData.of(user, item.getCategory(), item.getAnswer());
-                        userBaseDataRepository.save(userBaseData);
-                    }
-                }
-        );
+	// 유저 정보 중복 여부 검사
+	private void validateDuplicatedUser(UserRequestDto userRequestDto) {
+		if (userRepository.existsByEmail(userRequestDto.getEmail())) {
+			throw new UserException(UserErrorCode.EXISTS_EMAIL);
+		}
 
-    }
+		if (userRepository.existsByNickname(userRequestDto.getNickname())) {
+			throw new UserException(UserErrorCode.EXISTS_NICKNAME);
+		}
+	}
 
-    // 참여자 기초 정보 R
-    @Transactional(readOnly = true)
-    public BaseDataListResponseDto getBaseDatas(Long userId) {
+	// ID로 유저 찾기
+	private User findUser(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
+	}
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_FOUND_USER)
-        );
+	// 참여자 로그인 시 기초 정보 체크하여 없을 경우 기초정보 입력 메서드 호출
+	// 참여자 기초 정보 작성 선택지 보여주는 메서드
+	@Transactional(readOnly = true)
+	public BaseDataInfoResponseDto getBaseDataInfo() {
 
-        List<UserBaseData> userBaseDataList = userBaseDataRepository.findAllByUserId(user);
-        List<BaseDataResponseDto> baseDataResponseDtoList = new ArrayList<>();
-        userBaseDataList.forEach(
-                userBaseData -> {
-                    BaseDataResponseDto baseDataResponseDto = new BaseDataResponseDto(userBaseData.getCategory(), userBaseData.getData());
-                    baseDataResponseDtoList.add(baseDataResponseDto);
-                }
-        );
+		return new BaseDataInfoResponseDto();
+	}
 
-        return new BaseDataListResponseDto(baseDataResponseDtoList);
+	// 참여자 기초 정보 C,U
+	@Transactional
+	public void saveBaseDatas(Long userId, BaseDataListRequestDto requestDto) {
 
-    }
+		User user = userRepository.findById(userId).orElseThrow(
+			() -> new UserException(UserErrorCode.NOT_FOUND_USER)
+		);
 
-    // 참여자 기초 정보 가져오는 메서드
-//    private UserBaseData getUserBaseData(CustomUserDetails user) {
-//
-//        user.getId();
-//
-//    }
+		if (CategoryEnum.values().length != requestDto.getList().size()) {
+			throw new UserException(UserErrorCode.MISSING_BASE_DATA_CATEGORIES);
+		}
+
+		requestDto.getList().forEach(
+			item -> {
+				UserBaseData existingData = userBaseDataRepository.findByUserIdAndCategory(user, item.getCategory())
+					.orElse(null);
+
+				if (existingData != null) {
+					existingData.update(item.getAnswer());
+				} else {
+					UserBaseData userBaseData = UserBaseData.of(user, item.getCategory(), item.getAnswer());
+					userBaseDataRepository.save(userBaseData);
+				}
+			}
+		);
+
+	}
+
+	// 참여자 기초 정보 R
+	@Transactional(readOnly = true)
+	public BaseDataListResponseDto getBaseDatas(Long userId) {
+
+		User user = userRepository.findById(userId).orElseThrow(
+			() -> new UserException(UserErrorCode.NOT_FOUND_USER)
+		);
+
+		List<UserBaseData> userBaseDataList = userBaseDataRepository.findAllByUserId(user);
+		List<BaseDataResponseDto> baseDataResponseDtoList = new ArrayList<>();
+		userBaseDataList.forEach(
+			userBaseData -> {
+				BaseDataResponseDto baseDataResponseDto = new BaseDataResponseDto(userBaseData.getCategory(),
+					userBaseData.getData());
+				baseDataResponseDtoList.add(baseDataResponseDto);
+			}
+		);
+
+		return new BaseDataListResponseDto(baseDataResponseDtoList);
+
+	}
 }

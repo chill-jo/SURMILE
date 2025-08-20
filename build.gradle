@@ -54,12 +54,20 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor' // (3)
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc' // (4)
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
 
     // jwt
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.5'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.5'
+
+    //AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    //redisson
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.2'
 
     testRuntimeOnly 'com.h2database:h2'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
