@@ -9,11 +9,13 @@ toc-title: 목차
 :sectlinks:
 :docinfo: shared-head
 
-include::survey/survey.adoc[]
+include::user/user.adoc[]
 include::admin/admin.adoc[]
 include::point/point.adoc[]
+include::survey/survey.adoc[]
 include::question/question.adoc[]
 include::options/options.adoc[]
 include::surveyanswer/surveyanswer.adoc[]
 include::order/order.adoc[]
 include::product/product.adoc[]
+include::ai/ai.adoc[]

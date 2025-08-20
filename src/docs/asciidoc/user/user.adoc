@@ -1,0 +1,8 @@
+[[user-resource]]
+= User API
+
+include::get-my-page.adoc[]
+include::update-my-page.adoc[]
+include::get-base-data-info.adoc[]
+include::save-base-datas.adoc[]
+include::get-base-datas.adoc[]

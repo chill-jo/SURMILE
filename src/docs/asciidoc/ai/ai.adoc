@@ -1,0 +1,5 @@
+[[ai-resource]]
+= AI API
+
+include::ask-question.adoc[]
+include::index-text.adoc[]
