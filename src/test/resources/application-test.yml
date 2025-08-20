@@ -17,11 +17,6 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
-    vectorstore:
-      redis:
-        initialize-schema: true
-        index-name: surveyApp-index
-        prefix: embedding
 
   data:
     redis:

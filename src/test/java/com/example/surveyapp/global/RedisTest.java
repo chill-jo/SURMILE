@@ -1,9 +1,8 @@
 package com.example.surveyapp.global;
 
-import com.example.surveyapp.config.generator.UserFixtureGenerator;
+import com.example.surveyapp.domain.admin.application.facade.UserFacade;
+import com.example.surveyapp.domain.user.application.UserFacadeImpl;
 import com.example.surveyapp.domain.user.application.UserService;
-import com.example.surveyapp.domain.user.application.provider.JwtProvider;
-import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
 import com.example.surveyapp.domain.user.presentation.dto.LoginRequestDto;
 import com.example.surveyapp.domain.user.presentation.dto.LoginResponseDto;
@@ -12,33 +11,16 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Optional;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ExtendWith(RedisTestContainersExtension.class)
 @ActiveProfiles("test")
 @DisplayName("Redis::Auth")
 public class RedisTest {
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private JwtProvider jwtProvider;
 
     @Autowired
     private RedisTemplateFacade redisTemplateFacade;
@@ -59,7 +41,6 @@ public class RedisTest {
 
         // Then
         Assertions.assertThat(result).isInstanceOf(LoginResponseDto.class);
-
     }
 
     @Test
@@ -77,7 +58,7 @@ public class RedisTest {
     }
 
     @Test
-    @Sql("classpath:test-auth.sql")
+//    @Sql("classpath:test-auth.sql")
     @DisplayName("기능: 리프레시 토큰을 재발급 받는다")
     public void success_refreshToken() {
 
