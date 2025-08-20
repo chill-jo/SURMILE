@@ -1,0 +1,19 @@
+== Get MyPage API
+
+[example]
+`GET` 요청을 사용하여 마이페이지를 조회할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/user/save-base-datas/http-request.adoc[]
+include::{snippets}/user/save-base-datas/request-headers.adoc[]
+include::{snippets}/user/save-base-datas/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/user/save-base-datas/http-response.adoc[]
+include::{snippets}/user/save-base-datas/response-fields.adoc[]
+====

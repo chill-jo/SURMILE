@@ -87,8 +87,8 @@ public class SurveyControllerTest extends WebMvcTestBase {
 
         verify(surveyService, times(1))
                 .createSurvey(eq(userId), any(SurveyCreateRequestDto.class));
-        actions.andDo(print())
-                .andExpect(status().isAccepted())
+
+        actions.andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.data.title").value(requestDto.getTitle()))
                 .andExpect(jsonPath("$.data.status").value(SurveyStatus.PENDING.name()))
                 .andDo(document("survey/create-survey",

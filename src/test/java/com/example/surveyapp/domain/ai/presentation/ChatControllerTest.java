@@ -13,11 +13,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,9 +57,20 @@ public class ChatControllerTest extends WebMvcTestBase {
         // Then
         verify(chatService, times(1)).chat(eq(req.getQuestion()));
 
-        resultActions.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.answer").value(res.getAnswer()));
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.answer").value(res.getAnswer()))
+                .andDo(document("ai/ask-question",
+                        requestFields(
+                                fieldWithPath("question").type(JsonFieldType.STRING).description("챗봇 질문 내용")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.answer").type(JsonFieldType.STRING).description("답변 내용")
+                        )
+                ))
+        ;
     }
 
     @Test
@@ -64,6 +83,7 @@ public class ChatControllerTest extends WebMvcTestBase {
         // When
         ResultActions resultActions = mockMvc.perform(
                 post("/api/chat/index")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
         );
@@ -71,9 +91,24 @@ public class ChatControllerTest extends WebMvcTestBase {
         // Then
         verify(indexer, times(1)).indexText(eq(1L), eq(dto.getDocument()));
 
-        resultActions.andDo(print())
-                .andExpect(status().isOk())
+        resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("성공"))
+                .andDo(document("ai/index-text",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token"))
+                        ),
+                        requestFields(
+                                fieldWithPath("document").type(JsonFieldType.STRING).description("설문 제목")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                        )
+                ))
         ;
     }
 }
