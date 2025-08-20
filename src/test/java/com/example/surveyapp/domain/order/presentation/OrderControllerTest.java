@@ -16,6 +16,8 @@ import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -111,10 +113,10 @@ public class OrderControllerTest extends WebMvcTestBase {
     void 관리자_주문_전체조회_가능하다() throws Exception {
         // Given
         //테스트 전제 조건 및 환경 설정
-        List<OrderResponseDto> orderList = List.of(
+        Page<OrderResponseDto> orderList = new PageImpl<>(List.of(
                 new OrderResponseDto(1L, "uuid1", 1L, "dohan1", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), OrderStatus.PENDING_PAYMENT.getOrderStatus(), LocalDateTime.now()),
                 new OrderResponseDto(2L, "uuid1", 3L, "dohan2", 2L, "pizza", 3500L, Status.ON_SALE.getStatus(), OrderStatus.PENDING_PAYMENT.getOrderStatus(), LocalDateTime.now())
-        );
+        ));
 
         when(orderService.readAllOrder(0, 10)).thenReturn(orderList);
         // When
@@ -123,16 +125,15 @@ public class OrderControllerTest extends WebMvcTestBase {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .param("page", "0")
                 .param("size", "10")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(orderList)));
+                );
 
         // Then
         //검증 사항
         verify(orderService, times(1)).readAllOrder(0, 10);
         actions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].username").value("dohan1"))
-                .andExpect(jsonPath("$.data[1].username").value("dohan2"))
+                .andExpect(jsonPath("$.data.content[0].username").value("dohan1"))
+                .andExpect(jsonPath("$.data.content[1].username").value("dohan2"))
                 .andDo(document("order/get-orders",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
@@ -147,16 +148,29 @@ public class OrderControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
-                                fieldWithPath("data[].orderId").type(JsonFieldType.NUMBER).description("주문 ID"),
-                                fieldWithPath("data[].orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
-                                fieldWithPath("data[].userId").type(JsonFieldType.NUMBER).description("주문자 ID"),
-                                fieldWithPath("data[].username").type(JsonFieldType.STRING).description("주문자 이름"),
-                                fieldWithPath("data[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
-                                fieldWithPath("data[].title").type(JsonFieldType.STRING).description("주문 상품 제목"),
-                                fieldWithPath("data[].status").type(JsonFieldType.STRING).description(" 상품 상태"),
-                                fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
-                                fieldWithPath("data[].orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
-                                fieldWithPath("data[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
+                                fieldWithPath("data.content[].orderId").type(JsonFieldType.NUMBER).description("주문 ID"),
+                                fieldWithPath("data.content[].orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
+                                fieldWithPath("data.content[].userId").type(JsonFieldType.NUMBER).description("주문자 ID"),
+                                fieldWithPath("data.content[].username").type(JsonFieldType.STRING).description("주문자 이름"),
+                                fieldWithPath("data.content[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
+                                fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("주문 상품 제목"),
+                                fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description(" 상품 상태"),
+                                fieldWithPath("data.content[].price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("data.content[].orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
+                                fieldWithPath("data.content[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
+                                fieldWithPath("data.content[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
+                                fieldWithPath("data.pageable").type(JsonFieldType.STRING).description("주문 생성일"),
+                                fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("주문 생성일"),
+                                fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("주문 생성일"),
+                                fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
+                                fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("주문 생성일"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("주문 생성일"),
+                                fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
+                                fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
+                                fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
+                                fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("주문 생성일"),
+                                fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
+                                fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
 
 
@@ -168,26 +182,25 @@ public class OrderControllerTest extends WebMvcTestBase {
     void 참여자_주문_목록_조회() throws Exception {
         // Given
         //테스트 전제 조건 및 환경 설정
-        List<OrderResponseDto> orderList = List.of(
+        Page<OrderResponseDto> orderList = new PageImpl<>(List.of(
                 new OrderResponseDto(1L, "uuid1", 3L, "dohan2", 1L, "chicken", 2500L, Status.ON_SALE.getStatus(), OrderStatus.PENDING_PAYMENT.getOrderStatus(), LocalDateTime.now()),
                 new OrderResponseDto(2L, "uuid1", 3L, "dohan2", 2L, "pizza", 3500L, Status.ON_SALE.getStatus(), OrderStatus.PENDING_PAYMENT.getOrderStatus(), LocalDateTime.now())
-        );
+        ));
 
         when(orderService.readMyOrderList(0, 10, 3L)).thenReturn(orderList);
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(get("/api/orders/my")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(orderList)));
+                );
 
         // Then
         //검증 사항
         verify(orderService, times(1)).readMyOrderList(anyInt(), anyInt(), anyLong());
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].username").value("dohan2"))
-                .andExpect(jsonPath("$.data[1].username").value("dohan2"))
+                .andExpect(jsonPath("$.data.content[0].username").value("dohan2"))
+                .andExpect(jsonPath("$.data.content[1].username").value("dohan2"))
                 .andDo(document("order/get-my-orders",
                           requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
@@ -202,17 +215,31 @@ public class OrderControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
-                                fieldWithPath("data[].orderId").type(JsonFieldType.NUMBER).description("주문 ID"),
-                                fieldWithPath("data[].orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
-                                fieldWithPath("data[].userId").type(JsonFieldType.NUMBER).description("주문자 ID"),
-                                fieldWithPath("data[].username").type(JsonFieldType.STRING).description("주문자 이름"),
-                                fieldWithPath("data[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
-                                fieldWithPath("data[].title").type(JsonFieldType.STRING).description("주문 상품 제목"),
-                                fieldWithPath("data[].status").type(JsonFieldType.STRING).description(" 상품 상태"),
-                                fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
-                                fieldWithPath("data[].orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
-                                fieldWithPath("data[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
+                                fieldWithPath("data.content[].orderId").type(JsonFieldType.NUMBER).description("주문 ID"),
+                                fieldWithPath("data.content[].orderNumber").type(JsonFieldType.STRING).description("주문 번호"),
+                                fieldWithPath("data.content[].userId").type(JsonFieldType.NUMBER).description("주문자 ID"),
+                                fieldWithPath("data.content[].username").type(JsonFieldType.STRING).description("주문자 이름"),
+                                fieldWithPath("data.content[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
+                                fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("주문 상품 제목"),
+                                fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description(" 상품 상태"),
+                                fieldWithPath("data.content[].price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
+                                fieldWithPath("data.content[].orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
+                                fieldWithPath("data.content[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
+                                fieldWithPath("data.content[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
+                                fieldWithPath("data.pageable").type(JsonFieldType.STRING).description("주문 생성일"),
+                                fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("주문 생성일"),
+                                fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("주문 생성일"),
+                                fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
+                                fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("주문 생성일"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("주문 생성일"),
+                                fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
+                                fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
+                                fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
+                                fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("주문 생성일"),
+                                fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
+                                fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
+
 
     }
 
@@ -230,8 +257,7 @@ public class OrderControllerTest extends WebMvcTestBase {
         //실행할 행동
         ResultActions actions = mockMvc.perform(delete("/api/orders/{id}", responseDto.getOrderId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(responseDto)));
+                );
 
         // Then
         //검증 사항
@@ -270,8 +296,7 @@ public class OrderControllerTest extends WebMvcTestBase {
         //실행할 행동
         ResultActions actions = mockMvc.perform(get("/api/orders/{id}", responseDto.getOrderId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(responseDto)));
+                );
 
         // Then
         //검증 사항
@@ -318,8 +343,7 @@ public class OrderControllerTest extends WebMvcTestBase {
         // When
         //실행할 행동
         ResultActions actions = mockMvc.perform(get("/api/orders/my/{id}", responseDto.getOrderId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(responseDto)));
+                );
         // Then
         //검증 사항
         verify(orderService, times(1)).readOneMyOrder(responseDto.getOrderId(), responseDto.getUserId());
