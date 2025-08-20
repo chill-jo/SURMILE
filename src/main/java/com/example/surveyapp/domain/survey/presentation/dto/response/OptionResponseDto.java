@@ -2,15 +2,18 @@ package com.example.surveyapp.domain.survey.presentation.dto.response;
 
 import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@NoArgsConstructor
 public class OptionResponseDto {
 
-    private final Long id;
+    private Long id;
 
-    private final Long number;
+    private Long number;
 
-    private final String content;
+    private String content;
 
     public OptionResponseDto(Long id, Long number, String content){
         this.id = id;

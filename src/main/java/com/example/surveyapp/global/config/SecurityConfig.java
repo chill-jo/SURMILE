@@ -48,7 +48,6 @@ public class SecurityConfig {
                                 "/api/logout",
                                 "/api/refresh",
                                 "/error",
-                                "/api/survey/{surveyId}/answerTest",
                                 "/api/chat/ask"
                         ).permitAll()
 

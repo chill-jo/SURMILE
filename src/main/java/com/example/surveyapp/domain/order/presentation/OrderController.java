@@ -4,19 +4,18 @@ import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateResponseDto;
 import com.example.surveyapp.domain.order.presentation.dto.OrderResponseDto;
 import com.example.surveyapp.domain.order.application.OrderService;
-import com.example.surveyapp.global.response.ApiResponse;
+
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -37,11 +36,11 @@ public class OrderController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public  ResponseEntity<List<OrderResponseDto>> readAllOrder(
+    public  ResponseEntity<Page<OrderResponseDto>> readAllOrder(
             @RequestParam(defaultValue = "0")int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        List<OrderResponseDto> orderList = orderService.readAllOrder(page, size);
+        Page<OrderResponseDto> orderList = orderService.readAllOrder(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(orderList);
     }
 
@@ -54,13 +53,13 @@ public class OrderController {
 
     @GetMapping("/my")
     @PreAuthorize("hasRole('SURVEYEE')")
-    public ResponseEntity<List<OrderResponseDto>> readMyOrders(
+    public ResponseEntity<Page<OrderResponseDto>> readMyOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         Long userId = userDetails.getId();
-        List<OrderResponseDto> myOrderList = orderService.readMyOrderList(page,size,userId);
+        Page<OrderResponseDto> myOrderList = orderService.readMyOrderList(page,size,userId);
         return ResponseEntity.status(HttpStatus.OK).body(myOrderList);
     }
 

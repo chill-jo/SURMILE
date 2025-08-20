@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.order.application;
 
+import com.example.surveyapp.domain.order.application.mapper.OrderResponseMapper;
 import com.example.surveyapp.domain.order.exception.OrderErrorCode;
 import com.example.surveyapp.domain.order.exception.OrderException;
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto;
@@ -21,8 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -31,6 +30,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserReader userReader;
     private final ProductFacade productFacade;
+    private final OrderResponseMapper orderResponseMapper;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -59,27 +59,17 @@ public class OrderService {
        return OrderCreateResponseDto.from(saveOrder,status);
     }
 
-    public List<OrderResponseDto> readAllOrder(int page, int size) {
+    public Page<OrderResponseDto> readAllOrder(int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Order> orders = orderRepository.findAll(pageable);
-        List<Order> ordersList = orders.getContent();
-
-        return ordersList.stream()
-                .map(order -> {
-                    OrderItem item = order.getOrderItem();
-                    String username = userReader.usernameById(order.getUserId());
-                    ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
-                    String status = product.getStatus().getStatus();
-                    return OrderResponseDto.from(order,username,status);
-                })
-                .toList();
+        return orderRepository.findAll(pageable)
+                .map(orderResponseMapper::toDto);
     }
 
     public OrderResponseDto readOneOrder(Long id) {
 
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
 
         //유저정보 조회
@@ -94,20 +84,13 @@ public class OrderService {
 
     }
 
-    public List<OrderResponseDto> readMyOrderList(int page, int size, Long userId) {
+    public Page<OrderResponseDto> readMyOrderList(int page, int size, Long userId) {
         userReader.validateUserIdOrThrow(userId);
         Pageable pageable = PageRequest.of(page,size);
-        Page<Order> orders = orderRepository.findByUserIdAndIsDeletedFalse(userId,pageable);
 
-        return orders.stream()
-                .map(order -> {
-                    OrderItem item = order.getOrderItem();
-                    String username = userReader.usernameById(order.getUserId());
-                    ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
-                    String status = product.getStatus().getStatus();
-                    return OrderResponseDto.from(order,username,status);})
-                .toList();
-        }
+        return orderRepository.findByUserIdAndIsDeletedFalse(userId,pageable)
+                .map(orderResponseMapper::toDto);
+    }
 
     public OrderResponseDto readOneMyOrder(Long id, Long userId) {
 
