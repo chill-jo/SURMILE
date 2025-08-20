@@ -57,15 +57,4 @@ public class SurveyAnswerController {
         return ResponseEntity.status(HttpStatus.OK).body(statisticsDto);
     }
 
-    // 테스트용
-    // 설문 응답 제출
-    @PostMapping("/{surveyId}/answerTest")
-    public ResponseEntity<Void> testAnswerSurvey(
-            @PathVariable Long surveyId,
-            @RequestBody @Valid SurveyAnswerRequestDto requestDto
-    ) {
-        surveyAnswerService.testSaveSurveyAnswer(surveyId, requestDto);
-
-        return ResponseEntity.status(HttpStatus.OK).body(null);
-    }
 }

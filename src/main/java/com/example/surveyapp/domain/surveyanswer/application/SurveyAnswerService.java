@@ -41,7 +41,7 @@ public class SurveyAnswerService {
     public void saveSurveyAnswer(Long surveyId, SurveyAnswerRequestDto requestDto, Long userId) {
 
         userReader.validateUserIdOrThrow(userId);
-        surveyFacade.validateAndReserveSlot(surveyId,surveyAnswerRepository.countBySurveyId(surveyId));
+        surveyFacade.validateAndReserveSlot(surveyId, surveyAnswerRepository.countBySurveyId(surveyId));
         surveyFacade.validateSurveyStartable(surveyId);
         surveyAnswerQueryService.validateParticipated(userId, surveyId);
 
@@ -60,7 +60,7 @@ public class SurveyAnswerService {
         }
     }
 
-    public void saveAnswerWithStrategy(SurveyAnswerRequestDto requestDto, Long surveyId, SurveyAnswer surveyAnswer){
+    public void saveAnswerWithStrategy(SurveyAnswerRequestDto requestDto, Long surveyId, SurveyAnswer surveyAnswer) {
         requestDto.getAnswers().forEach(questionAnswer -> {
             QuestionIdAndTypeDto questionDto = surveyFacade.getQuestionIdAndTypeByNumber(surveyId, questionAnswer.getNumber());
 
@@ -81,30 +81,4 @@ public class SurveyAnswerService {
 
         return surveyAnswerFactory.createParticipatedSurveyListDto(surveyAnswerList);
     }
-
-    @Transactional
-    @LockAnnotation(key = "'survey:' + #surveyId")
-    public void testSaveSurveyAnswer(Long surveyId, SurveyAnswerRequestDto requestDto) {
-
-        Long userId = 2L;
-        userReader.validateUserIdOrThrow(userId);
-        surveyFacade.validateAndReserveSlot(surveyId,surveyAnswerRepository.countBySurveyId(surveyId));
-        surveyFacade.validateSurveyStartable(surveyId);
-        surveyAnswerQueryService.validateParticipated(userId, surveyId);
-
-        SurveyAnswer surveyAnswer = surveyAnswerRepository.save(SurveyAnswer.of(surveyId, userId));
-
-        saveAnswerWithStrategy(requestDto, surveyId, surveyAnswer);
-
-        eventPublisher.publishEvent(new SurveyAnswerEvent(
-                userId,
-                surveyFacade.getPointPerPersonBySurveyId(surveyId),
-                surveyAnswer.getId()
-        ));
-
-        if (surveyAnswerRepository.countBySurveyId(surveyId) >= surveyFacade.getSurveyInfo(surveyId).getMaxSurveyee()) {
-            eventPublisher.publishEvent(new SurveyDoneEvent(surveyId));
-        }
-    }
-
 }

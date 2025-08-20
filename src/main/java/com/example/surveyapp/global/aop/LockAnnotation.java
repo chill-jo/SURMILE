@@ -14,7 +14,7 @@ public @interface LockAnnotation {
 
     long waitTime() default 5000L;
 
-    long leaseTime() default 3000L;
+    long leaseTime() default 1000L;
 
     TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
 
