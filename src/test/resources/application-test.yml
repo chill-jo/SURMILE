@@ -27,7 +27,7 @@ spring:
 
 jwt:
   secret:
-    key: testSecretKeytestSecretKeytestSecretKeytestSecretKeytestSecretKeytestSecretKey
+    key: ${JWT_SECRET_KEY}
   access-token:
     expiration:
       access-token: 1800000 # 30 minutes
