@@ -19,6 +19,7 @@ spring:
       port: ${REDIS_PORT}
       cache-access-token: accessToken
       cache-refresh-token: refreshToken
+      default-ttl-sec: 1000
 
   datasource:
     url: ${DB_URL}
@@ -46,6 +47,7 @@ logging:
               BasicBinder: info
         org:
           hibernate: debug
+    org.springframework.cache: trace
 
 jwt:
   secret:

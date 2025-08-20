@@ -12,6 +12,7 @@ public class JacksonConfig {
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
+
         objectMapper.registerModule(new JavaTimeModule()); // LocalDateTime 직렬화 지원
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return objectMapper;

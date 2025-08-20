@@ -15,6 +15,8 @@ import com.example.surveyapp.domain.survey.domain.repository.SurveyRepository;
 import com.example.surveyapp.domain.survey.domain.event.SurveyCreateEvent;
 import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +36,8 @@ public class SurveyService {
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyAnswerFacade surveyAnswerFacade;
     private final AiModerationFacade aiModerationFacade;
+
+    private final CacheManager cacheManager;
 
     @Transactional
     public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
@@ -112,7 +116,7 @@ public class SurveyService {
 
     // 참여자 API
     // 삭제 되지 않은 설문만 설문 상세 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public SurveyResponseDto getSurvey(Long surveyId) {
 
         Survey survey = surveyQueryService.findSurvey(surveyId);
@@ -124,6 +128,7 @@ public class SurveyService {
 
     // 설문 시작
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "survey", key = "#surveyId")
     public SurveyQuestionDto startSurvey(Long userId, Long surveyId) {
         userReader.validateUserIdOrThrow(userId);
 
@@ -133,5 +138,19 @@ public class SurveyService {
 
         return surveyMapper.toSurveyQuestionDto(survey);
     }
+
+    // 테스트용
+//    @Transactional
+//    @Cacheable(cacheNames = "survey", key = "#surveyId")
+//    public SurveyQuestionDto testStartSurvey(Long surveyId) {
+//        Long userId = 2L;
+//        userReader.validateUserIdOrThrow(userId);
+//
+//        Survey survey = surveyQueryService.findSurvey(surveyId);
+//        surveyValidator.validateStartable(survey);
+//        surveyAnswerFacade.validateParticipated(userId, surveyId);
+//
+//        return surveyMapper.toSurveyQuestionDto(survey);
+//    }
 
 }

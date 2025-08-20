@@ -113,4 +113,10 @@ public class SurveyController {
         return ResponseEntity.status(HttpStatus.OK).body(surveyService.startSurvey(user.getId(), surveyId));
     }
 
+    // 테스트용
+    // 설문 시작
+//    @GetMapping("/{surveyId}/testStart")
+//    public ResponseEntity<SurveyQuestionDto> testStartSurvey(@PathVariable Long surveyId) {
+//        return ResponseEntity.status(HttpStatus.OK).body(surveyService.testStartSurvey(surveyId));
+//    }
 }
