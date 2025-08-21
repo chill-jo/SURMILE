@@ -34,20 +34,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Gradle build
-        run: ./gradlew clean build
-
-      - name: Archive 파일명 변경
-        run: mv ./build/libs/*SNAPSHOT.jar ./survey-app/app.jar
 
       - name: ENV 파일 생성
-        run: echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
+        run: |
+          echo "${{ secrets.ENV_PROPERTIES }}" > ./env
+          echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
+        
 
       - name: Dockerfile 생성
         run: mv ./Dockerfile ./survey-app
 
       - name: docker-compose.yml 파일 생성
         run: mv ./docker-compose.yml ./survey-app
+
+      - name: Gradle build
+        run: ./gradlew clean build
+
+      - name: Archive 파일명 변경
+        run: mv ./build/libs/*SNAPSHOT.jar ./survey-app/app.jar
 
       - name: 파일 생성 확인
         run: |
