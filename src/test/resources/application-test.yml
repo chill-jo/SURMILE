@@ -1,4 +1,9 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: surveyApp-test
+
   datasource:
     url: jdbc:h2:mem:test_db;MODE=MySQL;
     driver-class-name: org.h2.Driver
