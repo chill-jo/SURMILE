@@ -172,7 +172,7 @@ class AdminServiceTest {
         UserDto userDto = mock(UserDto.class);
         when(userFacade.getUserDto(userId)).thenReturn(userDto);
 
-        when(blackListRepository.findByUserId(userId)).thenReturn(null);
+        when(blackListRepository.findByUserId(userId)).thenReturn(blackList);
 
         // when & then
         assertThatThrownBy(() -> adminService.addBlackList(userId))
@@ -227,7 +227,8 @@ class AdminServiceTest {
         UserDto dto = mock(UserDto.class);
         when(userFacade.getUserDto(userId)).thenReturn(dto);
 
-        when(blackListRepository.findByUserId(userId)).thenReturn(null);
+        doThrow(new AdminException(AdminErrorCode.IS_NOT_BLACKLIST))
+                .when(blackListRepository).findByUserId(userId);
 
 
         // when & then
