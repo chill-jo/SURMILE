@@ -38,3 +38,4 @@ jwt:
       access-token: 1800000 # 30 minutes
       refresh-token: 1209600000 # 14 days
 
+
