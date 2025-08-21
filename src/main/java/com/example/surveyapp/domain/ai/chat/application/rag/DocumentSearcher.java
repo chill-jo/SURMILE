@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.ai.chat.rag;
+package com.example.surveyapp.domain.ai.chat.application.rag;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.document.Document;

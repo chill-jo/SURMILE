@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.ai.chat.rag;
+package com.example.surveyapp.domain.ai.chat.application.rag;
 
 import com.example.surveyapp.domain.ai.exception.AiErrorCode;
 import com.example.surveyapp.global.reader.UserReader;
