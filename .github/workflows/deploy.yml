@@ -26,7 +26,7 @@ jobs:
 
       - name: ENV 파일 생성
         run: |
-          echo "${{ secrets.ENV_PROPERTIES }}" > ./env
+          echo "${{ secrets.ENV_PROPERTIES }}" > ./.env
           echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
 
       - name: Dockerfile 생성
