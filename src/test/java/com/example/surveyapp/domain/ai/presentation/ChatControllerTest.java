@@ -7,7 +7,7 @@ import com.example.surveyapp.domain.ai.chat.application.ChatService;
 import com.example.surveyapp.domain.ai.chat.presentation.dto.ChatRequestDto;
 import com.example.surveyapp.domain.ai.chat.presentation.dto.ChatResponseDto;
 import com.example.surveyapp.domain.ai.chat.presentation.dto.IndexRequestDto;
-import com.example.surveyapp.domain.ai.chat.rag.DocumentIndexer;
+import com.example.surveyapp.domain.ai.chat.application.rag.DocumentIndexer;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

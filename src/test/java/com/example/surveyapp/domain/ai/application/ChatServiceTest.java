@@ -1,8 +1,8 @@
 package com.example.surveyapp.domain.ai.application;
 
 import com.example.surveyapp.domain.ai.chat.prompt.ChatPromptTemplate;
-import com.example.surveyapp.domain.ai.chat.rag.DocumentIndexer;
-import com.example.surveyapp.domain.ai.chat.rag.DocumentSearcher;
+import com.example.surveyapp.domain.ai.chat.application.rag.DocumentIndexer;
+import com.example.surveyapp.domain.ai.chat.application.rag.DocumentSearcher;
 import com.example.surveyapp.domain.ai.chat.application.ChatService;
 import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
