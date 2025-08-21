@@ -14,7 +14,7 @@ import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
 import com.example.surveyapp.domain.point.domain.repository.PaymentRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointHistoryRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +49,7 @@ public class PointServiceTest {
     private MoneyToPointService moneyToPointService;
 
     @Mock
-    private UserReader userReader;
+    private OauthReader oauthReader;
 
     @Mock
     private PaymentRepository paymentRepository;

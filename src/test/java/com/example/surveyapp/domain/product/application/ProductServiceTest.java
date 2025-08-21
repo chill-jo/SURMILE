@@ -8,7 +8,7 @@ import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
 import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 import com.example.surveyapp.global.response.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class ProductServiceTest {
     private ProductRepository productRepository;
 
     @Mock
-    private UserReader userReader;
+    private OauthReader oauthReader;
 
     @InjectMocks
     private ProductService productService;
@@ -56,8 +56,8 @@ class ProductServiceTest {
                 product.getPrice().getValue(),
                 product.getStatus());
 
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
-        when(userReader.validateUserRoleToAdmin(userId)).thenReturn(true);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
+        when(oauthReader.validateUserRoleToAdmin(userId)).thenReturn(true);
         when(productRepository.save(any(Product.class))).thenReturn(product);
         // When
         //실행할 행동
@@ -65,7 +65,7 @@ class ProductServiceTest {
 
         // Then
         //검증 사항
-        verify(userReader, times((1))).validateUserRoleToAdmin(userId);
+        verify(oauthReader, times((1))).validateUserRoleToAdmin(userId);
         verify(productRepository,times(1)).save(any(Product.class));
         assertEquals(product.getTitle(), productCreateResponseDto.getTitle());
         assertEquals(product.getPrice().getValue(),productCreateResponseDto.getPrice());
@@ -87,9 +87,9 @@ class ProductServiceTest {
         // When
         //실행할 행동
 
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         doThrow(new CustomException(ProductErrorCode.NOT_ADMIN_USER_ERROR))
-                .when(userReader)
+                .when(oauthReader)
                 .validateUserRoleToAdmin(userId);
 
         // Then
@@ -115,9 +115,9 @@ class ProductServiceTest {
         // When
         //실행할 행동
         doThrow(new ProductException(ProductErrorCode.NOT_ADMIN_USER_ERROR))
-                .when(userReader)
+                .when(oauthReader)
                 .validateUserRoleToAdmin(userId);
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         // Then
         //검증 사항
         assertThatThrownBy(() -> productService.createProduct(requestDto, userId))
@@ -140,8 +140,8 @@ class ProductServiceTest {
 
         // When
         //실행할 행동
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
-        when(userReader.validateUserRoleToAdmin(userId)).thenReturn(true);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
+        when(oauthReader.validateUserRoleToAdmin(userId)).thenReturn(true);
         when(productRepository.existsByTitleAndIsDeletedFalse(product.getTitle())).thenReturn(true);
 
         // Then
@@ -234,8 +234,8 @@ class ProductServiceTest {
         ReflectionTestUtils.setField(product,"id",1L);
         ReflectionTestUtils.setField(product,"status",Status.STOPPED_SALE);
         when(productRepository.findByIdAndIsDeletedFalse(product.getId())).thenReturn(Optional.of(product));
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
-        when(userReader.validateUserRoleToAdmin(userId)).thenReturn(true);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
+        when(oauthReader.validateUserRoleToAdmin(userId)).thenReturn(true);
 
 
         // When
@@ -256,8 +256,8 @@ class ProductServiceTest {
         Product product = ProductFixtureGenerator.generateProductFixture();
         ReflectionTestUtils.setField(product,"id",1L);
         when(productRepository.findByIdAndIsDeletedFalse(product.getId())).thenReturn(Optional.of(product));
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
-        when(userReader.validateUserRoleToAdmin(userId)).thenReturn(true);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
+        when(oauthReader.validateUserRoleToAdmin(userId)).thenReturn(true);
 
 
         // When
@@ -281,8 +281,8 @@ class ProductServiceTest {
         ReflectionTestUtils.setField(product,"id",1L);
 
         when(productRepository.findByIdAndIsDeletedFalse(product.getId())).thenReturn(Optional.of(product));
-        when(userReader.validateUserRoleToAdmin(userId)).thenReturn(true);
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        when(oauthReader.validateUserRoleToAdmin(userId)).thenReturn(true);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         // When
         //실행할 행동
         productService.statusUpdate(userId, product.getId(),new ProductStatusUpdateRequestDto(Status.STOPPED_SALE));

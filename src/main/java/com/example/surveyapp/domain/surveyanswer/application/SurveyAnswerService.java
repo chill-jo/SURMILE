@@ -1,8 +1,6 @@
 package com.example.surveyapp.domain.surveyanswer.application;
 
 import com.example.surveyapp.domain.survey.application.dto.QuestionIdAndTypeDto;
-import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import com.example.surveyapp.domain.surveyanswer.application.facade.SurveyFacade;
 import com.example.surveyapp.domain.surveyanswer.application.mapper.SurveyAnswerMapper;
 import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyAnswerEvent;
@@ -13,22 +11,19 @@ import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
 import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.surveyanswer.domain.strategy.SurveyQuestionStrategy;
 import com.example.surveyapp.global.aop.LockAnnotation;
-import com.example.surveyapp.global.reader.UserReader;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SurveyAnswerService {
 
-    private final UserReader userReader;
+    private final OauthReader oauthReader;
     private final SurveyFacade surveyFacade;
     private final ApplicationEventPublisher eventPublisher;
     private final List<SurveyQuestionStrategy> surveyQuestionStrategies;
@@ -40,7 +35,7 @@ public class SurveyAnswerService {
     @LockAnnotation(key = "'survey:' + #surveyId")
     public void saveSurveyAnswer(Long surveyId, SurveyAnswerRequestDto requestDto, Long userId) {
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
         surveyFacade.validateAndReserveSlot(surveyId, surveyAnswerRepository.countBySurveyId(surveyId));
         surveyFacade.validateSurveyStartable(surveyId);
         surveyAnswerQueryService.validateParticipated(userId, surveyId);
@@ -76,7 +71,7 @@ public class SurveyAnswerService {
     @Transactional(readOnly = true)
     public SurveyeeSurveyListDto getUserSurveyAnswerHistory(Long userId) {
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
         List<SurveyAnswer> surveyAnswerList = surveyAnswerRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
 
         return surveyAnswerFactory.createParticipatedSurveyListDto(surveyAnswerList);

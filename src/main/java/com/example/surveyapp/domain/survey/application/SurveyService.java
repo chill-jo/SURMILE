@@ -25,7 +25,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.PageSurveyR
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyResponseDto;
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyStatusResponseDto;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SurveyService {
 
-	private final UserReader userReader;
+	private final OauthReader oauthReader;
 	private final ApplicationEventPublisher eventPublisher;
 	private final SurveyRepository surveyRepository;
 	private final SurveyMapper surveyMapper;
@@ -46,7 +46,7 @@ public class SurveyService {
     @Transactional
 	public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
 
-		userReader.validateUserIdOrThrow(userId);
+		oauthReader.validateUserIdOrThrow(userId);
 		aiModerationFacade.checkTitleModeration(requestDto.getTitle());
 		aiModerationFacade.checkDescriptionModeration(requestDto.getDescription());
 
@@ -55,7 +55,7 @@ public class SurveyService {
 		Survey survey = Survey.of(userId, surveyInfo);
 		Survey saved = surveyRepository.save(survey);
 
-		if (userReader.validateUserRoleToSurveyor(userId)) {
+		if (oauthReader.validateUserRoleToSurveyor(userId)) {
 			eventPublisher.publishEvent(new SurveyCreateEvent(
 				saved.getId(),
 				saved.getSurveyInfo().getTotalPoint().getValue(),
@@ -81,7 +81,7 @@ public class SurveyService {
 	@Transactional
 	public SurveyResponseDto updateSurveyInfo(Long userId, Long surveyId, SurveyUpdateRequestDto requestDto) {
 
-		userReader.validateUserIdOrThrow(userId);
+		oauthReader.validateUserIdOrThrow(userId);
 		Survey survey = surveyQueryService.findSurvey(surveyId);
 		surveyValidator.validateUpdatable(userId, survey);
 		aiModerationFacade.checkTitleModeration(requestDto.getTitle());
@@ -101,7 +101,7 @@ public class SurveyService {
 	public SurveyStatusResponseDto updateSurveyStatus(Long userId, Long surveyId,
 		SurveyStatusUpdateRequestDto requestDto) {
 
-		userReader.validateUserIdOrThrow(userId);
+		oauthReader.validateUserIdOrThrow(userId);
 		Survey survey = surveyQueryService.findSurvey(surveyId);
 
 		surveyValidator.validateStatusUpdatable(userId, survey);
@@ -114,7 +114,7 @@ public class SurveyService {
 	@Transactional
 	public void deleteSurvey(Long userId, Long surveyId) {
 
-		userReader.validateUserIdOrThrow(userId);
+		oauthReader.validateUserIdOrThrow(userId);
 
 		Survey survey = surveyQueryService.findSurvey(surveyId);
 		surveyValidator.validateDeletable(userId, survey);
@@ -138,7 +138,7 @@ public class SurveyService {
 	@Transactional(readOnly = true)
 	@Cacheable(cacheNames = "survey", key = "#surveyId")
 	public SurveyQuestionDto startSurvey(Long userId, Long surveyId) {
-		userReader.validateUserIdOrThrow(userId);
+		oauthReader.validateUserIdOrThrow(userId);
 
 		Survey survey = surveyQueryService.findSurvey(surveyId);
 		surveyValidator.validateStartable(survey);

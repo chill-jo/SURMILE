@@ -16,7 +16,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.QuestionRes
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.model.enums.QuestionType;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +43,7 @@ public class QuestionServiceTest {
     private SurveyQueryService surveyQueryService;
 
     @Mock
-    private UserReader userReader;
+    private OauthReader oauthReader;
 
     @InjectMocks
     private QuestionService questionService;
@@ -80,7 +80,7 @@ public class QuestionServiceTest {
         QuestionResponseDto responseDto = questionService.createQuestion(userId, surveyId, requestDto);
 
         //then
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
         verify(surveyValidator).validateUpdatable(userId, surveyMock);
         verify(surveyQuestionService).addQuestion(any(Survey.class), any(Question.class));
@@ -111,7 +111,7 @@ public class QuestionServiceTest {
         Question questionMock = mock(Question.class);
 
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
-        when(userReader.validateUserRoleToSurveyee(userId)).thenReturn(true);
+        when(oauthReader.validateUserRoleToSurveyee(userId)).thenReturn(true);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
 
         when(questionMock.getId()).thenReturn(questionId);
@@ -128,9 +128,9 @@ public class QuestionServiceTest {
         assertThat(responseDto.getContent()).isEqualTo(content);
         assertThat(responseDto.getType()).isEqualTo(type);
 
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
-        verify(userReader).validateUserRoleToSurveyee(userId);
+        verify(oauthReader).validateUserRoleToSurveyee(userId);
         verify(surveyValidator).validateQuestionAccess(userId, surveyMock, true);
         verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
 
@@ -155,7 +155,7 @@ public class QuestionServiceTest {
         QuestionReadEntity questionReadEntityMock1 = mock(QuestionReadEntity.class);
         QuestionReadEntity questionReadEntityMock2 = mock(QuestionReadEntity.class);
 
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         Pageable pageable = PageRequest.of(page, size);
         Page<QuestionReadEntity> questionReadEntityMockPage = new PageImpl<>(
@@ -191,9 +191,9 @@ public class QuestionServiceTest {
                 .isEqualTo(questionMock2.getId());
         assertThat(pageQuestionResponseDto.getTotalElements()).isEqualTo(questionMockList.size());
 
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
-        verify(userReader).validateUserRoleToSurveyee(userId);
+        verify(oauthReader).validateUserRoleToSurveyee(userId);
         verify(surveyValidator).validateQuestionAccess(userId, surveyMock, false);
         verify(questionReadRepository).findAllBySurveyId(surveyId, pageable);
         verify(questionReadEntityMock1).toQuestion();
@@ -220,7 +220,7 @@ public class QuestionServiceTest {
         Question questionMock = mock(Question.class);
         QuestionUpdateRequestDto requestDto = new QuestionUpdateRequestDto(number, content, type);
 
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
 
@@ -241,7 +241,7 @@ public class QuestionServiceTest {
         QuestionResponseDto responseDto = questionService.updateQuestion(userId, surveyId, questionId, requestDto);
 
         //then
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
         verify(surveyValidator).validateUpdatable(userId, surveyMock);
         verify(surveyQuestionService).updateQuestion(
@@ -272,7 +272,7 @@ public class QuestionServiceTest {
         ReflectionTestUtils.setField(questionService, "surveyValidator", surveyValidator);
 
         Survey surveyMock = mock(Survey.class);
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         doNothing().when(surveyValidator).validateDeletable(userId, surveyMock);
         doNothing().when(surveyQuestionService).deleteQuestionById(surveyMock, questionId);
@@ -281,7 +281,7 @@ public class QuestionServiceTest {
         questionService.deleteQuestion(userId, surveyId, questionId);
 
         // then
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
         verify(surveyValidator).validateDeletable(userId, surveyMock);
         verify(surveyQuestionService).deleteQuestionById(surveyMock, questionId);

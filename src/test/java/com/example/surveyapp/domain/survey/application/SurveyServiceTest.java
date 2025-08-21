@@ -17,7 +17,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.*;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +49,7 @@ public class SurveyServiceTest {
     private SurveyMapper surveyMapper;
 
     @Mock
-    private UserReader userReader;
+    private OauthReader oauthReader;
 
     @Mock
     private SurveyQueryService surveyQueryService;
@@ -83,12 +83,12 @@ public class SurveyServiceTest {
         Survey savedSurvey = Survey.of(userId, surveyInfo);
         SurveyResponseDto responseDto = mock(SurveyResponseDto.class);
 
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         when(requestDto.getTitle()).thenReturn("테스트설문제목");
         when(requestDto.getDescription()).thenReturn("테스트설문내용");
         when(surveyMapper.toSurveyInfo(requestDto)).thenReturn(surveyInfo);
         when(surveyRepository.save(any(Survey.class))).thenReturn(savedSurvey);
-        when(userReader.validateUserRoleToSurveyor(userId)).thenReturn(true);
+        when(oauthReader.validateUserRoleToSurveyor(userId)).thenReturn(true);
         when(surveyMapper.toResponseDto(savedSurvey)).thenReturn(responseDto);
         when(aiModerationFacade.checkTitleModeration(eq("테스트설문제목")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
@@ -99,10 +99,10 @@ public class SurveyServiceTest {
         SurveyResponseDto result = surveyService.createSurvey(userId, requestDto);
 
         // then
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyMapper).toSurveyInfo(requestDto);
         verify(surveyRepository).save(any(Survey.class));
-        verify(userReader).validateUserRoleToSurveyor(userId);
+        verify(oauthReader).validateUserRoleToSurveyor(userId);
         verify(eventPublisher).publishEvent(any(SurveyCreateEvent.class));
         verify(surveyMapper).toResponseDto(savedSurvey);
 
@@ -194,7 +194,7 @@ public class SurveyServiceTest {
         Survey surveyMock = mock(Survey.class);
         SurveyInfo surveyInfoMock = mock(SurveyInfo.class);
 
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyMock.isNotStarted()).thenReturn(true);
         when(surveyMock.isUserSurveyCreator(anyLong())).thenReturn(true);
@@ -230,7 +230,7 @@ public class SurveyServiceTest {
         assertThat(responseDto.getMaxSurveyee()).isEqualTo(maxSurveyee);
         assertThat(responseDto.getTotalPoint()).isEqualTo(maxSurveyee * pointPerPerson);
 
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyMock).updateSurveyInfo(any(SurveyInfo.class));
         verify(surveyMapper).toResponseDto(surveyMock);
 
@@ -248,7 +248,7 @@ public class SurveyServiceTest {
 
         Survey surveyMock = mock(Survey.class);
 
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(id)).thenReturn(surveyMock);
         when(surveyMock.isUserSurveyCreator(anyLong())).thenReturn(true);
         doNothing().when(surveyMock).changeSurveyStatus(status);
@@ -277,7 +277,7 @@ public class SurveyServiceTest {
         ReflectionTestUtils.setField(questionMock2, "id", 2L);
 
         List<Question> questionMockList = List.of(questionMock1, questionMock2);
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(id)).thenReturn(surveyMock);
         when(surveyMock.isUserSurveyCreator(anyLong())).thenReturn(true);
         when(surveyMock.isInProgress()).thenReturn(false);
@@ -329,7 +329,7 @@ public class SurveyServiceTest {
         SurveyInfo surveyInfo = mock(SurveyInfo.class);
         SurveyQuestionDto expectedDto = mock(SurveyQuestionDto.class);
         List<Question> questions = Collections.singletonList(mock(Question.class));
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
 
         when(surveyQueryService.findSurvey(surveyId))
                 .thenReturn(survey);
@@ -348,7 +348,7 @@ public class SurveyServiceTest {
         // then
         assertThat(result).isEqualTo(expectedDto);
 
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
         verify(surveyAnswerFacade).validateParticipated(userId, surveyId);
         verify(surveyMapper).toSurveyQuestionDto(survey);

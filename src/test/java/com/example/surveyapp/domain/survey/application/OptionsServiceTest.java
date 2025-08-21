@@ -15,7 +15,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.OptionRespo
 import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +34,7 @@ public class OptionsServiceTest{
     private SurveyQueryService surveyQueryService;
 
     @Mock
-    private UserReader userReader;
+    private OauthReader oauthReader;
 
     @InjectMocks
     private OptionsService optionsService;
@@ -61,7 +61,7 @@ public class OptionsServiceTest{
         Options option = new Options(requestDto.getNumber(), requestDto.getContent());
         ReflectionTestUtils.setField(option, "id", 1L);
 
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
@@ -76,7 +76,7 @@ public class OptionsServiceTest{
         assertThat(responseDto.getNumber()).isEqualTo(requestDto.getNumber());
         assertThat(responseDto.getContent()).isEqualTo(requestDto.getContent());
 
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
         verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
         verify(surveyValidator).validateUpdatable(userId, surveyMock);
@@ -102,7 +102,7 @@ public class OptionsServiceTest{
 
         List<Options> optionsMockList = List.of(optionMock1, optionMock2);
 
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
         when(questionMock.getOptions()).thenReturn(optionsMockList);
@@ -119,10 +119,10 @@ public class OptionsServiceTest{
         List<OptionResponseDto> responseDtoList = optionsService.getOptions(userId, surveyId, questionId);
 
         //then
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
         verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
-        verify(userReader).validateUserRoleToSurveyee(userId);
+        verify(oauthReader).validateUserRoleToSurveyee(userId);
         verify(surveyValidator).validateQuestionAccess(userId, surveyMock, false);
         verify(questionMock).getOptions();
 
@@ -173,7 +173,7 @@ public class OptionsServiceTest{
         assertThat(responseDto.getNumber()).isEqualTo(requestDto.getNumber());
         assertThat(responseDto.getContent()).isEqualTo(requestDto.getContent());
 
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
         verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
         verify(surveyValidator).validateUpdatable(userId, surveyMock);
@@ -205,7 +205,7 @@ public class OptionsServiceTest{
         optionsService.deleteOption(userId, surveyId, questionId, optionId);
 
         // then
-        verify(userReader).validateUserIdOrThrow(userId);
+        verify(oauthReader).validateUserIdOrThrow(userId);
         verify(surveyQueryService).findSurvey(surveyId);
         verify(surveyQuestionService).getQuestionById(surveyMock, questionId);
         verify(surveyValidator).validateDeletable(userId, surveyMock);

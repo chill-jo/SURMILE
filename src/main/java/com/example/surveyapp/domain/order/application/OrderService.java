@@ -13,7 +13,7 @@ import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderItemPoints;
 import com.example.surveyapp.domain.order.domain.repository.OrderRepository;;
 import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -28,14 +28,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final UserReader userReader;
+    private final OauthReader oauthReader;
     private final ProductFacade productFacade;
     private final OrderResponseMapper orderResponseMapper;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public OrderCreateResponseDto createOrder(OrderCreateRequestDto requestDto, Long userId) {
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
 
         ProductInfoDto product = productFacade.findProductInfo(requestDto.getProductId());
 
@@ -77,7 +77,7 @@ public class OrderService {
     }
 
     public Page<OrderResponseDto> readMyOrderList(int page, int size, Long userId) {
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
         Pageable pageable = PageRequest.of(page,size);
 
         return orderRepository.findByUserIdAndIsDeletedFalse(userId,pageable)
@@ -86,7 +86,7 @@ public class OrderService {
 
     public OrderResponseDto readOneMyOrder(Long id, Long userId) {
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
 
         Order order = orderRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
@@ -98,7 +98,7 @@ public class OrderService {
 
     @Transactional
     public void deleteOrder(Long id, Long userId) {
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
         Order order = orderRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
 

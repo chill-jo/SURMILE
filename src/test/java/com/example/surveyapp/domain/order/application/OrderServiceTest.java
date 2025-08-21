@@ -13,7 +13,7 @@ import com.example.surveyapp.domain.order.domain.model.Order;
 import com.example.surveyapp.domain.order.domain.repository.OrderRepository;
 import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
 import com.example.surveyapp.domain.product.domain.model.Status;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +46,7 @@ class OrderServiceTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private UserReader userReader;
+    private OauthReader oauthReader;
 
     @Mock
     private ProductFacade productFacade;
@@ -72,7 +72,7 @@ class OrderServiceTest {
         //실행할 행동
         when(orderRepository.save(any(Order.class))).thenReturn(order);
         when(productFacade.findProductInfo(productId)).thenReturn(productInfoDto);
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
         doNothing().when(eventPublisher).publishEvent(any(OrderCreateEvent.class));
 
         OrderCreateResponseDto responseDto = orderService.createOrder(requestDto, userId);
@@ -164,7 +164,7 @@ class OrderServiceTest {
         Pageable pageable = PageRequest.of(page, size);
 
         PageImpl<Order> orders = new PageImpl<>(List.of(order), pageable, 1);
-        doNothing().when(userReader).validateUserIdOrThrow(userId);
+        doNothing().when(oauthReader).validateUserIdOrThrow(userId);
 
         when(orderRepository.findByUserIdAndIsDeletedFalse(userId, pageable)).thenReturn(orders);
         when(orderResponseMapper.toDto(order)).thenReturn(OrderResponseDto.from(
@@ -213,7 +213,7 @@ void 자신이_주문하지않은_다른_주문은_조회가_불가능하다() {
 
 
     when(orderRepository.findByIdAndIsDeletedFalse(1L)).thenReturn(Optional.of(order));
-    doNothing().when(userReader).validateUserIdOrThrow(userId);
+    doNothing().when(oauthReader).validateUserIdOrThrow(userId);
 
     // When
     //실행할 행동

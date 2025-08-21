@@ -11,7 +11,7 @@ import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import com.example.surveyapp.domain.survey.infrastructure.QuestionReadEntity;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,13 +27,13 @@ public class QuestionService {
     private final SurveyQueryService surveyQueryService;
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
-    private final UserReader userReader;
+    private final OauthReader oauthReader;
     private final AiModerationFacade aiModerationFacade;
 
     @Transactional
     public QuestionResponseDto createQuestion(Long userId, Long surveyId, QuestionCreateRequestDto requestDto){
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
         aiModerationFacade.checkQuestionModeration(requestDto.getContent());
@@ -52,9 +52,9 @@ public class QuestionService {
 
     public QuestionResponseDto getQuestion(Long userId, Long surveyId, Long questionId){
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
-        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRoleToSurveyee(userId));
+        surveyValidator.validateQuestionAccess(userId, survey, oauthReader.validateUserRoleToSurveyee(userId));
 
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
 
@@ -68,9 +68,9 @@ public class QuestionService {
 
     public PageQuestionResponseDto<QuestionResponseDto> getQuestions(int page, int size, Long userId, Long surveyId){
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
-        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRoleToSurveyee(userId));
+        surveyValidator.validateQuestionAccess(userId, survey, oauthReader.validateUserRoleToSurveyee(userId));
 
         Pageable pageable = PageRequest.of(page, size);
         Page<QuestionReadEntity> questionReadEntityPage = questionReadRepository.findAllBySurveyId(surveyId, pageable);
@@ -89,7 +89,7 @@ public class QuestionService {
     @Transactional
     public QuestionResponseDto updateQuestion(Long userId, Long surveyId, Long questionId, QuestionUpdateRequestDto requestDto){
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
 
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
@@ -113,7 +113,7 @@ public class QuestionService {
     @Transactional
     public void deleteQuestion(Long userId, Long surveyId, Long questionId){
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
 
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateDeletable(userId, survey);

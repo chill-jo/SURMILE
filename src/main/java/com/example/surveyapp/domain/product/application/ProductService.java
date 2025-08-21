@@ -8,7 +8,7 @@ import com.example.surveyapp.domain.product.domain.model.ProductPoints;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
 import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final UserReader userReader;
+    private final OauthReader oauthReader;
 
     /**
      * @param requestDto         생성 요청 DTO
@@ -35,8 +35,8 @@ public class ProductService {
      */
     @Transactional
     public ProductCreateResponseDto createProduct(ProductCreateRequestDto requestDto, Long userId) {
-        userReader.validateUserIdOrThrow(userId);
-        userReader.validateUserRoleToAdmin(userId);
+        oauthReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserRoleToAdmin(userId);
 
         if (productRepository.existsByTitleAndIsDeletedFalse(requestDto.getTitle())){
             throw new ProductException(ProductErrorCode.NOT_SAME_CREATE_PRODUCT_TITLE);
@@ -106,8 +106,8 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long id, Long userId) {
-        userReader.validateUserIdOrThrow(userId);
-        userReader.validateUserRoleToAdmin(userId);
+        oauthReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserRoleToAdmin(userId);
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
 
@@ -116,8 +116,8 @@ public class ProductService {
 
     @Transactional
     public ProductStatusUpdateResponseDto statusUpdate(Long userId, Long id, ProductStatusUpdateRequestDto requestDto) {
-        userReader.validateUserIdOrThrow(userId);
-        userReader.validateUserRoleToAdmin(userId);
+        oauthReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserRoleToAdmin(userId);
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
         product.changeStatus(requestDto.getNewStatus());

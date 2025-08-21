@@ -9,7 +9,7 @@ import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
-import com.example.surveyapp.global.reader.UserReader;
+import com.example.surveyapp.global.oauth.reader.OauthReader;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OptionsService {
 
-    private final UserReader userReader;
+    private final OauthReader oauthReader;
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyQueryService surveyQueryService;
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
@@ -31,7 +31,7 @@ public class OptionsService {
     @Transactional
     public OptionResponseDto createOption(Long userId, Long surveyId, Long questionId, OptionCreateRequestDto requestDto){
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
         aiModerationFacade.checkOptionsModeration(requestDto.getContent());
@@ -52,12 +52,12 @@ public class OptionsService {
     @Transactional(readOnly = true)
     public List<OptionResponseDto> getOptions(Long userId, Long surveyId, Long questionId){
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
 
         Survey survey = surveyQueryService.findSurvey(surveyId);
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
 
-        surveyValidator.validateQuestionAccess(userId, survey, userReader.validateUserRoleToSurveyee(userId));
+        surveyValidator.validateQuestionAccess(userId, survey, oauthReader.validateUserRoleToSurveyee(userId));
 
         List<Options> optionsList = question.getOptions();
 
@@ -73,7 +73,7 @@ public class OptionsService {
     @Transactional
     public OptionResponseDto updateOption(Long userId, Long surveyId, Long questionId, Long optionId, OptionUpdateRequestDto requestDto){
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
 
         Survey survey = surveyQueryService.findSurvey(surveyId);
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
@@ -91,7 +91,7 @@ public class OptionsService {
     @Transactional
     public void deleteOption(Long userId, Long surveyId, Long questionId, Long optionId){
 
-        userReader.validateUserIdOrThrow(userId);
+        oauthReader.validateUserIdOrThrow(userId);
 
         Survey survey = surveyQueryService.findSurvey(surveyId);
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
