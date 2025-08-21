@@ -13,7 +13,7 @@ import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderItemPoints;
 import com.example.surveyapp.domain.order.domain.repository.OrderRepository;;
 import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final OauthReader oauthReader;
+    private final UserReader oauthReader;
     private final ProductFacade productFacade;
     private final OrderResponseMapper orderResponseMapper;
     private final ApplicationEventPublisher eventPublisher;

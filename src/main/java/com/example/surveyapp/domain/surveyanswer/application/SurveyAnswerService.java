@@ -11,7 +11,7 @@ import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
 import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.surveyanswer.domain.strategy.SurveyQuestionStrategy;
 import com.example.surveyapp.global.aop.LockAnnotation;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SurveyAnswerService {
 
-    private final OauthReader oauthReader;
+    private final UserReader oauthReader;
     private final SurveyFacade surveyFacade;
     private final ApplicationEventPublisher eventPublisher;
     private final List<SurveyQuestionStrategy> surveyQuestionStrategies;

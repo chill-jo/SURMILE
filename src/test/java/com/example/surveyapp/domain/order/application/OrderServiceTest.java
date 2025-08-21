@@ -13,7 +13,7 @@ import com.example.surveyapp.domain.order.domain.model.Order;
 import com.example.surveyapp.domain.order.domain.repository.OrderRepository;
 import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
 import com.example.surveyapp.domain.product.domain.model.Status;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +46,7 @@ class OrderServiceTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private OauthReader oauthReader;
+    private UserReader oauthReader;
 
     @Mock
     private ProductFacade productFacade;

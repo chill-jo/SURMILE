@@ -4,7 +4,7 @@ import com.example.surveyapp.domain.ai.chat.prompt.ChatPromptTemplate;
 import com.example.surveyapp.domain.ai.chat.application.rag.DocumentIndexer;
 import com.example.surveyapp.domain.ai.chat.application.rag.DocumentSearcher;
 import com.example.surveyapp.domain.ai.chat.application.ChatService;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +45,7 @@ public class ChatServiceTest {
     private DocumentSearcher searcher;
 
     @Mock
-    private OauthReader oauthReader;
+    private UserReader oauthReader;
 
     @Test
     @DisplayName("기능_테스트_사용자가_질문하면_LLM_응답을_생성한다")

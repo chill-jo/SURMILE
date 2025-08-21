@@ -11,7 +11,7 @@ import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import com.example.surveyapp.domain.survey.infrastructure.QuestionReadEntity;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +27,7 @@ public class QuestionService {
     private final SurveyQueryService surveyQueryService;
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
-    private final OauthReader oauthReader;
+    private final UserReader oauthReader;
     private final AiModerationFacade aiModerationFacade;
 
     @Transactional

@@ -9,7 +9,7 @@ import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OptionsService {
 
-    private final OauthReader oauthReader;
+    private final UserReader oauthReader;
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyQueryService surveyQueryService;
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();

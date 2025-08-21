@@ -25,7 +25,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.PageSurveyR
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyResponseDto;
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyStatusResponseDto;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SurveyService {
 
-	private final OauthReader oauthReader;
+	private final UserReader oauthReader;
 	private final ApplicationEventPublisher eventPublisher;
 	private final SurveyRepository surveyRepository;
 	private final SurveyMapper surveyMapper;

@@ -8,7 +8,7 @@ import com.example.surveyapp.domain.product.domain.model.ProductPoints;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
 import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final OauthReader oauthReader;
+    private final UserReader oauthReader;
 
     /**
      * @param requestDto         생성 요청 DTO

@@ -17,7 +17,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.*;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +49,7 @@ public class SurveyServiceTest {
     private SurveyMapper surveyMapper;
 
     @Mock
-    private OauthReader oauthReader;
+    private UserReader oauthReader;
 
     @Mock
     private SurveyQueryService surveyQueryService;

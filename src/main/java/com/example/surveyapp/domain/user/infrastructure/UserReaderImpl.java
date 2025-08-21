@@ -6,13 +6,13 @@ import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class UserReaderImpl implements OauthReader {
+public class UserReaderImpl implements UserReader {
     private final UserRepository userRepository;
     private final BlackListRepository blackListRepository;
 
@@ -25,7 +25,6 @@ public class UserReaderImpl implements OauthReader {
             throw new UserException(UserErrorCode.IS_BLACKLIST);
         }
     }
-
 
     @Override
     public String usernameById(Long userId) {

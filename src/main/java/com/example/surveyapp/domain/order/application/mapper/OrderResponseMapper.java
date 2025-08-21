@@ -5,7 +5,7 @@ import com.example.surveyapp.domain.order.domain.model.Order;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
 import com.example.surveyapp.domain.order.presentation.dto.OrderResponseDto;
 import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OrderResponseMapper {
 
-    private final OauthReader oauthReader;
+    private final UserReader oauthReader;
     private final ProductFacade productFacade;
 
 

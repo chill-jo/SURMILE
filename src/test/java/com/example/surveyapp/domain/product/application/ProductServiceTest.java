@@ -8,7 +8,7 @@ import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
 import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
-import com.example.surveyapp.global.oauth.reader.OauthReader;
+import com.example.surveyapp.global.reader.UserReader;
 import com.example.surveyapp.global.response.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class ProductServiceTest {
     private ProductRepository productRepository;
 
     @Mock
-    private OauthReader oauthReader;
+    private UserReader oauthReader;
 
     @InjectMocks
     private ProductService productService;
