@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
 import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
-import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationSurveyResult;
 import com.example.surveyapp.domain.survey.application.facade.SurveyAnswerFacade;
 import com.example.surveyapp.domain.survey.application.mapper.SurveyMapper;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
