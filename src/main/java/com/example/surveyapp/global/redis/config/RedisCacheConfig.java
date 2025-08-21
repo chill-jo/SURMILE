@@ -34,7 +34,7 @@ public class RedisCacheConfig {
 		 */
 		// 저장될 캐시 데이터 설정
 		RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-			.computePrefixWith(cacheName -> cacheName + ":")
+			.computePrefixWith(cacheName -> "cache:" + cacheName + ":")
 			.serializeKeysWith(
 				RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
 			)
