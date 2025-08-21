@@ -1,7 +1,6 @@
-package com.example.surveyapp.domain.product.infrastructure;
+package com.example.surveyapp.domain.product.application;
 
 import com.example.surveyapp.domain.order.application.facade.ProductFacade;
-import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.exception.ProductErrorCode;
 import com.example.surveyapp.domain.product.exception.ProductException;
 import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
@@ -17,7 +16,7 @@ public class ProductFacadeImpl implements ProductFacade {
     private final ProductRepository productRepository;
     @Override
     public ProductInfoDto findProductInfo(Long id) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
         product.productPriceZeroOrThrow();
         product.getStatusStoppedSaleOrThrow();

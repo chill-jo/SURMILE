@@ -80,7 +80,7 @@ public class ProductService {
 
     @Transactional
     public ProductUpdateResponseDto updateProduct(Long id, ProductUpdateRequestDto requestDto) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ProductException(ProductErrorCode.NOT_FOUND_PRODUCT));
 
         product.changeStatus(product.getStatus());
