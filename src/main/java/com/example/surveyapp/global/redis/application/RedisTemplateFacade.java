@@ -8,4 +8,5 @@ public interface RedisTemplateFacade {
 
 	<T> T read(String key, Class<T> type);
 
+    <T> void delete(String key);
 }
