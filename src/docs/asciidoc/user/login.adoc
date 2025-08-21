@@ -1,0 +1,18 @@
+== Login API
+
+[example]
+`POST` 요청을 사용하여 로그인할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/user/login/http-request.adoc[]
+include::{snippets}/user/login/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/user/login/http-response.adoc[]
+include::{snippets}/user/login/response-fields.adoc[]
+====
