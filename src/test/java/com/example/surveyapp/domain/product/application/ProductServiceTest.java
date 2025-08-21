@@ -211,7 +211,7 @@ class ProductServiceTest {
         ProductUpdateRequestDto requestDto = new ProductUpdateRequestDto("변경된상품명", 2500L, "변경된설명", Status.ON_SALE);
 
 
-        when(productRepository.findById(id)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdAndIsDeletedFalse(id)).thenReturn(Optional.of(product));
         when(productRepository.existsByTitleAndIsDeletedFalse("변경된상품명")).thenReturn(false);
         // When
         //실행할 행동
@@ -219,7 +219,7 @@ class ProductServiceTest {
 
         // Then
         //검증 사항
-        verify(productRepository, times(1)).findById(id);
+        verify(productRepository, times(1)).findByIdAndIsDeletedFalse(id);
         assertThat(responseDto.getTitle()).isEqualTo("변경된상품명");
     }
 
