@@ -4,15 +4,20 @@ import com.example.surveyapp.config.generator.ProductFixtureGenerator;
 import com.example.surveyapp.config.testbase.DataJpaTestBase;
 import com.example.surveyapp.domain.product.domain.model.Product;
 import com.example.surveyapp.domain.product.domain.model.Status;
+import com.example.surveyapp.domain.product.infrastructure.ProductRepositoryImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ActiveProfiles("test")
 @DisplayName("repository: Product 레포지터리 테스트")
+@DataJpaTest
+@Import(ProductRepositoryImpl.class)
 public class ProductRepoTest extends DataJpaTestBase {
     @Autowired
     private ProductRepository productRepository;

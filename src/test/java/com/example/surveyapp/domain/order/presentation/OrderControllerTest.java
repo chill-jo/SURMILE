@@ -197,7 +197,7 @@ public class OrderControllerTest extends WebMvcTestBase {
         // Then
         //검증 사항
         verify(orderService, times(1)).readMyOrderList(anyInt(), anyInt(), anyLong());
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content[0].username").value("dohan2"))
                 .andExpect(jsonPath("$.data.content[1].username").value("dohan2"))
@@ -347,7 +347,7 @@ public class OrderControllerTest extends WebMvcTestBase {
         // Then
         //검증 사항
         verify(orderService, times(1)).readOneMyOrder(responseDto.getOrderId(), responseDto.getUserId());
-        actions.andDo(print())
+        actions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.orderNumber").value(responseDto.getOrderNumber()))
                 .andExpect(jsonPath("$.data.userId").value(responseDto.getUserId()))

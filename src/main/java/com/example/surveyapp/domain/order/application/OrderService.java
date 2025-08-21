@@ -72,15 +72,7 @@ public class OrderService {
         Order order = orderRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
 
-        //유저정보 조회
-        String username = userReader.usernameById(order.getUserId());
-
-        //상품정보 조회
-        OrderItem item = order.getOrderItem();
-        ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
-        String status = product.getStatus().getStatus();
-
-        return OrderResponseDto.from(order,username,status);
+        return orderResponseMapper.toDto(order);
 
     }
 
@@ -101,12 +93,7 @@ public class OrderService {
 
         order.validateOrderer(userId);
 
-        OrderItem item = order.getOrderItem();
-        String username = userReader.usernameById(order.getUserId());
-        ProductInfoDto product = productFacade.findProductInfo(item.getProductId());
-        String status = product.getStatus().getStatus();
-
-        return OrderResponseDto.from(order,username,status);
+        return orderResponseMapper.toDto(order);
     }
 
     @Transactional
@@ -115,10 +102,7 @@ public class OrderService {
         Order order = orderRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
 
-        if (!order.getUserId().equals(userId)) {
-            throw new OrderException(OrderErrorCode.NOT_SAME_ORDER_USER);
-        }
-
+        order.validateOrderer(userId);
         order.delete();
 
     }
