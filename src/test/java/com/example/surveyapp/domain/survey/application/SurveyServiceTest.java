@@ -82,8 +82,6 @@ public class SurveyServiceTest {
         );
         Survey savedSurvey = Survey.of(userId, surveyInfo);
         SurveyResponseDto responseDto = mock(SurveyResponseDto.class);
-        AiModerationResult approvedTitle = AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED);
-        AiModerationResult approvedDesc = AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED);
 
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         when(requestDto.getTitle()).thenReturn("테스트설문제목");
@@ -92,8 +90,10 @@ public class SurveyServiceTest {
         when(surveyRepository.save(any(Survey.class))).thenReturn(savedSurvey);
         when(userReader.validateUserRoleToSurveyor(userId)).thenReturn(true);
         when(surveyMapper.toResponseDto(savedSurvey)).thenReturn(responseDto);
-        when(aiModerationFacade.checkSurveyModeration(eq("테스트설문제목"), eq("테스트설문내용")))
-                .thenReturn(AiModerationSurveyResult.of(approvedTitle, approvedDesc));
+        when(aiModerationFacade.checkTitleModeration(eq("테스트설문제목")))
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
+        when(aiModerationFacade.checkDescriptionModeration(eq("테스트설문내용")))
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         // when
         SurveyResponseDto result = surveyService.createSurvey(userId, requestDto);
@@ -193,16 +193,16 @@ public class SurveyServiceTest {
 
         Survey surveyMock = mock(Survey.class);
         SurveyInfo surveyInfoMock = mock(SurveyInfo.class);
-        AiModerationResult approvedTitle = AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED);
-        AiModerationResult approvedDesc = AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED);
 
         doNothing().when(userReader).validateUserIdOrThrow(userId);
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyMock.isNotStarted()).thenReturn(true);
         when(surveyMock.isUserSurveyCreator(anyLong())).thenReturn(true);
         when(surveyMock.getSurveyInfo()).thenReturn(surveyInfoMock);
-        when(aiModerationFacade.checkSurveyModeration(eq("테스트설문제목수정"), eq("테스트설문내용수정")))
-                .thenReturn(AiModerationSurveyResult.of(approvedTitle, approvedDesc));
+        when(aiModerationFacade.checkTitleModeration(eq("테스트설문제목")))
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
+        when(aiModerationFacade.checkDescriptionModeration(eq("테스트설문내용")))
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         doNothing().when(surveyMock).updateSurveyInfo(any(SurveyInfo.class));
 

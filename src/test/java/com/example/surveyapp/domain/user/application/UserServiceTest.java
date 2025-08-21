@@ -38,9 +38,6 @@ public class UserServiceTest {
     @Mock
     private AiModerationFacade aiModerationFacade;
 
-    @Mock
-    private AiModerationResult aiModerationResult;
-
     @Test
     @DisplayName("기능_테스트_회원_정보를_조회한다")
     void 회원_정보를_조회한다(){
@@ -69,7 +66,7 @@ public class UserServiceTest {
         when(userRepository.existsByNickname(requestDto.getNickname())).thenReturn(false);
         when(passwordEncoder.encode(requestDto.getPassword())).thenReturn("encodedPw123!");
         when(aiModerationFacade.checkNicknameModeration(eq("newNickname")))
-                .thenReturn(aiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
+                .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         // When
         UserResponseDto updatedUser = userService.updateMyInfo(ID, requestDto);
