@@ -1,7 +1,7 @@
 package com.example.surveyapp.domain.ai.chat.application;
 
 import com.example.surveyapp.domain.ai.chat.prompt.ChatPromptTemplate;
-import com.example.surveyapp.domain.ai.chat.rag.DocumentSearcher;
+import com.example.surveyapp.domain.ai.chat.application.rag.DocumentSearcher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
