@@ -35,7 +35,7 @@ public class LockAop {
         LockAnnotation lockAnnotation = method.getAnnotation(LockAnnotation.class);
 
         String lockKeyExpression = lockAnnotation.key();
-        String lockKey = parseKey(lockKeyExpression, signature, joinPoint.getArgs());
+        String lockKey = "lock:" + parseKey(lockKeyExpression, signature, joinPoint.getArgs());
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
