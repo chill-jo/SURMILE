@@ -1,0 +1,19 @@
+== Withdraw API
+
+[example]
+`DELETE` 요청을 사용하여 회원탈퇴 할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/user/withdraw/http-request.adoc[]
+include::{snippets}/user/withdraw/request-headers.adoc[]
+include::{snippets}/user/withdraw/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/user/withdraw/http-response.adoc[]
+include::{snippets}/user/withdraw/response-fields.adoc[]
+====

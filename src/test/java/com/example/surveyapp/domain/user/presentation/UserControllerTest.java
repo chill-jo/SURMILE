@@ -147,6 +147,211 @@ public class UserControllerTest extends WebMvcTestBase {
                 ))
         ;
     }
+
+    @Test
+    @DisplayName("기능_테스트_User_회원가입")
+    public void User_회원가입에_성공한다() throws Exception {
+        // Given
+        RegisterRequestDto dto = new RegisterRequestDto(
+                "new@example.com",
+                "newPw123!",
+                "newPw123!",
+                "newName",
+                "newNick",
+                UserRoleEnum.SURVEYEE
+        );
+
+        doNothing().when(userService).register(any(RegisterRequestDto.class));
+
+        // When
+        ResultActions resultActions = mockMvc.perform(post("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)));
+
+        // Then
+        verify(userService, times(1)).register(any(RegisterRequestDto.class));
+
+        resultActions.andExpect(status().isOk())
+                .andDo(document("user/register",
+                        requestFields(
+                                fieldWithPath("email").type(JsonFieldType.STRING).description("유저 이메일"),
+                                fieldWithPath("password").type(JsonFieldType.STRING).description("유저 비밀번호"),
+                                fieldWithPath("confirmPassword").type(JsonFieldType.STRING).description("유저 비밀번호 확인"),
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("유저 이름"),
+                                fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
+                                fieldWithPath("userRole").type(JsonFieldType.STRING).description("유저 회원유형"),
+                                fieldWithPath("validUserRole").type(JsonFieldType.BOOLEAN).description("유저 회원유형 검증")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("기능_테스트_User_로그인")
+    public void User_로그인에_성공한다() throws Exception {
+        // Given
+        LoginRequestDto dto = new LoginRequestDto(
+                "new@example.com",
+                "newPw123!"
+        );
+
+        LoginResponseDto responseDto = new LoginResponseDto(
+                "1L",
+                "newName",
+                "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyIiwicm9sZSI6IlNVUlZFWUVFIiwiaWF0IjoxNzU1NzYzMTA3LCJleHAiOjE3NTU3NjQ5MDd9.mlnLEu99PjVJ2qprW0e_QJ7qr7rHY_dEdfH5ewv8EHd10VQyvaNeENAkepyalqtr",
+                "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzU1NzYzMTA3LCJleHAiOjE3NTY5NzI3MDd9.Jwk3IDb8VsEpCCOjVB09bmHwf0GWNo644DvFqIuG3e2GyoGLrCG4lakzqpHJv7U5"
+        );
+
+        when(userService.login(any(LoginRequestDto.class))).thenReturn(responseDto);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(post("/api/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)));
+
+        // Then
+        verify(userService, times(1)).login(any(LoginRequestDto.class));
+
+        resultActions.andExpect(status().isOk())
+                .andDo(document("user/login",
+                        requestFields(
+                                fieldWithPath("email").type(JsonFieldType.STRING).description("유저 이메일"),
+                                fieldWithPath("password").type(JsonFieldType.STRING).description("유저 비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.id").type(JsonFieldType.STRING).description("유저 ID"),
+                                fieldWithPath("data.name").type(JsonFieldType.STRING).description("유저 이름"),
+                                fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("Access Token"),
+                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("Refresh Token")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @WithCustomMockUser(id = 1, role = UserRoleEnum.SURVEYEE)
+    @DisplayName("기능_테스트_User_로그아웃")
+    public void User_로그아웃에_성공한다() throws Exception {
+        // Given
+        String accessToken = "Bearer test-token";
+
+        doNothing().when(userService).logout(eq(accessToken));
+
+        // When
+        ResultActions resultActions = mockMvc.perform(post("/api/logout")
+                .header(HttpHeaders.AUTHORIZATION, accessToken));
+
+        // Then
+        verify(userService, times(1)).logout(eq(accessToken));
+
+        resultActions.andExpect(status().isOk())
+                .andDo(document("user/logout",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value(accessToken))
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @WithCustomMockUser(id = 1, role = UserRoleEnum.SURVEYEE)
+    @DisplayName("기능_테스트_User_토큰_재발급")
+    public void User_토큰_재발급에_성공한다() throws Exception {
+        // Given
+        String refreshToken = "Bearer test-token";
+
+        LoginResponseDto responseDto = new LoginResponseDto(
+                "1L",
+                "newName",
+                "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyIiwicm9sZSI6IlNVUlZFWUVFIiwiaWF0IjoxNzU1NzYzMTA3LCJleHAiOjE3NTU3NjQ5MDd9.mlnLEu99PjVJ2qprW0e_QJ7qr7rHY_dEdfH5ewv8EHd10VQyvaNeENAkepyalqtr",
+                "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzU1NzYzMTA3LCJleHAiOjE3NTY5NzI3MDd9.Jwk3IDb8VsEpCCOjVB09bmHwf0GWNo644DvFqIuG3e2GyoGLrCG4lakzqpHJv7U5"
+        );
+
+        when(userService.refresh(eq(refreshToken))).thenReturn(responseDto);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(post("/api/refresh")
+                .header(HttpHeaders.AUTHORIZATION, refreshToken));
+
+        // Then
+        verify(userService, times(1)).refresh(eq(refreshToken));
+
+        resultActions.andExpect(status().isOk())
+                .andDo(document("user/refresh",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value(refreshToken))
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data.id").type(JsonFieldType.STRING).description("유저 ID"),
+                                fieldWithPath("data.name").type(JsonFieldType.STRING).description("유저 이름"),
+                                fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("Access Token"),
+                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("Refresh Token")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @WithCustomMockUser(id = 1, role = UserRoleEnum.SURVEYEE)
+    @DisplayName("기능_테스트_User_회원탈퇴")
+    public void User_회원탈퇴에_성공한다() throws Exception {
+        // Given
+        Long userId = 1L;
+        WithdrawRequestDto dto = new WithdrawRequestDto();
+        ReflectionTestUtils.setField(dto, "password", "newPw123!");
+
+        doNothing().when(userService).withdraw(eq(userId), any(WithdrawRequestDto.class));
+        // When
+        ResultActions resultActions = mockMvc.perform(delete("/api/withdraw")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)));
+
+        // Then
+        verify(userService, times(1)).withdraw(eq(userId), any(WithdrawRequestDto.class));
+
+        resultActions.andExpect(status().isOk())
+                .andDo(document("user/withdraw",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("JWT 인증 토큰 (Bearer + 토큰 값)")
+                                        .attributes(key("format").value("Bearer {jwt_token}"))
+                        ),
+                        requestFields(
+                                fieldWithPath("password").type(JsonFieldType.STRING).description("유저 패스워드")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                        )
+                ))
+        ;
+    }
+
     @Test
     @WithCustomMockUser(id = 1, role = UserRoleEnum.SURVEYEE)
     @DisplayName("기능_테스트_User_참여자_기초정보등록_선택지_조회된다")
@@ -202,10 +407,6 @@ public class UserControllerTest extends WebMvcTestBase {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDtoList)));
-
-        // Then
-//        verify(userService, times(1))
-//                .saveBaseDatas(eq(userId), any(BaseDataListRequestDto.class));
 
         resultActions.andExpect(status().isOk())
                 .andDo(document("user/save-base-datas",
