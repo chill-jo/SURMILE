@@ -23,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -136,7 +135,7 @@ class AdminServiceTest {
         UserDto dto = mock(UserDto.class);
 
         when(userFacade.getUserDto(userId)).thenReturn(dto);
-        when(blackListRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(blackListRepository.findByUserId(userId)).thenReturn(null);
         when(blackListRepository.save(any(BlackList.class))).thenReturn(blackList);
 
         // when
@@ -173,7 +172,7 @@ class AdminServiceTest {
         UserDto userDto = mock(UserDto.class);
         when(userFacade.getUserDto(userId)).thenReturn(userDto);
 
-        when(blackListRepository.findByUserId(userId)).thenReturn(Optional.of(blackList));
+        when(blackListRepository.findByUserId(userId)).thenReturn(blackList);
 
         // when & then
         assertThatThrownBy(() -> adminService.addBlackList(userId))
@@ -191,7 +190,7 @@ class AdminServiceTest {
         Long userId = 1L;
         UserDto dto = mock(UserDto.class);
         when(userFacade.getUserDto(userId)).thenReturn(dto);
-        when(blackListRepository.findByUserId(userId)).thenReturn(Optional.of(blackList));
+        when(blackListRepository.findByUserId(userId)).thenReturn(null);
 
         // when
         UserDto result = adminService.deleteBlackList(userId);
@@ -228,7 +227,8 @@ class AdminServiceTest {
         UserDto dto = mock(UserDto.class);
         when(userFacade.getUserDto(userId)).thenReturn(dto);
 
-        when(blackListRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        doThrow(new AdminException(AdminErrorCode.IS_NOT_BLACKLIST))
+                .when(blackListRepository).findByUserId(userId);
 
 
         // when & then

@@ -48,14 +48,19 @@ public class RedisTest {
 	@Test
 	@DisplayName("기능: 로그아웃을 성공한다")
 	public void success_logout() {
+
 		//Given
-		String accessToken = "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyIiwicm9sZSI6IlNVUlZFWU9SIiwiaWF0IjoxNzU1NjgyMzQwLCJleHAiOjE3NTU2ODQxNDB9.cz32waE8lqiQQ7sK6igrNVpZzyNZ4_1iVm_OACeWIOrTsAsBrTI9N9U_t6u2eEg6";
+        RegisterRequestDto registerRequestDto = new RegisterRequestDto("test2@example.com", "Password!234", "Password!234", "test2", "test2", UserRoleEnum.SURVEYOR);
+        userService.register(registerRequestDto);
+        LoginRequestDto requestDto = new LoginRequestDto("test2@example.com", "Password!234");
+        LoginResponseDto loginResponseDto = userService.login(requestDto);
+		String accessToken = loginResponseDto.getAccessToken();
 
 		//When
 		userService.logout(accessToken);
 
 		//Then
-		String actual = redisTemplateFacade.read("accessToken:2", String.class);
+		String actual = redisTemplateFacade.read("accessToken:" + loginResponseDto.getId(), String.class);
 		assertThat("Bearer " + actual).isEqualTo(accessToken);
 	}
 
@@ -64,9 +69,9 @@ public class RedisTest {
 	public void success_refreshToken() {
 
 		//Given
-        RegisterRequestDto registerRequestDto = new RegisterRequestDto("test2@example.com", "Password!234", "Password!234", "test2", "test2", UserRoleEnum.SURVEYOR);
+        RegisterRequestDto registerRequestDto = new RegisterRequestDto("test3@example.com", "Password!234", "Password!234", "test3", "test3", UserRoleEnum.SURVEYOR);
         userService.register(registerRequestDto);
-        LoginRequestDto requestDto = new LoginRequestDto("test2@example.com", "Password!234");
+        LoginRequestDto requestDto = new LoginRequestDto("test3@example.com", "Password!234");
         LoginResponseDto loginResponseDto = userService.login(requestDto);
 		String refreshToken = loginResponseDto.getRefreshToken();
 
