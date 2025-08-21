@@ -19,10 +19,21 @@ jobs:
       - name: 파일 전송을 위한 디렉토리 생성
         run: mkdir ./survey-app
 
-      - name: Fix Docker permissions // 이미 설치 되어 있는 도커 사용.
+      - name: Fix Docker permissions # 이미 설치 되어 있는 도커 사용.
         run: |
           sudo chmod 666 /var/run/docker.sock
           docker info
+
+      - name: ENV 파일 생성
+        run: |
+          echo "${{ secrets.ENV_PROPERTIES }}" > ./env
+          echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
+
+      - name: Dockerfile 생성
+        run: mv ./Dockerfile ./survey-app
+
+      - name: docker-compose.yml 파일 생성
+        run: mv ./docker-compose.yml ./survey-app
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -33,19 +44,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
-
-      - name: ENV 파일 생성
-        run: |
-          echo "${{ secrets.ENV_PROPERTIES }}" > ./env
-          echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
-        
-
-      - name: Dockerfile 생성
-        run: mv ./Dockerfile ./survey-app
-
-      - name: docker-compose.yml 파일 생성
-        run: mv ./docker-compose.yml ./survey-app
 
       - name: Gradle build
         run: ./gradlew clean build
