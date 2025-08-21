@@ -14,7 +14,7 @@ spring:
       port: ${REDIS_PORT}
       cache-access-token: accessToken
       cache-refresh-token: refreshToken
-      default-ttl-sec: 1000
+      default-ttl-sec: 86400
 
   datasource:
     url: ${DB_URL}

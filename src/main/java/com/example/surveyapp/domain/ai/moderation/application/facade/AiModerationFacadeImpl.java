@@ -3,7 +3,6 @@ package com.example.surveyapp.domain.ai.moderation.application.facade;
 import com.example.surveyapp.domain.ai.moderation.application.AiModerationService;
 import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationTargetType;
 import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
-import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationSurveyResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +17,13 @@ public class AiModerationFacadeImpl implements AiModerationFacade {
     }
 
     @Override
-    public AiModerationSurveyResult checkSurveyModeration(String title, String description) {
-        AiModerationResult titleRes = aiModerationService.moderate(AiModerationTargetType.SURVEY_TITLE, title);
-        AiModerationResult descRes  = aiModerationService.moderate(AiModerationTargetType.SURVEY_DESCRIPTION, description);
+    public AiModerationResult checkTitleModeration(String title) {
+        return aiModerationService.moderate(AiModerationTargetType.SURVEY_TITLE, title);
+    }
 
-        return AiModerationSurveyResult.of(titleRes, descRes);
+    @Override
+    public AiModerationResult checkDescriptionModeration(String description){
+        return aiModerationService.moderate(AiModerationTargetType.SURVEY_DESCRIPTION, description);
     }
 
     @Override

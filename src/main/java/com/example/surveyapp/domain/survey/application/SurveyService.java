@@ -1,5 +1,7 @@
 package com.example.surveyapp.domain.survey.application;
 
+import com.example.surveyapp.global.redis.application.RedisTemplateFacade;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -39,12 +41,14 @@ public class SurveyService {
 	private final SurveyValidator surveyValidator = new SurveyValidator();
 	private final SurveyAnswerFacade surveyAnswerFacade;
 	private final AiModerationFacade aiModerationFacade;
+    private final RedisTemplateFacade redisTemplateFacade;
 
-	@Transactional
+    @Transactional
 	public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
 
 		userReader.validateUserIdOrThrow(userId);
-		aiModerationFacade.checkSurveyModeration(requestDto.getTitle(), requestDto.getDescription());
+		aiModerationFacade.checkTitleModeration(requestDto.getTitle());
+		aiModerationFacade.checkDescriptionModeration(requestDto.getDescription());
 
 		SurveyInfo surveyInfo = surveyMapper.toSurveyInfo(requestDto);
 
@@ -80,7 +84,8 @@ public class SurveyService {
 		userReader.validateUserIdOrThrow(userId);
 		Survey survey = surveyQueryService.findSurvey(surveyId);
 		surveyValidator.validateUpdatable(userId, survey);
-		aiModerationFacade.checkSurveyModeration(requestDto.getTitle(), requestDto.getDescription());
+		aiModerationFacade.checkTitleModeration(requestDto.getTitle());
+		aiModerationFacade.checkDescriptionModeration(requestDto.getDescription());
 
 		SurveyInfo oldSurveyInfo = survey.getSurveyInfo();
 		SurveyInfo newSurveyInfo = requestDto.toNewSurveyInfo(oldSurveyInfo);
@@ -91,6 +96,7 @@ public class SurveyService {
 	}
 
 	@Transactional
+    @CacheEvict(cacheNames = "survey", key = "#surveyId")
 	//설문 상태 변경(NOT_STARTED -> IN_PROGRESS, IN_PROGRESS -> PAUSED, PAUSED -> IN_PROGRESS, IN_PROGRESS -> DONE)
 	public SurveyStatusResponseDto updateSurveyStatus(Long userId, Long surveyId,
 		SurveyStatusUpdateRequestDto requestDto) {

@@ -17,6 +17,7 @@ public class RedisTemplateFacadeImpl implements RedisTemplateFacade {
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
 
+    @Override
 	public <T> void write(String key, T value, Duration ttl) {
 		try {
 			String jsonString = objectMapper.writeValueAsString(value);
@@ -26,6 +27,7 @@ public class RedisTemplateFacadeImpl implements RedisTemplateFacade {
 		}
 	}
 
+    @Override
 	public <T> T read(String key, Class<T> type) {
 		String jsonString = redisTemplate.opsForValue().get(key);
 
@@ -39,6 +41,11 @@ public class RedisTemplateFacadeImpl implements RedisTemplateFacade {
 			throw new RuntimeException(key + " : " + type.getName());
 		}
 	}
+
+    @Override
+    public void delete(String key) {
+        redisTemplate.delete(key);
+    }
 
 	//    @Override
 	//    @Cacheable(cacheNames = "refreshToken", key = "#userId")

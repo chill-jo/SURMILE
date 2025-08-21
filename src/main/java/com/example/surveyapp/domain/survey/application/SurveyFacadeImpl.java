@@ -30,13 +30,11 @@ public class SurveyFacadeImpl implements SurveyFacade {
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
 
     public Survey findSurvey(Long surveyId) {
-        return surveyRepository.findByIdAndIsDeletedFalse(surveyId).orElseThrow(
-                () -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
+        return surveyRepository.findByIdAndIsDeletedFalse(surveyId);
     }
 
     public Survey findByIdAndIsDeletedFalseWithPessimisticLock(Long surveyId){
-        return surveyRepository.findByIdAndIsDeletedFalseWithPessimisticLock(surveyId).orElseThrow(
-                () -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
+        return surveyRepository.findByIdAndIsDeletedFalseWithPessimisticLock(surveyId);
     }
 
     public void validateAndReserveSlot(Long surveyId,Long count) {

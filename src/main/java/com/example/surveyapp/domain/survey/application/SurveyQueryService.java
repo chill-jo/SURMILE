@@ -16,12 +16,10 @@ public class SurveyQueryService {
     private final SurveyRepository surveyRepository;
 
     public Survey findSurvey(Long surveyId){
-        return surveyRepository.findByIdAndIsDeletedFalse(surveyId)
-                .orElseThrow(() -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
+        return surveyRepository.findByIdAndIsDeletedFalse(surveyId);
     }
 
     public Survey findSurveyWithQuestionsAndOptions(Long surveyId){
-        return surveyRepository.findSurveyWithQuestionsAndOptions(surveyId)
-                .orElseThrow(() -> new SurveyException(SurveyErrorCode.SURVEY_NOT_FOUND));
+        return surveyRepository.findSurveyWithQuestionsAndOptions(surveyId);
     }
 }
