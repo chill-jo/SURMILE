@@ -47,7 +47,7 @@ public class AdminService {
 
         UserDto userDto = userFacade.getUserDto(userId);
 
-        if (blackListRepository.findByUserId(userId).isPresent()) {
+        if (blackListRepository.findByUserId(userId) != null) {
             throw new AdminException(AdminErrorCode.IS_BLACKLIST);
         }
 
@@ -62,10 +62,7 @@ public class AdminService {
 
         UserDto userDto = userFacade.getUserDto(userId);
 
-        BlackList blackList = blackListRepository.findByUserId(userId).orElseThrow(
-                () -> new AdminException(AdminErrorCode.IS_NOT_BLACKLIST)
-        );
-
+        BlackList blackList = blackListRepository.findByUserId(userId);
         blackListRepository.delete(blackList);
 
         return userDto;
