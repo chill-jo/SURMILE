@@ -1,7 +1,7 @@
 package com.example.surveyapp.domain.survey.application;
 
 import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
-import com.example.surveyapp.domain.survey.domain.repository.QuestionReadRepository;
+import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
 import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionCreateRequestDto;
 import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionUpdateRequestDto;
 import com.example.surveyapp.domain.survey.presentation.dto.response.PageQuestionResponseDto;
@@ -11,7 +11,6 @@ import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import com.example.surveyapp.domain.survey.infrastructure.QuestionReadEntity;
-import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QuestionService {
 
-    private final QuestionReadRepository questionReadRepository;
+    private final QuestionRepository questionReadRepository;
     private final SurveyQueryService surveyQueryService;
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();

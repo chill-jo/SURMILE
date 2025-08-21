@@ -1,13 +1,11 @@
-package com.example.surveyapp.domain.surveyanswer.domain.repository;
+package com.example.surveyapp.domain.surveyanswer.infrastructure;
 
 import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface SurveyAnswerRepository{
-
-    SurveyAnswer save(SurveyAnswer surveyAnswer);
+public interface SurveyAnswerJpaRepository extends JpaRepository<SurveyAnswer, Long> {
 
     List<SurveyAnswer> findAllByUserIdOrderByCreatedAtDesc(Long userId);
 
