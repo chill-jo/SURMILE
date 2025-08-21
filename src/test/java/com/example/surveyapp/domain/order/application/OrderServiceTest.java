@@ -137,9 +137,7 @@ class OrderServiceTest {
         ReflectionTestUtils.setField(order, "id", 1L);
 
         when(orderRepository.findByIdAndIsDeletedFalse(order.getId())).thenReturn(Optional.of(order));
-        when(productFacade.findProductInfo(any()))
-                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
-
+        when(orderResponseMapper.toDto(order)).thenReturn(OrderResponseDto.from(order,any(),Status.ON_SALE.getStatus()));
         // When
         //실행할 행동
         OrderResponseDto orderResponseDto = orderService.readOneOrder(order.getId());
@@ -189,9 +187,7 @@ void 참여자_주문_단건_조회() {
     Order order = OrderFixtureGenerator.generateOrderFixture(userId);
 
     when(orderRepository.findByIdAndIsDeletedFalse(order.getId())).thenReturn(Optional.of(order));
-    doNothing().when(userReader).validateUserIdOrThrow(userId);
-    when(productFacade.findProductInfo(any()))
-            .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
+    when(orderResponseMapper.toDto(order)).thenReturn(OrderResponseDto.from(order,any(),Status.ON_SALE.getStatus()));
 
     // When
     //실행할 행동
@@ -199,9 +195,9 @@ void 참여자_주문_단건_조회() {
 
     // Then
     //검증 사항
-    verify(orderRepository).findByIdAndIsDeletedFalse(responseDto.getOrderId());
+    verify(orderRepository).findByIdAndIsDeletedFalse(order.getId());
 
-    assertThat(responseDto.getOrderNumber()).isEqualTo(responseDto.getOrderNumber());
+    assertThat(responseDto.getOrderNumber()).isEqualTo(order.getOrderNumber().getValue());
 
 }
 
