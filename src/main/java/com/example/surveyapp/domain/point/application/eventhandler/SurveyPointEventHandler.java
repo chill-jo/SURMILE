@@ -1,8 +1,8 @@
 package com.example.surveyapp.domain.point.application.eventhandler;
 
 import com.example.surveyapp.domain.point.application.PointEarnRedeemService;
-import com.example.surveyapp.domain.point.domain.event.PointRedeemFailEvent;
-import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
+import com.example.surveyapp.domain.point.domain.event.SurveyPointRedeemFailedEvent;
+import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
 import com.example.surveyapp.domain.survey.domain.event.SurveyCreateEvent;
 import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyAnswerEvent;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class SurveyPointEventHandler {
                     event.getSurveyId(), e.getMessage());
 
             eventPublisher.publishEvent(
-                new PointRedeemFailEvent(
+                new SurveyPointRedeemFailedEvent(
                         event.getUserId(),
                         event.getSurveyId()
                 )

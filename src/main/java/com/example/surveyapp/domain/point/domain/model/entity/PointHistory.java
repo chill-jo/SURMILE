@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.point.domain.model.entity;
 
-import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
+import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
 import com.example.surveyapp.domain.point.domain.model.enums.PointType;
 import com.example.surveyapp.domain.point.domain.model.enums.Target;
 import com.example.surveyapp.global.config.entity.BaseEntity;

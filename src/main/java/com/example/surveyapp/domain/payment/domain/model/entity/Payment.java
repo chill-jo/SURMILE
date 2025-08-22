@@ -1,9 +1,9 @@
-package com.example.surveyapp.domain.point.domain.model.entity;
+package com.example.surveyapp.domain.payment.domain.model.entity;
 
-import com.example.surveyapp.domain.point.domain.model.entity.vo.Money;
-import com.example.surveyapp.domain.point.domain.model.enums.Method;
-import com.example.surveyapp.domain.point.domain.model.enums.TargetType;
-import com.example.surveyapp.domain.point.domain.model.enums.PointStatus;
+import com.example.surveyapp.domain.payment.domain.model.vo.Money;
+import com.example.surveyapp.domain.payment.domain.model.enums.Method;
+import com.example.surveyapp.domain.payment.domain.model.enums.TargetType;
+import com.example.surveyapp.domain.payment.domain.model.enums.PointStatus;
 import com.example.surveyapp.global.config.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -55,5 +55,13 @@ public class Payment extends BaseEntity {
                 .method(method)
                 .targetType(targetType)
                 .build();
+    }
+
+    public void confirm(){
+        this.pointStatus = PointStatus.CONFIRM;
+    }
+
+    public void fail(){
+        this.pointStatus = PointStatus.FAILED;
     }
 }

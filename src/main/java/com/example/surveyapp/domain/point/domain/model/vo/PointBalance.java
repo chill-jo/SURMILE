@@ -1,8 +1,7 @@
-package com.example.surveyapp.domain.point.domain.model.entity.vo;
+package com.example.surveyapp.domain.point.domain.model.vo;
 
 import com.example.surveyapp.domain.point.exception.PointErrorCode;
 import com.example.surveyapp.domain.point.exception.PointException;
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
