@@ -1,12 +1,11 @@
 package com.example.surveyapp.domain.point.application;
 
 import com.example.surveyapp.domain.order.exception.OrderException;
-import com.example.surveyapp.domain.point.domain.event.PointChargeSucceededEvent;
-import com.example.surveyapp.domain.point.domain.event.PointRedeemSucceededEvent;
-import com.example.surveyapp.domain.point.domain.event.SurveyPointRedeemSucceededEvent;
+import com.example.surveyapp.domain.point.domain.event.*;
 import com.example.surveyapp.domain.point.domain.model.entity.PointOutbox;
 import com.example.surveyapp.domain.point.domain.model.entity.PointOutboxEnum;
 import com.example.surveyapp.domain.point.domain.repository.PointOutboxRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,19 +28,12 @@ public class PointOutboxScheduler {
     @Scheduled(fixedDelay = 10_000)
     @Transactional
     public void publishOutboxEvents() throws Exception {
-        List<PointOutbox> unpublished = pointOutboxRepository.findByStatusAndPublished(PointOutboxEnum.READY.READY, false);
+        List<PointOutbox> unpublished = pointOutboxRepository.findByStatusAndPublished(PointOutboxEnum.READY, false);
 
         for (PointOutbox pointOutbox : unpublished) {
             try {
-                if (pointOutbox.getAggregateType().equals("Order")){
-                    eventPublisher.publishEvent(objectMapper.readValue(pointOutbox.getPayload(), PointRedeemSucceededEvent.class));
-                }
-                if (pointOutbox.getAggregateType().equals("Survey")) {
-                    eventPublisher.publishEvent(objectMapper.readValue(pointOutbox.getPayload(), SurveyPointRedeemSucceededEvent.class));
-                }
-                if (pointOutbox.getAggregateType().equals("Payment")) {
-                    eventPublisher.publishEvent(objectMapper.readValue(pointOutbox.getPayload(), PointChargeSucceededEvent.class));
-                }
+
+                eventPublisher.publishEvent(mapEventByAggregateType(pointOutbox));
 
                 pointOutbox.markPublished();
 
@@ -51,5 +43,29 @@ public class PointOutboxScheduler {
             pointOutboxRepository.save(pointOutbox);
         }
 
+    }
+
+    private Object mapEventByAggregateType(PointOutbox pointOutbox) throws JsonProcessingException {
+        if(pointOutbox.getAggregateType().equals("Order-Success")){
+            return objectMapper.readValue(pointOutbox.getPayload(), PointRedeemSucceededEvent.class);
+        }
+        if(pointOutbox.getAggregateType().equals("Survey-Success")){
+            return objectMapper.readValue(pointOutbox.getPayload(), SurveyPointRedeemSucceededEvent.class);
+        }
+        if (pointOutbox.getAggregateType().equals("Payment-Success")) {
+            return objectMapper.readValue(pointOutbox.getPayload(), PointChargeSucceededEvent.class);
+        }
+        if(pointOutbox.getAggregateType().equals("Order-Fail")){
+            return objectMapper.readValue(pointOutbox.getPayload(), PointRedeemFailedEvent.class);
+        }
+        if(pointOutbox.getAggregateType().equals("Survey-Fail")){
+            return objectMapper.readValue(pointOutbox.getPayload(), SurveyPointRedeemFailedEvent.class);
+        }
+        if(pointOutbox.getAggregateType().equals("Payment-Fail")){
+            return objectMapper.readValue(pointOutbox.getPayload(), PointChargeFailedEvent.class);
+        }
+        else{
+            return null;
+        }
     }
 }
