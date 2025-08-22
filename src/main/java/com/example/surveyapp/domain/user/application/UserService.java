@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.example.surveyapp.domain.surveyanswer.exception.AnswerErrorCode;
 import com.example.surveyapp.domain.surveyanswer.exception.AnswerException;
+import com.example.surveyapp.domain.user.application.facade.UserModerationFacade;
 import com.example.surveyapp.domain.user.domain.model.UserOutbox;
 import com.example.surveyapp.domain.user.domain.repository.UserOutboxRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.user.application.provider.JwtProvider;
 import com.example.surveyapp.domain.user.domain.event.RegisterEvent;
 import com.example.surveyapp.domain.user.domain.model.CategoryEnum;
@@ -49,7 +49,7 @@ public class UserService {
 	private final UserBaseDataRepository userBaseDataRepository;
 	private final ApplicationEventPublisher eventPublisher;
 	private final RedisTemplateFacade redisTemplateFacade;
-	private final AiModerationFacade aiModerationFacade;
+	private final UserModerationFacade userModerationFacade;
 	private final JwtProvider jwtProvider;
 	private final ObjectMapper objectMapper;
 	private final UserOutboxRepository userOutboxRepository;
@@ -77,7 +77,7 @@ public class UserService {
 		if (!requestDto.getPassword().equals(requestDto.getConfirmPassword())) {
 			throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
 		}
-		aiModerationFacade.checkNicknameModeration(requestDto.getNickname());
+		userModerationFacade.checkNicknameModeration(null, null, requestDto.getNickname());
 
 		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
@@ -187,7 +187,7 @@ public class UserService {
 
 		validateDuplicatedUser(requestDto);
 
-		aiModerationFacade.checkNicknameModeration(requestDto.getNickname());
+		userModerationFacade.checkNicknameModeration(userId, requestDto.getEmail(), requestDto.getNickname());
 
 		user.updateInfo(requestDto.getEmail(), requestDto.getName(), requestDto.getNickname(), requestDto.getPassword(),
 			passwordEncoder);

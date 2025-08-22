@@ -26,7 +26,7 @@ public class UserRequestDto {
 
     @NotBlank
     @Size(min = 1, max = 10, message = "이름은 1~10자여야 합니다.")
-    @Pattern(regexp = "^[a-zA-Z]+$", message = "이름에는 숫자 또는 특수문자를 사용할 수 없습니다.")
+    @Pattern(regexp = "^[a-zA-Z가-힣]+$", message = "이름에는 숫자 또는 특수문자를 사용할 수 없습니다.")
     private String name;
 
     @NotBlank

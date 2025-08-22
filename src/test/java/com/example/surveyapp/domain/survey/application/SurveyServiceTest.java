@@ -3,7 +3,6 @@ package com.example.surveyapp.domain.survey.application;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
 import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
 import com.example.surveyapp.domain.survey.application.facade.SurveyAnswerFacade;
@@ -19,6 +18,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.*;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
+import com.example.surveyapp.domain.survey.application.facade.SurveyModerationFacade;
 import com.example.surveyapp.global.reader.UserReader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -70,7 +70,7 @@ public class SurveyServiceTest {
     private SurveyService surveyService;
 
     @Mock
-    private AiModerationFacade aiModerationFacade;
+    private SurveyModerationFacade surveyModerationFacade;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -99,9 +99,9 @@ public class SurveyServiceTest {
         when(surveyRepository.save(any(Survey.class))).thenReturn(savedSurvey);
         when(userReader.validateUserRoleToSurveyor(userId)).thenReturn(true);
         when(surveyMapper.toResponseDto(savedSurvey)).thenReturn(responseDto);
-        when(aiModerationFacade.checkTitleModeration(eq("테스트설문제목")))
+        when(surveyModerationFacade.checkTitleModeration(eq(userId), eq("테스트설문제목")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
-        when(aiModerationFacade.checkDescriptionModeration(eq("테스트설문내용")))
+        when(surveyModerationFacade.checkDescriptionModeration(eq(userId), eq("테스트설문내용")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
         when(objectMapper.writeValueAsString(any(SurveyCreateEvent.class))).thenReturn("json-payload");
 
@@ -209,9 +209,9 @@ public class SurveyServiceTest {
         when(surveyMock.isNotStarted()).thenReturn(true);
         when(surveyMock.isUserSurveyCreator(anyLong())).thenReturn(true);
         when(surveyMock.getSurveyInfo()).thenReturn(surveyInfoMock);
-        when(aiModerationFacade.checkTitleModeration(eq("테스트설문제목수정")))
+        when(surveyModerationFacade.checkTitleModeration(eq(userId), eq("테스트설문제목수정")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
-        when(aiModerationFacade.checkDescriptionModeration(eq("테스트설문내용수정")))
+        when(surveyModerationFacade.checkDescriptionModeration(eq(userId), eq("테스트설문내용수정")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         doNothing().when(surveyMock).updateSurveyInfo(any(SurveyInfo.class));
