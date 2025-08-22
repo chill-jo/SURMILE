@@ -2,16 +2,17 @@ package com.example.surveyapp.domain.payment.application;
 
 import com.example.surveyapp.domain.payment.domain.model.entity.Payment;
 import com.example.surveyapp.domain.payment.domain.model.vo.Money;
+import com.example.surveyapp.domain.payment.domain.repository.PaymentOutboxRepository;
 import com.example.surveyapp.domain.payment.domain.repository.PaymentRepository;
 import com.example.surveyapp.domain.payment.presentation.dto.request.PointChargeRequestDto;
 import com.example.surveyapp.domain.payment.presentation.dto.response.PointChargeResponseDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -24,7 +25,10 @@ public class PaymentServiceTest {
     private PaymentRepository paymentRepository;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private ObjectMapper objectMapper;
+
+    @Mock
+    private PaymentOutboxRepository paymentOutboxRepository;
 
     @InjectMocks
     private PaymentService paymentService;

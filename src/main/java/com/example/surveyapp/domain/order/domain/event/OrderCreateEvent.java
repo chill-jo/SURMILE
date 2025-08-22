@@ -1,15 +1,14 @@
 package com.example.surveyapp.domain.order.domain.event;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
-public class OrderCreateEvent {
-    private final Long orderId;
-
-    private final Long userId;
-
-    private final Long totalAmount;
-
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderCreateEvent{
+    private Long orderId;
+    private Long userId;
+    private Long totalAmount;
 }

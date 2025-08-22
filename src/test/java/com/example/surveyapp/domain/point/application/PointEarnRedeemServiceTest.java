@@ -2,12 +2,16 @@ package com.example.surveyapp.domain.point.application;
 
 import com.example.surveyapp.domain.point.domain.event.SurveyPointRedeemSucceededEvent;
 import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
+import com.example.surveyapp.domain.point.domain.model.entity.PointOutbox;
 import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
 import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
 import com.example.surveyapp.domain.point.domain.repository.PointHistoryRepository;
+import com.example.surveyapp.domain.point.domain.repository.PointOutboxRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.point.exception.PointErrorCode;
 import com.example.surveyapp.domain.point.exception.PointException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,9 +43,15 @@ public class PointEarnRedeemServiceTest {
     @InjectMocks
     private PointEarnRedeemService pointEarnRedeemService;
 
+    @Mock
+    private ObjectMapper objectMapper;
+
+    @Mock
+    private PointOutboxRepository pointOutboxRepository;
+
     @Test
     @DisplayName("기능_테스트_출제자_설문생성시_포인트가_차감된다")
-    void 출제자_설문생성시_포인트가_차감된다() {
+    void 출제자_설문생성시_포인트가_차감된다() throws JsonProcessingException {
         // given
         Long userId = 1L;
         PointBalance amount = PointBalance.of(2000L);
@@ -60,6 +70,7 @@ public class PointEarnRedeemServiceTest {
 
         PointHistory pointHistory = mock(PointHistory.class);
         when(pointHistoryRepository.save(any(PointHistory.class))).thenReturn(pointHistory);
+        when(objectMapper.writeValueAsString(any(SurveyPointRedeemSucceededEvent.class))).thenReturn("json-payload");
 
         // when
         pointEarnRedeemService.decreaseSurveyorPoint(userId, amount, surveyId);
@@ -67,8 +78,8 @@ public class PointEarnRedeemServiceTest {
         // then
         assertThat(point.getPointBalance().getValue()).isEqualTo(8000L);
 
-        verify(eventPublisher).publishEvent(any(SurveyPointRedeemSucceededEvent.class));
         verify(pointHistoryRepository, times(1)).save(any(PointHistory.class));
+        verify(pointOutboxRepository, times(1)).save(any(PointOutbox.class));
     }
 
     @Test

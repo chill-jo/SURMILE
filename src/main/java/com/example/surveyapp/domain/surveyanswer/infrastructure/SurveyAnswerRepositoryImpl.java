@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.surveyanswer.infrastructure;
 
-import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
+import com.example.surveyapp.domain.surveyanswer.domain.model.entity.SurveyAnswer;
 import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

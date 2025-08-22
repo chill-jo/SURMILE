@@ -2,10 +2,14 @@ package com.example.surveyapp.domain.point.domain.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class PointRedeemFailedEvent {
-    private final Long userId;
-    private final Long OrderId;
+    private Long targetId;
+
+    private Long userId;
+
 }
