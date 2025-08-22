@@ -90,9 +90,9 @@ public class SurveyServiceTest {
         when(surveyRepository.save(any(Survey.class))).thenReturn(savedSurvey);
         when(userReader.validateUserRoleToSurveyor(userId)).thenReturn(true);
         when(surveyMapper.toResponseDto(savedSurvey)).thenReturn(responseDto);
-        when(aiModerationFacade.checkTitleModeration(eq("테스트설문제목")))
+        when(aiModerationFacade.checkTitleModeration(eq(userId), eq("테스트설문제목")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
-        when(aiModerationFacade.checkDescriptionModeration(eq("테스트설문내용")))
+        when(aiModerationFacade.checkDescriptionModeration(eq(userId), eq("테스트설문내용")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         // when
@@ -199,9 +199,9 @@ public class SurveyServiceTest {
         when(surveyMock.isNotStarted()).thenReturn(true);
         when(surveyMock.isUserSurveyCreator(anyLong())).thenReturn(true);
         when(surveyMock.getSurveyInfo()).thenReturn(surveyInfoMock);
-        when(aiModerationFacade.checkTitleModeration(eq("테스트설문제목수정")))
+        when(aiModerationFacade.checkTitleModeration(eq(userId), eq("테스트설문제목수정")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
-        when(aiModerationFacade.checkDescriptionModeration(eq("테스트설문내용수정")))
+        when(aiModerationFacade.checkDescriptionModeration(eq(userId), eq("테스트설문내용수정")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         doNothing().when(surveyMock).updateSurveyInfo(any(SurveyInfo.class));

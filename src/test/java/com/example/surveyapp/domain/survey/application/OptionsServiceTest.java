@@ -65,7 +65,7 @@ public class OptionsServiceTest{
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
-        when(aiModerationFacade.checkOptionsModeration(eq("테스트선택지내용")))
+        when(aiModerationFacade.checkOptionsModeration(eq(userId), eq("테스트선택지내용")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         // when
@@ -158,7 +158,7 @@ public class OptionsServiceTest{
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
         when(questionMock.updateOption(optionId, requestDto.getNumber(), requestDto.getContent())).thenReturn(optionMock);
-        when(aiModerationFacade.checkOptionsModeration(eq("테스트질문지내용수정")))
+        when(aiModerationFacade.checkOptionsModeration(eq(userId), eq("테스트질문지내용수정")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         when(optionMock.getId()).thenReturn(optionId);

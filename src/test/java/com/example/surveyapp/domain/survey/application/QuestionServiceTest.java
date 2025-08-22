@@ -70,7 +70,7 @@ public class QuestionServiceTest {
 
         when(surveyQueryService.findSurvey(anyLong())).thenReturn(surveyMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
-        when(aiModerationFacade.checkQuestionModeration(eq("테스트질문내용")))
+        when(aiModerationFacade.checkQuestionModeration(eq(userId), eq("테스트질문내용")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
         Question question = Question.from(requestDto, surveyId);
 
