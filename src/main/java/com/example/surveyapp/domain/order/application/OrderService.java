@@ -13,7 +13,7 @@ import com.example.surveyapp.domain.order.application.facade.ProductFacade;
 import com.example.surveyapp.domain.order.domain.model.Order;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderItemPoints;
-import com.example.surveyapp.domain.order.domain.repository.OrderRepository;;
+import com.example.surveyapp.domain.order.domain.repository.OrderRepository;
 import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
 import com.example.surveyapp.global.reader.UserReader;
 import com.fasterxml.jackson.core.JsonProcessingException;
