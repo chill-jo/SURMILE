@@ -12,6 +12,7 @@ toc-title: 목차
 include::user/user.adoc[]
 include::admin/admin.adoc[]
 include::point/point.adoc[]
+include::payment/payment.adoc[]
 include::survey/survey.adoc[]
 include::question/question.adoc[]
 include::options/options.adoc[]
