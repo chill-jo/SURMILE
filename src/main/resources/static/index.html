@@ -37,13 +37,9 @@
 
 <h2>써마일에 오신 것을 환영합니다!</h2>
 
-<!-- 구글 OAuth 로그인 URL로 연결 -->
-<button class="google"
-        onclick="location.href='https://accounts.google.com/o/oauth2/v2/auth?client_id=327848907069-5vcnae83kl65h92emqnqhm36b2gtg70s.apps.googleusercontent.com&redirect_uri=http://localhost:8080/login/oauth2/code/google&response_type=code&scope=email%20profile'">
-    <!--        onclick="location.href='https://accounts.google.com/o/oauth2/v2/auth?client_id=327848907069-5vcnae83kl65h92emqnqhm36b2gtg70s.apps.googleusercontent.com&redirect_uri=https://surmile.o-r.kr/login/oauth2/code/google&response_type=code&scope=email%20profile'">-->
+<button class="google" onclick="location.href='/oauth2/authorization/google'">
     Google 로그인
 </button>
-
 
 <!-- Kakao 로그인 (테스트용) -->
 <button class="kakao" onclick="alert('Kakao 로그인 테스트')">
