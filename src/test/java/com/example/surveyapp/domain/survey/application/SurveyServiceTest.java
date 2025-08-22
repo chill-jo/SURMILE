@@ -10,14 +10,17 @@ import com.example.surveyapp.domain.survey.application.facade.SurveyAnswerFacade
 import com.example.surveyapp.domain.survey.application.mapper.SurveyMapper;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.event.SurveyCreateEvent;
+import com.example.surveyapp.domain.survey.domain.model.entity.SurveyOutbox;
 import com.example.surveyapp.domain.survey.domain.model.vo.SurveyInfo;
 import com.example.surveyapp.domain.survey.domain.model.vo.SurveyPoints;
+import com.example.surveyapp.domain.survey.domain.repository.SurveyOutboxRepository;
 import com.example.surveyapp.domain.survey.presentation.dto.request.*;
 import com.example.surveyapp.domain.survey.presentation.dto.response.*;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
 import com.example.surveyapp.global.reader.UserReader;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,6 +61,9 @@ public class SurveyServiceTest {
     private SurveyAnswerFacade surveyAnswerFacade;
 
     @Mock
+    private SurveyOutboxRepository surveyOutboxRepository;
+
+    @Mock
     private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
@@ -66,9 +72,12 @@ public class SurveyServiceTest {
     @Mock
     private AiModerationFacade aiModerationFacade;
 
+    @Mock
+    private ObjectMapper objectMapper;
+
     @Test
     @DisplayName("기능_설문 생성을 성공한다")
-    void 설문을_생성한다(){
+    void 설문을_생성한다() throws Exception {
         //Given
         Long userId = 1L;
         SurveyCreateRequestDto requestDto = mock(SurveyCreateRequestDto.class);
@@ -94,6 +103,7 @@ public class SurveyServiceTest {
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
         when(aiModerationFacade.checkDescriptionModeration(eq("테스트설문내용")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
+        when(objectMapper.writeValueAsString(any(SurveyCreateEvent.class))).thenReturn("json-payload");
 
         // when
         SurveyResponseDto result = surveyService.createSurvey(userId, requestDto);
@@ -103,8 +113,8 @@ public class SurveyServiceTest {
         verify(surveyMapper).toSurveyInfo(requestDto);
         verify(surveyRepository).save(any(Survey.class));
         verify(userReader).validateUserRoleToSurveyor(userId);
-        verify(eventPublisher).publishEvent(any(SurveyCreateEvent.class));
         verify(surveyMapper).toResponseDto(savedSurvey);
+        verify(surveyOutboxRepository, times(1)).save(any(SurveyOutbox.class));
 
         assertThat(responseDto).isEqualTo(result);
     }
