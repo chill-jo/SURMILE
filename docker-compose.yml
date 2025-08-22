@@ -36,7 +36,7 @@ services:
 
 #  certbot:
 #    image: certbot/certbot
-#    command: certonly --webroot --non-interactive --agree-tos --webroot-path=/var/www/certbot -d xn--hz2b19osld.o-r.kr
+#    command: certonly --webroot --non-interactive --agree-tos --webroot-path=/var/www/certbot -d surmile.o-r.kr
 #    volumes:
 #      - /home/ec2-user/certbot/conf:/etc/letsencrypt
 #      - /home/ec2-user/certbot/www:/var/www/certbot
