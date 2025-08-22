@@ -34,7 +34,7 @@ public class OptionsService {
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
-        aiModerationFacade.checkOptionsModeration(requestDto.getContent());
+        aiModerationFacade.checkOptionsModeration(userId, requestDto.getContent());
 
         surveyValidator.validateUpdatable(userId, survey);
 
@@ -78,7 +78,7 @@ public class OptionsService {
         Survey survey = surveyQueryService.findSurvey(surveyId);
         Question question = surveyQuestionService.getQuestionById(survey, questionId);
         surveyValidator.validateUpdatable(userId, survey);
-        aiModerationFacade.checkOptionsModeration(requestDto.getContent());
+        aiModerationFacade.checkOptionsModeration(userId, requestDto.getContent());
 
         Options option = question.updateOption(optionId, requestDto.getNumber(), requestDto.getContent());
 

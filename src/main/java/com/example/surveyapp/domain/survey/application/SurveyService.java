@@ -47,8 +47,8 @@ public class SurveyService {
 	public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
 
 		userReader.validateUserIdOrThrow(userId);
-		aiModerationFacade.checkTitleModeration(requestDto.getTitle());
-		aiModerationFacade.checkDescriptionModeration(requestDto.getDescription());
+		aiModerationFacade.checkTitleModeration(userId, requestDto.getTitle());
+		aiModerationFacade.checkDescriptionModeration(userId, requestDto.getDescription());
 
 		SurveyInfo surveyInfo = surveyMapper.toSurveyInfo(requestDto);
 
@@ -84,8 +84,8 @@ public class SurveyService {
 		userReader.validateUserIdOrThrow(userId);
 		Survey survey = surveyQueryService.findSurvey(surveyId);
 		surveyValidator.validateUpdatable(userId, survey);
-		aiModerationFacade.checkTitleModeration(requestDto.getTitle());
-		aiModerationFacade.checkDescriptionModeration(requestDto.getDescription());
+		aiModerationFacade.checkTitleModeration(userId, requestDto.getTitle());
+		aiModerationFacade.checkDescriptionModeration(userId, requestDto.getDescription());
 
 		SurveyInfo oldSurveyInfo = survey.getSurveyInfo();
 		SurveyInfo newSurveyInfo = requestDto.toNewSurveyInfo(oldSurveyInfo);

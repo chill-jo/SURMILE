@@ -36,7 +36,7 @@ public class QuestionService {
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
-        aiModerationFacade.checkQuestionModeration(requestDto.getContent());
+        aiModerationFacade.checkQuestionModeration(userId, requestDto.getContent());
 
         Question question = Question.from(requestDto, surveyId);
 
@@ -93,7 +93,7 @@ public class QuestionService {
 
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
-        aiModerationFacade.checkQuestionModeration(requestDto.getContent());
+        aiModerationFacade.checkQuestionModeration(userId, requestDto.getContent());
 
         Question question = surveyQuestionService.updateQuestion(
                 survey,

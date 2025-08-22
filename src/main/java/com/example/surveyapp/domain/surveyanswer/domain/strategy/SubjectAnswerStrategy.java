@@ -18,9 +18,10 @@ public class SubjectAnswerStrategy implements SurveyQuestionStrategy {
     @Override
     public void doSave(QuestionAnswerRequestDto questionAnswer, SurveyAnswer surveyAnswer, Long questionId) {
         String content = (String)questionAnswer.getAnswer();
+        Long userId = surveyAnswer.getUserId();
 
         if (content != null && !content.isBlank()) {
-            aiModerationFacade.checkTextAnswerModeration(content);
+            aiModerationFacade.checkTextAnswerModeration(userId, content);
         }
 
         surveyTextAnswerRepository.save(new SurveyTextAnswer(surveyAnswer.getId(), questionId, (String) questionAnswer.getAnswer()));

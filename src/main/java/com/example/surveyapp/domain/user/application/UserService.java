@@ -69,7 +69,7 @@ public class UserService {
 		if (!requestDto.getPassword().equals(requestDto.getConfirmPassword())) {
 			throw new UserException(UserErrorCode.NOT_MATCH_PASSWORD);
 		}
-		aiModerationFacade.checkNicknameModeration(requestDto.getNickname());
+		aiModerationFacade.checkNicknameModeration(null, null, requestDto.getNickname());
 
 		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
@@ -167,7 +167,7 @@ public class UserService {
 
 		validateDuplicatedUser(requestDto);
 
-		aiModerationFacade.checkNicknameModeration(requestDto.getNickname());
+		aiModerationFacade.checkNicknameModeration(userId, requestDto.getEmail(), requestDto.getNickname());
 
 		user.updateInfo(requestDto.getEmail(), requestDto.getName(), requestDto.getNickname(), requestDto.getPassword(),
 			passwordEncoder);
