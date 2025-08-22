@@ -1,0 +1,20 @@
+== Update Survey Status API
+
+[example]
+`PATCH` 요청을 사용하여 설문 상태를 수정할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/survey/update-survey-status/http-request.adoc[]
+include::{snippets}/survey/update-survey-status/request-headers.adoc[]
+include::{snippets}/survey/update-survey-status/path-parameters.adoc[]
+include::{snippets}/survey/update-survey-status/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/survey/update-survey-status/http-response.adoc[]
+include::{snippets}/survey/update-survey-status/response-fields.adoc[]
+====

@@ -1,4 +1,9 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: surveyApp-test
+
   datasource:
     url: jdbc:h2:mem:test_db;MODE=MySQL;
     driver-class-name: org.h2.Driver
@@ -14,7 +19,23 @@ spring:
         highlight_sql: true
         dialect: org.hibernate.dialect.H2Dialect
 
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      cache-access-token: accessToken
+      cache-refresh-token: refreshToken
+
 jwt:
   secret:
-    key: testSecretKeytestSecretKeytestSecretKeytestSecretKeytestSecretKeytestSecretKey
+    key: ${JWT_SECRET_KEY}
+  access-token:
+    expiration:
+      access-token: 1800000 # 30 minutes
+      refresh-token: 1209600000 # 14 days
+
 
