@@ -2,6 +2,7 @@ package com.example.surveyapp.config.testmockbeans;
 
 import static org.mockito.Mockito.*;
 
+import com.example.surveyapp.domain.payment.application.PaymentService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -43,6 +44,9 @@ public class TestMockBeans {
 	public PointService pointService() {
 		return mock(PointService.class);
 	}
+
+	@Bean
+	public PaymentService paymentService(){ return mock(PaymentService.class);}
 
 	@Bean
 	public ProductService productService() {
