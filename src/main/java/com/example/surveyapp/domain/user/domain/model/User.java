@@ -16,9 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-@ToString
 @Entity
 @Getter
 @Table(name = "users")
@@ -37,7 +35,7 @@ public class User extends BaseEntity {
 	@Column(nullable = false, length = 10)
 	private String name;
 
-	@Column(nullable = false, unique = true, length = 10)
+	@Column(nullable = false, unique = true)
 	private String nickname;
 
 	@Column(nullable = false)

@@ -7,6 +7,8 @@ import com.example.surveyapp.domain.admin.exception.AdminException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class BlackListRepositoryImpl implements BlackListRepository {
@@ -14,10 +16,8 @@ public class BlackListRepositoryImpl implements BlackListRepository {
     private final BlackListJpaRepository blackListJpaRepository;
 
     @Override
-    public BlackList findByUserId(Long userId) {
-        return blackListJpaRepository.findByUserId(userId).orElseThrow(
-                () -> new AdminException(AdminErrorCode.IS_NOT_BLACKLIST
-        ));
+    public Optional<BlackList> findByUserId(Long userId) {
+        return blackListJpaRepository.findByUserId(userId);
 
     }
 
