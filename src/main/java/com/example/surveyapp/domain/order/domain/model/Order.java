@@ -82,6 +82,6 @@ public class Order extends BaseEntity {
         if (orderStatus != OrderStatus.PENDING_PAYMENT) {
             throw new OrderException(OrderErrorCode.FAILED_ORDER_STATUS);
         }
-        this.orderStatus = OrderStatus.CANCEL;
+        this.orderStatus = OrderStatus.CANCELLED;
     }
 }
