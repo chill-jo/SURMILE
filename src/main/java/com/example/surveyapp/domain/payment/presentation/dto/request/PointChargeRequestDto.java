@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.point.presentation.dto.request;
+package com.example.surveyapp.domain.payment.presentation.dto.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
