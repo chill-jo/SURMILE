@@ -1,6 +1,8 @@
 package com.example.surveyapp.domain.order.application;
 
 import com.example.surveyapp.domain.order.application.mapper.OrderResponseMapper;
+import com.example.surveyapp.domain.order.domain.model.OrderOutbox;
+import com.example.surveyapp.domain.order.domain.repository.OrderOutboxRepository;
 import com.example.surveyapp.domain.order.exception.OrderErrorCode;
 import com.example.surveyapp.domain.order.exception.OrderException;
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto;
@@ -11,9 +13,12 @@ import com.example.surveyapp.domain.order.application.facade.ProductFacade;
 import com.example.surveyapp.domain.order.domain.model.Order;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderItemPoints;
-import com.example.surveyapp.domain.order.domain.repository.OrderRepository;;
+import com.example.surveyapp.domain.order.domain.repository.OrderRepository;
 import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
 import com.example.surveyapp.global.reader.UserReader;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -32,6 +37,8 @@ public class OrderService {
     private final ProductFacade productFacade;
     private final OrderResponseMapper orderResponseMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final ObjectMapper objectMapper;
+    private final OrderOutboxRepository orderOutboxRepository;
 
     @Transactional
     public OrderCreateResponseDto createOrder(OrderCreateRequestDto requestDto, Long userId) {
@@ -51,10 +58,24 @@ public class OrderService {
         String status = product.getStatus().getStatus();
 
         Order saveOrder = orderRepository.save(order);
-        //이벤트 발행
-        eventPublisher.publishEvent(new OrderCreateEvent(saveOrder.getId(),
-                userId,
-                order.orderAmount()));
+
+        try {
+            OrderCreateEvent event = new OrderCreateEvent(saveOrder.getId(),
+                    userId,
+                    order.orderAmount());
+
+            String payload = objectMapper.writeValueAsString(event);
+
+            OrderOutbox orderOutbox = OrderOutbox.of("Order",
+                    saveOrder.getId(),
+                    payload
+                    );
+
+            orderOutboxRepository.save(orderOutbox);
+
+        } catch (JsonProcessingException e) {
+            throw new OrderException(OrderErrorCode.CANNOT_CONVERT_PAYLOAD);
+        }
 
        return OrderCreateResponseDto.from(saveOrder,status);
     }

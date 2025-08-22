@@ -22,33 +22,21 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class OrderCreatedEventHandler {
 
     private final OrderRepository orderRepository;
-
-    /**
-     * 이벤트 발행 수신 성공시 결제 상태 확정 이벤트
-     * @param event  -> 포인트 차감 성공 이벤트 로직
-     */
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void PointSucceedEvent(PointRedeemSucceededEvent event) {
-        log.info("이벤트 성공 컨펌으로 변경 메서드");
-        Order order = orderRepository.findByIdAndIsDeletedFalse(event.getOrderId())
+        Order order = orderRepository.findByIdAndIsDeletedFalse(event.getTargetId())
                 .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
         order.confirm();
-            }
 
+    }
 
-    /**
-     * 이벤트 발행 수신 실패 시 결제 상태 확정 이벤트
-     * @param event
-     */
     @Async
     @EventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void PointFailedEvent(PointRedeemFailedEvent event) {
-        log.info("이벤트 실패 캔슬로 변경 메서드");
-
-        Order order = orderRepository.findByIdAndIsDeletedFalse(event.getOrderId())
+           Order order = orderRepository.findByIdAndIsDeletedFalse(event.getTargetId())
                 .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
 
         order.cancel();
