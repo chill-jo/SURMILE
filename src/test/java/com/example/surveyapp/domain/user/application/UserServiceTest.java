@@ -65,7 +65,7 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(requestDto.getEmail())).thenReturn(false);
         when(userRepository.existsByNickname(requestDto.getNickname())).thenReturn(false);
         when(passwordEncoder.encode(requestDto.getPassword())).thenReturn("encodedPw123!");
-        when(aiModerationFacade.checkNicknameModeration(eq(ID), eq("newNickname")))
+        when(aiModerationFacade.checkNicknameModeration(eq(ID), eq(EMAIL), eq("newNickname")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         // When
