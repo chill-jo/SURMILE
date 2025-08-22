@@ -25,7 +25,10 @@ public enum SurveyErrorCode implements ErrorCode {
     NO_QUESTIONS_IN_SURVEY(HttpStatus.NO_CONTENT, "설문에 질문이 존재하지 않아 설문 참여를 시작할 수 없습니다."),
     //선택지 에러
     OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 선택지입니다."),
-    OPTION_INVALID_FOR_SUBJECTIVE_QUESTION(HttpStatus.BAD_REQUEST, "주관식 질문에는 선택지를 생성할 수 없습니다.");
+    OPTION_INVALID_FOR_SUBJECTIVE_QUESTION(HttpStatus.BAD_REQUEST, "주관식 질문에는 선택지를 생성할 수 없습니다."),
+
+    //outbox 에러
+    CANNOT_CONVERT_PAYLOAD(HttpStatus.UNAUTHORIZED,"이벤트 직렬화 실패");
 
     private final HttpStatus status;
 

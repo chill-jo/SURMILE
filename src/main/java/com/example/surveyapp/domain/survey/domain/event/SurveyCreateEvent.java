@@ -1,13 +1,14 @@
 package com.example.surveyapp.domain.survey.domain.event;
 
-import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class SurveyCreateEvent {
-    private final Long surveyId;
-    private final Long totalPoint;
-    private final Long userId;
+    private Long surveyId;
+    private Long totalPoint;
+    private Long userId;
 }
