@@ -1,12 +1,10 @@
 package com.example.surveyapp.domain.survey.application;
 
-import com.example.surveyapp.domain.order.domain.model.OrderOutbox;
-import com.example.surveyapp.domain.order.exception.OrderErrorCode;
-import com.example.surveyapp.domain.order.exception.OrderException;
 import com.example.surveyapp.domain.survey.domain.model.entity.SurveyOutbox;
 import com.example.surveyapp.domain.survey.domain.repository.SurveyOutboxRepository;
 import com.example.surveyapp.domain.survey.exception.SurveyErrorCode;
 import com.example.surveyapp.domain.survey.exception.SurveyException;
+import com.example.surveyapp.domain.survey.application.facade.SurveyModerationFacade;
 import com.example.surveyapp.global.redis.application.RedisTemplateFacade;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.survey.application.facade.SurveyAnswerFacade;
 import com.example.surveyapp.domain.survey.application.mapper.SurveyMapper;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
@@ -49,7 +46,7 @@ public class SurveyService {
 	private final SurveyQueryService surveyQueryService;
 	private final SurveyValidator surveyValidator = new SurveyValidator();
 	private final SurveyAnswerFacade surveyAnswerFacade;
-	private final AiModerationFacade aiModerationFacade;
+	private final SurveyModerationFacade surveyModerationFacade;
     private final RedisTemplateFacade redisTemplateFacade;
 	private final ObjectMapper objectMapper;
 	private final SurveyOutboxRepository surveyOutboxRepository;
@@ -58,8 +55,8 @@ public class SurveyService {
 	public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
 
 		userReader.validateUserIdOrThrow(userId);
-		aiModerationFacade.checkTitleModeration(userId, requestDto.getTitle());
-		aiModerationFacade.checkDescriptionModeration(userId, requestDto.getDescription());
+		surveyModerationFacade.checkTitleModeration(userId, requestDto.getTitle());
+		surveyModerationFacade.checkDescriptionModeration(userId, requestDto.getDescription());
 
 		SurveyInfo surveyInfo = surveyMapper.toSurveyInfo(requestDto);
 
@@ -105,8 +102,8 @@ public class SurveyService {
 		userReader.validateUserIdOrThrow(userId);
 		Survey survey = surveyQueryService.findSurvey(surveyId);
 		surveyValidator.validateUpdatable(userId, survey);
-		aiModerationFacade.checkTitleModeration(userId, requestDto.getTitle());
-		aiModerationFacade.checkDescriptionModeration(userId, requestDto.getDescription());
+		surveyModerationFacade.checkTitleModeration(userId, requestDto.getTitle());
+		surveyModerationFacade.checkDescriptionModeration(userId, requestDto.getDescription());
 
 		SurveyInfo oldSurveyInfo = survey.getSurveyInfo();
 		SurveyInfo newSurveyInfo = requestDto.toNewSurveyInfo(oldSurveyInfo);

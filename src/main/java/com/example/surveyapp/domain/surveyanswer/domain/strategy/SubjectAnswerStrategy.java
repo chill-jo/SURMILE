@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.surveyanswer.domain.strategy;
 
-import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
+import com.example.surveyapp.domain.surveyanswer.application.facade.SurveyAnswerModerationFacade;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.request.QuestionAnswerRequestDto;
 import com.example.surveyapp.domain.surveyanswer.domain.model.entity.SurveyAnswer;
 import com.example.surveyapp.domain.surveyanswer.domain.model.entity.SurveyTextAnswer;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SubjectAnswerStrategy implements SurveyQuestionStrategy {
     private final SurveyTextAnswerRepository surveyTextAnswerRepository;
-    private final AiModerationFacade aiModerationFacade;
+    private final SurveyAnswerModerationFacade surveyAnswerModerationFacade;
 
     @Override
     public void doSave(QuestionAnswerRequestDto questionAnswer, SurveyAnswer surveyAnswer, Long questionId) {
@@ -21,7 +21,7 @@ public class SubjectAnswerStrategy implements SurveyQuestionStrategy {
         Long userId = surveyAnswer.getUserId();
 
         if (content != null && !content.isBlank()) {
-            aiModerationFacade.checkTextAnswerModeration(userId, content);
+            surveyAnswerModerationFacade.checkTextAnswerModeration(userId, content);
         }
 
         surveyTextAnswerRepository.save(new SurveyTextAnswer(surveyAnswer.getId(), questionId, (String) questionAnswer.getAnswer()));

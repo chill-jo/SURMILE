@@ -1,6 +1,5 @@
 package com.example.surveyapp.domain.survey.application;
 
-import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
 import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionCreateRequestDto;
 import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionUpdateRequestDto;
@@ -11,6 +10,7 @@ import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;
 import com.example.surveyapp.domain.survey.infrastructure.QuestionReadEntity;
+import com.example.surveyapp.domain.survey.application.facade.SurveyModerationFacade;
 import com.example.surveyapp.global.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,7 @@ public class QuestionService {
     private final SurveyValidator surveyValidator = new SurveyValidator();
     private final SurveyQuestionService surveyQuestionService = new SurveyQuestionService();
     private final UserReader userReader;
-    private final AiModerationFacade aiModerationFacade;
+    private final SurveyModerationFacade surveyModerationFacade;
 
     @Transactional
     public QuestionResponseDto createQuestion(Long userId, Long surveyId, QuestionCreateRequestDto requestDto){
@@ -36,7 +36,7 @@ public class QuestionService {
         userReader.validateUserIdOrThrow(userId);
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
-        aiModerationFacade.checkQuestionModeration(userId, requestDto.getContent());
+        surveyModerationFacade.checkQuestionModeration(userId, requestDto.getContent());
 
         Question question = Question.from(requestDto, surveyId);
 
@@ -93,7 +93,7 @@ public class QuestionService {
 
         Survey survey = surveyQueryService.findSurvey(surveyId);
         surveyValidator.validateUpdatable(userId, survey);
-        aiModerationFacade.checkQuestionModeration(userId, requestDto.getContent());
+        surveyModerationFacade.checkQuestionModeration(userId, requestDto.getContent());
 
         Question question = surveyQuestionService.updateQuestion(
                 survey,
