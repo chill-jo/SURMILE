@@ -3,6 +3,8 @@ package com.example.surveyapp.domain.order.application;
 import com.example.surveyapp.config.generator.OrderFixtureGenerator;
 import com.example.surveyapp.domain.order.application.mapper.OrderResponseMapper;
 import com.example.surveyapp.domain.order.domain.event.OrderCreateEvent;
+import com.example.surveyapp.domain.order.domain.model.OrderOutbox;
+import com.example.surveyapp.domain.order.domain.repository.OrderOutboxRepository;
 import com.example.surveyapp.domain.order.exception.OrderErrorCode;
 import com.example.surveyapp.domain.order.exception.OrderException;
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,9 +60,15 @@ class OrderServiceTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    private OrderOutboxRepository orderOutboxRepository;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
     @Test
     @DisplayName("기능_테스트_참여자가 주문을 생성한다")
-    void 주문_생성() {
+    void 주문_생성() throws Exception {
 
         // Given
         //테스트 전제 조건 및 환경 설정
@@ -68,12 +77,14 @@ class OrderServiceTest {
         ProductInfoDto productInfoDto = new ProductInfoDto("chicken", 2500L, Status.ON_SALE);
         Order order = OrderFixtureGenerator.generateOrderFixture(userId);
         OrderCreateRequestDto requestDto = new OrderCreateRequestDto(productId);
+
         // When
         //실행할 행동
         when(orderRepository.save(any(Order.class))).thenReturn(order);
         when(productFacade.findProductInfo(productId)).thenReturn(productInfoDto);
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        doNothing().when(eventPublisher).publishEvent(any(OrderCreateEvent.class));
+        when(orderOutboxRepository.save(any(OrderOutbox.class))).thenReturn(mock(OrderOutbox.class));
+        when(objectMapper.writeValueAsString(any(OrderCreateEvent.class))).thenReturn("json-payload");
 
         OrderCreateResponseDto responseDto = orderService.createOrder(requestDto, userId);
 
@@ -84,8 +95,9 @@ class OrderServiceTest {
         assertThat(responseDto.getStatus()).isEqualTo(Status.ON_SALE.getStatus());
         assertThat(responseDto.getTitle()).isEqualTo(order.getOrderItem().getTitle());
 
-        verify(eventPublisher).publishEvent(any(OrderCreateEvent.class));
         verify(orderRepository, times(1)).save(any(Order.class));
+        verify(orderOutboxRepository, times(1)).save(any(OrderOutbox.class));
+
     }
 
     @Test
@@ -137,9 +149,7 @@ class OrderServiceTest {
         ReflectionTestUtils.setField(order, "id", 1L);
 
         when(orderRepository.findByIdAndIsDeletedFalse(order.getId())).thenReturn(Optional.of(order));
-        when(productFacade.findProductInfo(any()))
-                .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
-
+        when(orderResponseMapper.toDto(order)).thenReturn(OrderResponseDto.from(order,any(),Status.ON_SALE.getStatus()));
         // When
         //실행할 행동
         OrderResponseDto orderResponseDto = orderService.readOneOrder(order.getId());
@@ -189,9 +199,7 @@ void 참여자_주문_단건_조회() {
     Order order = OrderFixtureGenerator.generateOrderFixture(userId);
 
     when(orderRepository.findByIdAndIsDeletedFalse(order.getId())).thenReturn(Optional.of(order));
-    doNothing().when(userReader).validateUserIdOrThrow(userId);
-    when(productFacade.findProductInfo(any()))
-            .thenReturn(new ProductInfoDto("title",2500L,Status.ON_SALE));
+    when(orderResponseMapper.toDto(order)).thenReturn(OrderResponseDto.from(order,any(),Status.ON_SALE.getStatus()));
 
     // When
     //실행할 행동
@@ -199,9 +207,9 @@ void 참여자_주문_단건_조회() {
 
     // Then
     //검증 사항
-    verify(orderRepository).findByIdAndIsDeletedFalse(responseDto.getOrderId());
+    verify(orderRepository).findByIdAndIsDeletedFalse(order.getId());
 
-    assertThat(responseDto.getOrderNumber()).isEqualTo(responseDto.getOrderNumber());
+    assertThat(responseDto.getOrderNumber()).isEqualTo(order.getOrderNumber().getValue());
 
 }
 

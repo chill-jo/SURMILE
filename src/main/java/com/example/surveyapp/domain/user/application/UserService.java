@@ -4,6 +4,12 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.surveyapp.domain.surveyanswer.exception.AnswerErrorCode;
+import com.example.surveyapp.domain.surveyanswer.exception.AnswerException;
+import com.example.surveyapp.domain.user.domain.model.UserOutbox;
+import com.example.surveyapp.domain.user.domain.repository.UserOutboxRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +51,8 @@ public class UserService {
 	private final RedisTemplateFacade redisTemplateFacade;
 	private final AiModerationFacade aiModerationFacade;
 	private final JwtProvider jwtProvider;
+	private final ObjectMapper objectMapper;
+	private final UserOutboxRepository userOutboxRepository;
 
 	@Value("${spring.data.redis.cache-access-token}")
 	private String ACCESS_TOKEN;
@@ -83,7 +91,19 @@ public class UserService {
 
 		userRepository.save(user);
 
-		eventPublisher.publishEvent(new RegisterEvent(user.getId()));
+		RegisterEvent event = new RegisterEvent(user.getId());
+
+		try {
+			String payload = objectMapper.writeValueAsString(event);
+			UserOutbox userOutbox = UserOutbox.of("User",
+					user.getId(),
+					payload);
+
+			userOutboxRepository.save(userOutbox);
+
+		} catch (JsonProcessingException e) {
+			throw new AnswerException(AnswerErrorCode.CANNOT_CONVERT_PAYLOAD);
+		}
 	}
 
 	@Transactional(readOnly = true)

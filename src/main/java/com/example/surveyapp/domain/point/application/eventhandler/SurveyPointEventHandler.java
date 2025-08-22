@@ -1,13 +1,18 @@
 package com.example.surveyapp.domain.point.application.eventhandler;
 
 import com.example.surveyapp.domain.point.application.PointEarnRedeemService;
-import com.example.surveyapp.domain.point.domain.event.PointRedeemFailEvent;
-import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
+import com.example.surveyapp.domain.point.domain.event.SurveyPointRedeemFailedEvent;
+import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
+import com.example.surveyapp.domain.point.domain.model.entity.PointOutbox;
+import com.example.surveyapp.domain.point.domain.repository.PointOutboxRepository;
+import com.example.surveyapp.domain.point.exception.PointErrorCode;
+import com.example.surveyapp.domain.point.exception.PointException;
 import com.example.surveyapp.domain.survey.domain.event.SurveyCreateEvent;
 import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyAnswerEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -21,7 +26,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class SurveyPointEventHandler {
 
     private final PointEarnRedeemService pointEarnRedeemService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final ObjectMapper objectMapper;
+    private final PointOutboxRepository pointOutboxRepository;
 
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -33,17 +39,9 @@ public class SurveyPointEventHandler {
                     PointBalance.of(event.getTotalPoint()),
                     event.getSurveyId()
             );
-
         } catch (Exception e) {
-            log.error("포인트 차감 실패 - suveyId={}, errorCode={}",
-                    event.getSurveyId(), e.getMessage());
-
-            eventPublisher.publishEvent(
-                new PointRedeemFailEvent(
-                        event.getUserId(),
-                        event.getSurveyId()
-                )
-            );
+            SurveyPointRedeemFailedEvent pointFailedEvent = new SurveyPointRedeemFailedEvent(event.getUserId(), event.getSurveyId());
+            publishOutbox(pointFailedEvent);
         }
     }
 
@@ -54,5 +52,22 @@ public class SurveyPointEventHandler {
                 event.getUserId(),
                 PointBalance.of(event.getPointPerPerson()),
                 event.getSurveyAnswerId());
+    }
+
+    private void publishOutbox(SurveyPointRedeemFailedEvent event){
+        PointOutbox pointOutbox = PointOutbox.of(
+                "Survey",
+                event.getSurveyId(),
+                toJson(event)
+        );
+        pointOutboxRepository.save(pointOutbox);
+    }
+
+    private String toJson(Object event){
+        try{
+            return objectMapper.writeValueAsString(event);
+        }catch(JsonProcessingException e){
+            throw new PointException(PointErrorCode.CANNOT_CONVERT_PAYLOAD);
+        }
     }
 }

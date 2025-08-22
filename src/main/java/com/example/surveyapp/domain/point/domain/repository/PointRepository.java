@@ -7,8 +7,10 @@ import org.springframework.data.jpa.repository.Lock;
 
 import java.util.Optional;
 
-public interface PointRepository extends JpaRepository<PointWallet, Long> {
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+public interface PointRepository {
+//    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<PointWallet> findByUserId(Long userId);
     Boolean existsByUserId(Long userId);
+
+    PointWallet save(PointWallet pointWallet);
 }

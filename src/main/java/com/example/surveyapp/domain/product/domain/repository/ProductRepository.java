@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository {
     
     Page<Product> findAllByStatusAndIsDeletedFalse(Status status, Pageable pageable);
 
@@ -18,4 +18,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByTitleAndIsDeletedFalse(String title);
 
     Optional<Product> findByIdAndIsDeletedFalse(Long id);
+
+    Product save(Product product);
 }

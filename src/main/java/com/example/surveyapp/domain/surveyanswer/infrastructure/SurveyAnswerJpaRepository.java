@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.surveyanswer.infrastructure;
 
-import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
+import com.example.surveyapp.domain.surveyanswer.domain.model.entity.SurveyAnswer;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

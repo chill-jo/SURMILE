@@ -3,7 +3,7 @@ package com.example.surveyapp.domain.surveyanswer.application.mapper;
 import com.example.surveyapp.domain.survey.application.SurveyQueryService;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyeeSurveyDto;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyeeSurveyListDto;
-import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
+import com.example.surveyapp.domain.surveyanswer.domain.model.entity.SurveyAnswer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
