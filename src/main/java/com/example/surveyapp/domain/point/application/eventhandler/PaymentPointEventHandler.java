@@ -30,7 +30,6 @@ public class PaymentPointEventHandler {
     private final PointOutboxRepository pointOutboxRepository;
 
     @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePointChargeEvent(PointChargeEvent event){
         try{
@@ -47,7 +46,7 @@ public class PaymentPointEventHandler {
 
     private void publishOutbox(PointChargeFailedEvent event){
         PointOutbox pointOutbox = PointOutbox.of(
-                "Payment",
+                "Payment-Fail",
                 event.getPaymentId(),
                 toJson(event)
         );
