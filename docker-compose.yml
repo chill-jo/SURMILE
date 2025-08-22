@@ -3,6 +3,10 @@ services:
     build: .
     ports:
       - "8080:8080"
+    volumes:
+      - ./logs:/app/logs   # 호스트 ./logs ↔ 컨테이너 /app/logs 연결
+    command: >
+      sh -c "java -jar /app/app.jar >> /app/logs/app.log 2>&1"
     restart: always
     container_name: survey-app
     env_file:
@@ -15,3 +19,23 @@ services:
     ports:
       - "6379:6379"
     container_name: redis
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /home/ec2-user/nginx:/etc/nginx/conf.d
+      - /home/ec2-user/certbot/conf:/etc/letsencrypt
+      - /home/ec2-user/certbot/www:/var/www/certbot
+
+  certbot:
+    image: certbot/certbot
+    command: certonly --webroot --non-interactive --agree-tos --webroot-path=/var/www/certbot -d xn--hz2b19osld.o-r.kr
+    volumes:
+      - /home/ec2-user/certbot/conf:/etc/letsencrypt
+      - /home/ec2-user/certbot/www:/var/www/certbot
+    depends_on:
+      - nginx
+
