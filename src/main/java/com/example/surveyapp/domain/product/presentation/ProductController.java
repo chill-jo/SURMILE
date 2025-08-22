@@ -3,8 +3,7 @@ package com.example.surveyapp.domain.product.presentation;
 import com.example.surveyapp.domain.product.presentation.dto.*;
 import com.example.surveyapp.domain.product.application.ProductService;
 import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
-import com.example.surveyapp.global.response.ApiResponse;
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +26,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductCreateResponseDto> create(
             @Valid @RequestBody ProductCreateRequestDto dto,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails) {
         Long userId = userDetails.getId();
         ProductCreateResponseDto product =  productService.createProduct(dto,userId);
         URI location = URI.create("/api/products" + product.getId());
@@ -80,7 +79,7 @@ public class ProductController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<ProductStatusUpdateResponseDto> statusUpdate(@PathVariable Long id,
                                                                        @RequestBody ProductStatusUpdateRequestDto requestDto,
-                                                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
+                                                                       @AuthenticationPrincipal CustomSecurityUserDetails userDetails) {
         Long userId = userDetails.getId();
         ProductStatusUpdateResponseDto responseDto = productService.statusUpdate(userId,id, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
@@ -93,7 +92,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ProductUpdateResponseDto> delete(
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails userDetails){
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails){
         Long userId = userDetails.getId();
         productService.deleteProduct(id,userId);
         return ResponseEntity.status(HttpStatus.OK)

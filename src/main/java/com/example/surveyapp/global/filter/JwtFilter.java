@@ -3,14 +3,13 @@ package com.example.surveyapp.global.filter;
 import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.domain.user.domain.repository.UserRepository;
 import com.example.surveyapp.global.response.exception.UnauthorizedException;
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 import com.example.surveyapp.global.security.jwt.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -87,9 +86,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 2. 인증된 사용자 정보를 인증된 사용자 정보가 필요한 비지니스 로직 처리 부에 접근 가능하도록 하기 위해
         // SecurityContextHolder에 저장하기 위한 타입으로 변환: CustomUserDetails, UsernamePasswordAuthenticationToken
-        CustomUserDetails customUserDetails = new CustomUserDetails(user);
+        CustomSecurityUserDetails customSecurityUserDetails = new CustomSecurityUserDetails(user);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                customUserDetails, null, customUserDetails.getAuthorities()
+                customSecurityUserDetails, null, customSecurityUserDetails.getAuthorities()
         );
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 

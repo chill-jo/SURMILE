@@ -6,7 +6,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.request.SurveyUpdate
 import com.example.surveyapp.domain.survey.presentation.dto.response.*;
 import com.example.surveyapp.domain.survey.application.SurveyService;
 import com.example.surveyapp.domain.survey.presentation.dto.response.SurveyQuestionDto;
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +28,7 @@ public class SurveyController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<SurveyResponseDto> createSurvey(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @RequestBody @Valid SurveyCreateRequestDto requestDto
     ){
         Long userId = userDetails.getId();
@@ -56,7 +56,7 @@ public class SurveyController {
     @PatchMapping("/{surveyId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<SurveyResponseDto> updateSurvey(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId,
             @Valid @RequestBody SurveyUpdateRequestDto requestDto
     ){
@@ -70,7 +70,7 @@ public class SurveyController {
     @PatchMapping("/{surveyId}/status")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<SurveyStatusResponseDto> updateSurveyStatus(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId,
             @Valid @RequestBody SurveyStatusUpdateRequestDto requestDto
     ){
@@ -84,7 +84,7 @@ public class SurveyController {
     @DeleteMapping("/{surveyId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<Void> deleteSurvey(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId
     ){
         Long userId = userDetails.getId();
@@ -106,7 +106,7 @@ public class SurveyController {
     @PreAuthorize("hasAnyRole('SURVEYEE')")
     @GetMapping("/{surveyId}/start")
     public ResponseEntity<SurveyQuestionDto> startSurvey(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AuthenticationPrincipal CustomSecurityUserDetails user,
             @PathVariable Long surveyId
     ) {
 

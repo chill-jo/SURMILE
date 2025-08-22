@@ -1,7 +1,7 @@
 package com.example.surveyapp.config.custommockuser;
 
 import com.example.surveyapp.domain.user.domain.model.User;
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +20,7 @@ public class MockSecurityContextFactory implements WithSecurityContextFactory<Wi
         );
         ReflectionTestUtils.setField(mockUser, "id", annotation.id());
 
-        CustomUserDetails userDetails = new CustomUserDetails(mockUser);
+        CustomSecurityUserDetails userDetails = new CustomSecurityUserDetails(mockUser);
 
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

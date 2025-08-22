@@ -4,7 +4,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.request.OptionCreate
 import com.example.surveyapp.domain.survey.presentation.dto.request.OptionUpdateRequestDto;
 import com.example.surveyapp.domain.survey.presentation.dto.response.OptionResponseDto;
 import com.example.surveyapp.domain.survey.application.OptionsService;
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ public class OptionsController {
     @PostMapping("/{surveyId}/question/{questionId}/option")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<OptionResponseDto> createOption(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId,
             @RequestBody OptionCreateRequestDto requestDto
@@ -41,7 +41,7 @@ public class OptionsController {
 
     @GetMapping("/{surveyId}/question/{questionId}/option")
     public ResponseEntity<List<OptionResponseDto>> getOptions(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId
     ){
@@ -56,7 +56,7 @@ public class OptionsController {
     @PatchMapping("/{surveyId}/question/{questionId}/option/{optionId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<OptionResponseDto> updateOption(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId,
             @PathVariable Long optionId,
@@ -73,7 +73,7 @@ public class OptionsController {
     @DeleteMapping("/{surveyId}/question/{questionId}/option/{optionId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<Void> deleteOption(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId,
             @PathVariable Long optionId

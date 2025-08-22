@@ -22,7 +22,7 @@ import com.example.surveyapp.domain.user.presentation.dto.RegisterRequestDto;
 import com.example.surveyapp.domain.user.presentation.dto.UserRequestDto;
 import com.example.surveyapp.domain.user.presentation.dto.UserResponseDto;
 import com.example.surveyapp.domain.user.presentation.dto.WithdrawRequestDto;
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class UserController {
 	// 회원 정보 조회
 	@GetMapping("/my-page")
 	public ResponseEntity<UserResponseDto> getMyInfo(
-		@AuthenticationPrincipal CustomUserDetails userDetails
+		@AuthenticationPrincipal CustomSecurityUserDetails userDetails
 	) {
 		log.info(String.valueOf(userDetails.getId()));
 		UserResponseDto getResponseDto = userService.getMyInfo(userDetails.getId());
@@ -48,7 +48,7 @@ public class UserController {
 	// 회원 정보 수정
 	@PatchMapping("/my-page")
 	public ResponseEntity<UserResponseDto> updateMyInfo(
-		@AuthenticationPrincipal CustomUserDetails userDetails,
+		@AuthenticationPrincipal CustomSecurityUserDetails userDetails,
 		@Valid @RequestBody UserRequestDto requestDto
 	) {
 		log.info(String.valueOf(userDetails.getId()));
@@ -95,8 +95,8 @@ public class UserController {
 	//회원탈퇴
 	@DeleteMapping("/withdraw")
 	public ResponseEntity<Void> withdraw(
-		@AuthenticationPrincipal CustomUserDetails userDetails, // 로그인 유저 정보
-		@RequestBody @Valid WithdrawRequestDto requestDto
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails, // 로그인 유저 정보
+            @RequestBody @Valid WithdrawRequestDto requestDto
 	) {
 		userService.withdraw(userDetails.getId(), requestDto);
 		return ResponseEntity.ok(null);
@@ -113,7 +113,7 @@ public class UserController {
 	@PreAuthorize("hasRole('SURVEYEE')")
 	@PostMapping("/surveyee/base-datas")
 	public ResponseEntity<Void> saveBaseDatas(
-		@AuthenticationPrincipal CustomUserDetails user,
+		@AuthenticationPrincipal CustomSecurityUserDetails user,
 		@Valid @RequestBody BaseDataListRequestDto requestDto
 	) {
 		userService.saveBaseDatas(user.getId(), requestDto);
@@ -123,7 +123,7 @@ public class UserController {
 	// 참여자 기초 정보 R
 	@PreAuthorize("hasRole('SURVEYEE')")
 	@GetMapping("/surveyee/base-datas")
-	public ResponseEntity<BaseDataListResponseDto> getBaseDatas(@AuthenticationPrincipal CustomUserDetails user) {
+	public ResponseEntity<BaseDataListResponseDto> getBaseDatas(@AuthenticationPrincipal CustomSecurityUserDetails user) {
 		return ResponseEntity.ok(userService.getBaseDatas(user.getId()));
 	}
 

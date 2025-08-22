@@ -5,7 +5,7 @@ import com.example.surveyapp.domain.order.presentation.dto.OrderCreateResponseDt
 import com.example.surveyapp.domain.order.presentation.dto.OrderResponseDto;
 import com.example.surveyapp.domain.order.application.OrderService;
 
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ public class OrderController {
     @PostMapping
     @PreAuthorize("hasRole('SURVEYEE')")
     public ResponseEntity<OrderCreateResponseDto> create(@Valid@RequestBody OrderCreateRequestDto requestDto,
-                                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
+                                                                      @AuthenticationPrincipal CustomSecurityUserDetails userDetails) {
         Long userId = userDetails.getId();
         OrderCreateResponseDto order = orderService.createOrder(requestDto,userId);
         URI location = URI.create("/api/orders" + order.getId());
@@ -56,7 +56,7 @@ public class OrderController {
     public ResponseEntity<Page<OrderResponseDto>> readMyOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails) {
 
         Long userId = userDetails.getId();
         Page<OrderResponseDto> myOrderList = orderService.readMyOrderList(page,size,userId);
@@ -67,7 +67,7 @@ public class OrderController {
     @PreAuthorize("hasRole('SURVEYEE')")
     public ResponseEntity<OrderResponseDto> readOneMyOrder(
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails) {
         Long userId = userDetails.getId();
         OrderResponseDto responseDto = orderService.readOneMyOrder(id,userId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
@@ -77,7 +77,7 @@ public class OrderController {
     @PreAuthorize("hasRole('SURVEYEE')")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails
     ){
         Long userId = userDetails.getId();
         orderService.deleteOrder(id,userId);

@@ -4,7 +4,7 @@ import com.example.surveyapp.domain.point.presentation.dto.request.PointChargeRe
 import com.example.surveyapp.domain.point.presentation.dto.response.PointHistoryResponseDto;
 import com.example.surveyapp.domain.point.application.PointService;
 import com.example.surveyapp.global.response.ApiResponse;
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,7 +29,7 @@ public class PointController {
     @PostMapping("/charge")
     public ResponseEntity<ApiResponse<Void>> charge(
             @Valid @RequestBody PointChargeRequestDto dto,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails
     ){
         pointService.charge(userDetails.getId(), dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("결제가 되었습니다.",null));
@@ -39,7 +39,7 @@ public class PointController {
     @PreAuthorize("hasAnyRole('SURVEYOR', 'SURVEYEE')")
     @GetMapping
     public ResponseEntity<ApiResponse<Page<PointHistoryResponseDto>>> getHistories(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PageableDefault(page = 0, size = 10) Pageable pageable
     ){
         Page<PointHistoryResponseDto> page = pointService.getHistories(userDetails.getId(), pageable);

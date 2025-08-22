@@ -5,7 +5,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionUpda
 import com.example.surveyapp.domain.survey.presentation.dto.response.PageQuestionResponseDto;
 import com.example.surveyapp.domain.survey.presentation.dto.response.QuestionResponseDto;
 import com.example.surveyapp.domain.survey.application.QuestionService;
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class QuestionController {
     @PostMapping("/{surveyId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<QuestionResponseDto> createQuestion(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId,
             @Valid @RequestBody QuestionCreateRequestDto requestDto
     ){
@@ -44,7 +44,7 @@ public class QuestionController {
     public ResponseEntity<PageQuestionResponseDto<QuestionResponseDto>> getQuestions(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId
     ){
         Long userId = userDetails.getId();
@@ -58,7 +58,7 @@ public class QuestionController {
     //질문 단건 조회
     @GetMapping("/{surveyId}/question/{questionId}")
     public ResponseEntity<QuestionResponseDto> getQuestion(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId
     ){
@@ -74,7 +74,7 @@ public class QuestionController {
     @PatchMapping("/{surveyId}/question/{questionId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<QuestionResponseDto> updateQuestion(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId,
             @Valid @RequestBody QuestionUpdateRequestDto requestDto
@@ -91,7 +91,7 @@ public class QuestionController {
     @DeleteMapping("/{surveyId}/question/{questionId}")
     @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
     public ResponseEntity<Void> deleteQuestion(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @PathVariable Long surveyId,
             @PathVariable Long questionId
     ){

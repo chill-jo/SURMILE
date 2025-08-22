@@ -5,7 +5,7 @@ import com.example.surveyapp.domain.ai.chat.presentation.dto.ChatResponseDto;
 import com.example.surveyapp.domain.ai.chat.presentation.dto.IndexRequestDto;
 import com.example.surveyapp.domain.ai.chat.application.rag.DocumentIndexer;
 import com.example.surveyapp.domain.ai.chat.application.ChatService;
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ public class ChatController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping(value = "/index")
     public ResponseEntity<ChatResponseDto> indexText(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomSecurityUserDetails userDetails,
             @RequestBody IndexRequestDto requestDto) {
 
         indexer.indexText(userDetails.getId(), requestDto.getDocument());

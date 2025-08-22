@@ -14,7 +14,7 @@ import java.util.List;
 
 @ToString
 @Getter
-public class CustomUserDetails implements UserDetails {
+public class CustomSecurityUserDetails implements UserDetails {
 
     private final Long id;
     private final String name;
@@ -26,7 +26,7 @@ public class CustomUserDetails implements UserDetails {
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(User user) {
+    public CustomSecurityUserDetails(User user) {
         this.id = user.getId();
         this.name = user.getName();
         this.nickname = user.getNickname();

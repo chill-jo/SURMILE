@@ -5,7 +5,7 @@ import com.example.surveyapp.domain.surveyanswer.application.SurveyAnswerStatist
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.request.SurveyAnswerRequestDto;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyStatisticsDto;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyeeSurveyListDto;
-import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import com.example.surveyapp.global.security.jwt.CustomSecurityUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +28,7 @@ public class SurveyAnswerController {
     public ResponseEntity<Void> answerSurvey(
             @PathVariable Long surveyId,
             @RequestBody @Valid SurveyAnswerRequestDto requestDto,
-            @AuthenticationPrincipal CustomUserDetails user
+            @AuthenticationPrincipal CustomSecurityUserDetails user
     ) {
         surveyAnswerService.saveSurveyAnswer(surveyId, requestDto, user.getId());
 
@@ -39,7 +39,7 @@ public class SurveyAnswerController {
     @PreAuthorize("hasAnyRole('SURVEYEE')")
     @GetMapping("/surveyee")
     public ResponseEntity<SurveyeeSurveyListDto> getUserSurveyAnswerHistory(
-            @AuthenticationPrincipal CustomUserDetails user
+            @AuthenticationPrincipal CustomSecurityUserDetails user
     ) {
 
         return ResponseEntity.status(HttpStatus.OK).body(surveyAnswerService.getUserSurveyAnswerHistory(user.getId()));
@@ -49,7 +49,7 @@ public class SurveyAnswerController {
     @PreAuthorize("hasAnyRole('ADMIN', 'SURVEYOR')")
     @GetMapping("/{surveyId}/result")
     public ResponseEntity<SurveyStatisticsDto> getSurveyStatistics(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AuthenticationPrincipal CustomSecurityUserDetails user,
             @PathVariable Long surveyId
     ){
         SurveyStatisticsDto statisticsDto = surveyAnswerStatisticsService.getStatistics(surveyId);
