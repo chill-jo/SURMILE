@@ -20,7 +20,10 @@ public enum OrderErrorCode implements ErrorCode {
     ONE_ORDER_ONE_PRODUCT(HttpStatus.BAD_REQUEST, "한개의 상품만 있어야 주문이 가능합니다." ),
     INVALID_PRICE_ORDERITEM(HttpStatus.BAD_REQUEST, "유효 하지 않는 상품 금액입니다." ),
     INVALID_ORDER_STATUS(HttpStatus.UNAUTHORIZED,"허용되지 않는 주문 상태입니다."),
-    FAILED_ORDER_STATUS(HttpStatus.UNAUTHORIZED,"이벤트 실패로 결제 취소 되었습니다." );
+    FAILED_ORDER_STATUS(HttpStatus.UNAUTHORIZED,"이벤트 실패로 결제 취소 되었습니다." ),
+
+    //outbox 에러코드
+    CANNOT_CONVERT_PAYLOAD(HttpStatus.UNAUTHORIZED,"이벤트 직렬화 실패" );
 
     private final HttpStatus status;
 
