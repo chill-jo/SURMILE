@@ -51,7 +51,7 @@ public class PointEarnRedeemService {
             String payload = objectMapper.writeValueAsString(event);
 
             PointOutbox pointOutbox = PointOutbox.of(
-                    "Order",
+                    "Order-Success",
                     point.getId(),
                     payload);
 
@@ -90,7 +90,7 @@ public class PointEarnRedeemService {
 
             String payload = objectMapper.writeValueAsString(event);
 
-            PointOutbox pointOutbox = PointOutbox.of("Survey",
+            PointOutbox pointOutbox = PointOutbox.of("Survey-Success",
                     point.getId(),
                     payload);
 
@@ -150,12 +150,19 @@ public class PointEarnRedeemService {
 
         point.earn(amount);
 
-        eventPublisher.publishEvent(new PointChargeSucceededEvent(
-                userId,
-                paymentId
-        ));
+        try{
+            PointChargeSucceededEvent event = new PointChargeSucceededEvent(userId, paymentId);
 
-        log.info("이벤트 발행");
+            String payload = objectMapper.writeValueAsString(event);
+
+            PointOutbox pointOutbox = PointOutbox.of("Payment-Success",
+                    point.getId(),
+                    payload);
+
+            pointOutboxRepository.save(pointOutbox);
+        } catch (JsonProcessingException e) {
+            throw new PointException(PointErrorCode.CANNOT_CONVERT_PAYLOAD);
+        }
 
         PointHistory history = PointHistory.of(
                 currentBalance,

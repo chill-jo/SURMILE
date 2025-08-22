@@ -37,7 +37,7 @@ public class SurveyEventHandler {
         log.info("포인트 차감 실패 이벤트 받음");
         Survey survey = surveyQueryService.findSurvey(event.getSurveyId());
 
-        survey.changeSurveyStatus(SurveyStatus.CANCELED);
+        survey.changeSurveyStatus(SurveyStatus.CANCELLED);
         survey.deleteSurvey();
     }
 

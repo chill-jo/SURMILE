@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -30,7 +28,6 @@ public class SurveyPointEventHandler {
     private final PointOutboxRepository pointOutboxRepository;
 
     @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSurveyCreateEvent(SurveyCreateEvent event){
         try{
@@ -56,7 +53,7 @@ public class SurveyPointEventHandler {
 
     private void publishOutbox(SurveyPointRedeemFailedEvent event){
         PointOutbox pointOutbox = PointOutbox.of(
-                "Survey",
+                "Survey-Fail",
                 event.getSurveyId(),
                 toJson(event)
         );

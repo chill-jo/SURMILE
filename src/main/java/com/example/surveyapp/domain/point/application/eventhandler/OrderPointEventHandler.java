@@ -36,18 +36,18 @@ public class OrderPointEventHandler {
                     event.getOrderId());
         }
         catch (PointException e) {
-            PointRedeemFailedEvent pointFailedEvent = new PointRedeemFailedEvent(event.getUserId(), event.getOrderId());
+            PointRedeemFailedEvent pointFailedEvent = new PointRedeemFailedEvent(event.getOrderId(), event.getUserId());
             publishOutbox(pointFailedEvent);
         }
         catch (Exception e){
-            PointRedeemFailedEvent pointFailedEvent = new PointRedeemFailedEvent(event.getUserId(), event.getOrderId());
+            PointRedeemFailedEvent pointFailedEvent = new PointRedeemFailedEvent(event.getOrderId(), event.getUserId());
             publishOutbox(pointFailedEvent);
         }
     }
 
     private void publishOutbox(PointRedeemFailedEvent event){
         PointOutbox pointOutbox = PointOutbox.of(
-                "Order",
+                "Order-Fail",
                 event.getTargetId(),
                 toJson(event)
         );
