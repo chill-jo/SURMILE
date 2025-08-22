@@ -47,11 +47,13 @@ public class SecurityConfig {
                                 "/api/login",
                                 "/api/logout",
                                 "/api/refresh",
-                                "/error"
+                                "/error",
+                                "/api/chat/ask"
                         ).permitAll()
 
                         // 관리자 권한 필요
                         .requestMatchers("/api/admin/**").hasRole(UserRoleEnum.ADMIN.getRole())
+                        .requestMatchers("/api/chat/index").hasRole(UserRoleEnum.ADMIN.getRole())
 
                         // 유저 권한 필요 (설문 참여자, 출제자 모두 허용)
                         .requestMatchers("/api/user/**").hasAnyRole(

@@ -61,9 +61,16 @@ public class JwtFilter extends OncePerRequestFilter {
         // 3. 우리가 발급한 입장권인지 유효한 입장권인지
         // - Jwt를 만들때 사용했던 sercret-key를 기반으로 해석했을 때, 해석이 된다면 우리가 발급한 JWT 구나
         // - 유효 기간, JWT의 형식 검증등을 포함
-        if (!jwtUtil.validateToken(jwt)) {
-            throw new UnauthorizedException("유효하지 않은 JWT 토큰입니다.");
+        if (!path.equals("/api/refresh")) {
+            if (!jwtUtil.validateToken(jwt)) {
+                throw new UnauthorizedException("유효하지 않은 JWT 토큰입니다.");
+            }
+
+            if (jwtUtil.extractAllClaims(jwt).get("role") == null) {
+                throw new UnauthorizedException("유효하지 않은 JWT 토큰입니다.");
+            }
         }
+
 
         // 5. 우리가 발급한 입장권이고, 유효기간이 지나지 않은 사용가능한 입장권(jwt)라면 입장권 검사(필터링) 이후
         // 비지니스 로직 혹은 규칙등을 실행하는데 필요한 인증된 사용자 정보를 제공하기 위해

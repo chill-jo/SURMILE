@@ -1,0 +1,13 @@
+== Read All My Order API
+
+[example]
+`GET` 요청을 사용하여 참여자는 자신의 모든 주문을 조회할 수 있습니다.
+
+=== Http Request
+
+=== Http Response
+include::{snippets}/order/get-orders/http-response.adoc[]
+include::{snippets}/order/get-my-orders/query-parameters.adoc[]
+include::{snippets}/order/get-my-orders/response-fields.adoc[]
+
+

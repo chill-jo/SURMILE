@@ -1,0 +1,4 @@
+[[point-resource]]
+= Point API
+
+include::get-point-history.adoc[]

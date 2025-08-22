@@ -1,0 +1,14 @@
+== Delete My Order API
+
+[example]
+`DEL` 요청을 사용하여 참여자는 자신의 주문을 삭제할 수 있습니다.
+
+=== Http Request
+
+include::{snippets}/order/delete-order/path-parameters.adoc[]
+
+=== Http Response
+include::{snippets}/order/get-orders/http-response.adoc[]
+include::{snippets}/order/delete-order/response-fields.adoc[]
+
+

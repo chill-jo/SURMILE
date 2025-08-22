@@ -1,12 +1,13 @@
 package com.example.surveyapp.domain.survey.domain.model.enums;
 
 import lombok.Getter;
-import org.springframework.security.core.parameters.P;
 
 import java.util.Arrays;
 
 @Getter
 public enum SurveyStatus {
+    PENDING("결제 전"),
+    CANCELED("실패"),
     NOT_STARTED("시작 전"),
     IN_PROGRESS("진행 중"),
     PAUSED("일시 중지"),
@@ -40,4 +41,6 @@ public enum SurveyStatus {
     public boolean isPaused(){
         return this == PAUSED;
     }
+
+    public boolean isPending(){ return this == PENDING; }
 }

@@ -1,5 +1,6 @@
 package com.example.surveyapp.domain.product.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,5 +10,5 @@ public enum Status {
     ON_SALE("판매중"),
     STOPPED_SALE("판매 중단");
 
-    private String status;
+    private final String status;
 }
