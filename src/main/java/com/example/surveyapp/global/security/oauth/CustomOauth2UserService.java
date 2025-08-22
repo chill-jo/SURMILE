@@ -70,7 +70,12 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
 				provider,
 				providerId
 			);
-			log.info("Created user for google: {}", created);
+			log.info(
+				"Created user for google: [email: {}, name: {}, nickname: {}, userRole: {},  provider: {}, providerId: {}, password: {}]",
+				created.getEmail(), created.getName(), created.getNickname(),
+				created.getUserRole(), created.getProvider(), created.getProviderId(),
+				created.getPassword()
+			);
 			return userRepository.save(created);
 		});
 
