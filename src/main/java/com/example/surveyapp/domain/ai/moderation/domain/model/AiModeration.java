@@ -18,6 +18,12 @@ public class AiModeration extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
+    private Long userId;
+
+    @Column(nullable = false, unique = true, length = 100)
+    private String nickname;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private AiModerationTargetType targetType;
 
@@ -27,13 +33,17 @@ public class AiModeration extends BaseEntity {
     private boolean isDeleted = false;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private AiModeration(AiModerationTargetType targetType, String content) {
+    private AiModeration(Long userId, String nickname, AiModerationTargetType targetType, String content) {
+        this.userId = userId;
+        this.nickname = nickname;
         this.targetType = targetType;
         this.content = content;
     }
 
-    public static AiModeration of(AiModerationTargetType targetType, String content) {
+    public static AiModeration of(Long userId, String nickname, AiModerationTargetType targetType, String content) {
         return AiModeration.builder()
+                .userId(userId)
+                .nickname(nickname)
                 .targetType(targetType)
                 .content(content)
                 .build();
