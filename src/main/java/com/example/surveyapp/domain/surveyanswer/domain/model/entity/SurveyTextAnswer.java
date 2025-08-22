@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.surveyanswer.domain.model;
+package com.example.surveyapp.domain.surveyanswer.domain.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "survey_options_answer")
+@Table(name = "survey_text_answer")
 @AllArgsConstructor
 @NoArgsConstructor
-public class SurveyOptionsAnswer {
+public class SurveyTextAnswer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,11 +21,11 @@ public class SurveyOptionsAnswer {
     private Long questionId;
 
     @Column(nullable = false)
-    private Long number;
+    private String content;
 
-    public SurveyOptionsAnswer(Long surveyAnswerId, Long questionId, Long number) {
+    public SurveyTextAnswer(Long surveyAnswerId, Long questionId, String content) {
         this.surveyAnswerId = surveyAnswerId;
         this.questionId = questionId;
-        this.number = number;
+        this.content = content;
     }
 }

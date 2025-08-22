@@ -2,8 +2,8 @@ package com.example.surveyapp.domain.surveyanswer.domain.strategy;
 
 import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.request.QuestionAnswerRequestDto;
-import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
-import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyTextAnswer;
+import com.example.surveyapp.domain.surveyanswer.domain.model.entity.SurveyAnswer;
+import com.example.surveyapp.domain.surveyanswer.domain.model.entity.SurveyTextAnswer;
 import com.example.surveyapp.domain.survey.domain.model.enums.QuestionType;
 import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyTextAnswerRepository;
 import lombok.RequiredArgsConstructor;

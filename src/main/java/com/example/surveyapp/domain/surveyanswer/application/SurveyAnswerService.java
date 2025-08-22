@@ -1,27 +1,28 @@
 package com.example.surveyapp.domain.surveyanswer.application;
 
 import com.example.surveyapp.domain.survey.application.dto.QuestionIdAndTypeDto;
-import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
-import com.example.surveyapp.domain.survey.domain.model.enums.SurveyStatus;
 import com.example.surveyapp.domain.surveyanswer.application.facade.SurveyFacade;
 import com.example.surveyapp.domain.surveyanswer.application.mapper.SurveyAnswerMapper;
 import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyAnswerEvent;
 import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyDoneEvent;
+import com.example.surveyapp.domain.surveyanswer.domain.model.entity.SurveyAnswerOutbox;
+import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerOutboxRepository;
+import com.example.surveyapp.domain.surveyanswer.exception.AnswerErrorCode;
+import com.example.surveyapp.domain.surveyanswer.exception.AnswerException;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.request.SurveyAnswerRequestDto;
 import com.example.surveyapp.domain.surveyanswer.presentation.dto.response.SurveyeeSurveyListDto;
-import com.example.surveyapp.domain.surveyanswer.domain.model.SurveyAnswer;
+import com.example.surveyapp.domain.surveyanswer.domain.model.entity.SurveyAnswer;
 import com.example.surveyapp.domain.surveyanswer.domain.repository.SurveyAnswerRepository;
 import com.example.surveyapp.domain.surveyanswer.domain.strategy.SurveyQuestionStrategy;
 import com.example.surveyapp.global.aop.LockAnnotation;
 import com.example.surveyapp.global.reader.UserReader;
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -35,6 +36,8 @@ public class SurveyAnswerService {
     private final SurveyAnswerMapper surveyAnswerFactory;
     private final SurveyAnswerRepository surveyAnswerRepository;
     private final SurveyAnswerQueryService surveyAnswerQueryService;
+    private final ObjectMapper objectMapper;
+    private final SurveyAnswerOutboxRepository surveyAnswerOutboxRepository;
 
     @Transactional
     @LockAnnotation(key = "'survey:' + #surveyId")
@@ -54,6 +57,22 @@ public class SurveyAnswerService {
                 surveyFacade.getPointPerPersonBySurveyId(surveyId),
                 surveyAnswer.getId()
         ));
+
+        SurveyAnswerEvent event = new SurveyAnswerEvent(userId,
+                surveyFacade.getPointPerPersonBySurveyId(surveyId),
+                surveyAnswer.getId());
+        try {
+            String payload = objectMapper.writeValueAsString(event);
+            SurveyAnswerOutbox answerOutbox = SurveyAnswerOutbox.of("Survey_Answer",
+                    surveyAnswer.getId(),
+                    payload
+                    );
+
+            surveyAnswerOutboxRepository.save(answerOutbox);
+
+        } catch (JsonProcessingException e) {
+            throw new AnswerException(AnswerErrorCode.CANNOT_CONVERT_PAYLOAD);
+        }
 
         if (surveyAnswerRepository.countBySurveyId(surveyId) >= surveyFacade.getSurveyInfo(surveyId).getMaxSurveyee()) {
             eventPublisher.publishEvent(new SurveyDoneEvent(surveyId));

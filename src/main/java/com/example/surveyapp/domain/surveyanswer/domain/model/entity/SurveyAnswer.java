@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.surveyanswer.domain.model;
+package com.example.surveyapp.domain.surveyanswer.domain.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
