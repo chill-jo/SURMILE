@@ -1,18 +1,22 @@
 package com.example.surveyapp.domain.point.application;
 
 import com.example.surveyapp.domain.point.domain.event.PointChargeSucceededEvent;
+import com.example.surveyapp.domain.point.domain.event.PointRedeemSucceededEvent;
 import com.example.surveyapp.domain.point.domain.event.SurveyPointRedeemSucceededEvent;
 import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
 import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
-import com.example.surveyapp.domain.point.domain.event.PointRedeemSucceededEvent;
 import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
+import com.example.surveyapp.domain.point.domain.model.entity.PointOutbox;
 import com.example.surveyapp.domain.point.domain.model.enums.PointType;
 import com.example.surveyapp.domain.point.domain.model.enums.Target;
 import com.example.surveyapp.domain.point.domain.repository.PointHistoryRepository;
+import com.example.surveyapp.domain.point.domain.repository.PointOutboxRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.point.exception.PointErrorCode;
 import com.example.surveyapp.domain.point.exception.PointException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -26,7 +30,9 @@ public class PointEarnRedeemService {
 
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final PointOutboxRepository pointOutboxRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public void decreasePoint(Long userId, PointBalance amount, Long orderId){
@@ -35,12 +41,25 @@ public class PointEarnRedeemService {
                 .orElseThrow(() -> new PointException(PointErrorCode.POINT_NOT_FOUND));
 
         PointBalance currentBalance = point.getPointBalance();
-
         point.redeem(amount);
 
-        eventPublisher.publishEvent(new PointRedeemSucceededEvent(
-                userId,
-                orderId ));
+
+        try {
+            PointRedeemSucceededEvent event =
+                    new PointRedeemSucceededEvent(orderId, userId);
+
+            String payload = objectMapper.writeValueAsString(event);
+
+            PointOutbox pointOutbox = PointOutbox.of(
+                    "Order",
+                    point.getId(),
+                    payload);
+
+            pointOutboxRepository.save(pointOutbox);
+
+        } catch (JsonProcessingException e) {
+            throw new PointException(PointErrorCode.CANNOT_CONVERT_PAYLOAD);
+        }
 
         PointHistory history = PointHistory.of(
                 currentBalance,
@@ -57,7 +76,6 @@ public class PointEarnRedeemService {
         pointHistoryRepository.save(history);
     }
 
-
     @Transactional
     public void decreaseSurveyorPoint(Long userId, PointBalance amount, Long surveyId) {
 
@@ -65,12 +83,21 @@ public class PointEarnRedeemService {
                 .orElseThrow(() -> new PointException(PointErrorCode.POINT_NOT_FOUND));
 
         PointBalance currentBalance = point.getPointBalance();
-
         point.redeem(amount);
 
-        SurveyPointRedeemSucceededEvent event = new SurveyPointRedeemSucceededEvent(userId, surveyId);
+        try{
+            SurveyPointRedeemSucceededEvent event = new SurveyPointRedeemSucceededEvent(userId, surveyId);
 
-        eventPublisher.publishEvent(event);
+            String payload = objectMapper.writeValueAsString(event);
+
+            PointOutbox pointOutbox = PointOutbox.of("Survey",
+                    point.getId(),
+                    payload);
+
+            pointOutboxRepository.save(pointOutbox);
+        } catch (JsonProcessingException e) {
+            throw new PointException(PointErrorCode.CANNOT_CONVERT_PAYLOAD);
+        }
 
         PointHistory history = PointHistory.of(
                 currentBalance,
@@ -114,7 +141,7 @@ public class PointEarnRedeemService {
     }
 
     @Transactional
-    public void increaseSurveyorPoint(Long userId, Long paymentId, PointBalance amount){
+    public void increaseSurveyorPoint(Long userId, Long paymentId, PointBalance amount) {
 
         PointWallet point = pointRepository.findByUserId(userId)
                 .orElseThrow(() -> new PointException(PointErrorCode.POINT_NOT_FOUND));
@@ -143,7 +170,14 @@ public class PointEarnRedeemService {
         );
 
         pointHistoryRepository.save(history);
+    }
 
+    private String toJson(Object event){
+        try{
+            return objectMapper.writeValueAsString(event);
+        } catch(JsonProcessingException e){
+            throw new PointException(PointErrorCode.CANNOT_CONVERT_PAYLOAD);
+        }
     }
 
 }
