@@ -1,6 +1,15 @@
 package com.example.surveyapp.domain.survey.application;
 
+import com.example.surveyapp.domain.order.domain.model.OrderOutbox;
+import com.example.surveyapp.domain.order.exception.OrderErrorCode;
+import com.example.surveyapp.domain.order.exception.OrderException;
+import com.example.surveyapp.domain.survey.domain.model.entity.SurveyOutbox;
+import com.example.surveyapp.domain.survey.domain.repository.SurveyOutboxRepository;
+import com.example.surveyapp.domain.survey.exception.SurveyErrorCode;
+import com.example.surveyapp.domain.survey.exception.SurveyException;
 import com.example.surveyapp.global.redis.application.RedisTemplateFacade;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,6 +51,8 @@ public class SurveyService {
 	private final SurveyAnswerFacade surveyAnswerFacade;
 	private final AiModerationFacade aiModerationFacade;
     private final RedisTemplateFacade redisTemplateFacade;
+	private final ObjectMapper objectMapper;
+	private final SurveyOutboxRepository surveyOutboxRepository;
 
     @Transactional
 	public SurveyResponseDto createSurvey(Long userId, SurveyCreateRequestDto requestDto) {
@@ -56,11 +67,21 @@ public class SurveyService {
 		Survey saved = surveyRepository.save(survey);
 
 		if (userReader.validateUserRoleToSurveyor(userId)) {
-			eventPublisher.publishEvent(new SurveyCreateEvent(
-				saved.getId(),
-				saved.getSurveyInfo().getTotalPoint().getValue(),
-				userId)
-			);
+
+			try {
+				SurveyCreateEvent event = new SurveyCreateEvent(saved.getId(),
+						saved.getSurveyInfo().getTotalPoint().getValue(),
+						userId);
+				String payload = objectMapper.writeValueAsString(event);
+				SurveyOutbox surveyOutbox = SurveyOutbox.of("Survey",
+						saved.getId(),
+						payload);
+
+				surveyOutboxRepository.save(surveyOutbox);
+
+			} catch (JsonProcessingException e) {
+				throw new SurveyException(SurveyErrorCode.CANNOT_CONVERT_PAYLOAD);
+			}
 		}
 
 		return surveyMapper.toResponseDto(saved);
