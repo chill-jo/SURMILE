@@ -51,10 +51,24 @@ public class User extends BaseEntity {
         this.providerId = providerId;
     }
 
-    public static User of(String email, String password, String name, String nickname, UserRoleEnum role, String provider, String providerId) {
+    public static User of(String email, String password, String name, String nickname, UserRoleEnum role) {
         return User.builder()
                 .email(email)
                 .password(password)
+                .name(name)
+                .nickname(nickname)
+                .userRole(role)
+                .provider(null)
+                .providerId(null)
+                .build();
+    }
+
+    // 소셜 가입용
+    public static User ofSocial(String email, String name, String nickname,
+                                UserRoleEnum role, String provider, String providerId) {
+        return User.builder()
+                .email(email)
+                .password(null) // 소셜은 보통 비번 없음
                 .name(name)
                 .nickname(nickname)
                 .userRole(role)

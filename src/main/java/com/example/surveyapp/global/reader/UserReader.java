@@ -6,6 +6,4 @@ public interface UserReader {
     boolean validateUserRoleToAdmin(Long userId);
     boolean validateUserRoleToSurveyee(Long userId);
     boolean validateUserRoleToSurveyor(Long userId);
-    String usernameByEmail(String email);
-    boolean validateUserRoleToSurveyorByEmail(String userRole, String email);
 }
