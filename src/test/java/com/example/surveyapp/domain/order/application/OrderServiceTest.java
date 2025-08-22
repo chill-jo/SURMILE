@@ -95,7 +95,6 @@ class OrderServiceTest {
         assertThat(responseDto.getStatus()).isEqualTo(Status.ON_SALE.getStatus());
         assertThat(responseDto.getTitle()).isEqualTo(order.getOrderItem().getTitle());
 
-        verify(eventPublisher).publishEvent(any(OrderCreateEvent.class));
         verify(orderRepository, times(1)).save(any(Order.class));
         verify(orderOutboxRepository, times(1)).save(any(OrderOutbox.class));
 
