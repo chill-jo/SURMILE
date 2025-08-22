@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -25,8 +24,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
 	private final JwtUtil jwtUtil;
 
-	@Value("${app.oauth2.success-redirect-uri}")
-	private String successRedirectUri;
+	private String successRedirectUri = "http://localhost:8080/";
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request,
