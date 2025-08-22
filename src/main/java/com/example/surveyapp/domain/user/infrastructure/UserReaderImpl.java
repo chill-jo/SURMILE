@@ -26,12 +26,18 @@ public class UserReaderImpl implements UserReader {
         }
     }
 
-
     @Override
     public String usernameById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
         return user.getName();
+    }
+
+    @Override
+    public String emailById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.NOT_FOUND_USER));
+        return user.getEmail();
     }
 
     @Override

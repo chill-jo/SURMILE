@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.example.surveyapp.domain.ai.moderation.application.facade.AiModerationFacade;
 import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
 import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
@@ -15,6 +14,7 @@ import com.example.surveyapp.domain.survey.presentation.dto.response.OptionRespo
 import com.example.surveyapp.domain.survey.domain.model.entity.Options;
 import com.example.surveyapp.domain.survey.domain.model.entity.Question;
 import com.example.surveyapp.domain.survey.domain.model.entity.Survey;
+import com.example.surveyapp.domain.survey.application.facade.SurveyModerationFacade;
 import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ public class OptionsServiceTest{
     private OptionsService optionsService;
 
     @Mock
-    private AiModerationFacade aiModerationFacade;
+    private SurveyModerationFacade surveyModerationFacade;
 
     @Test
     @DisplayName("기능_선택지 생성을 성공한다")
@@ -65,7 +65,7 @@ public class OptionsServiceTest{
         when(surveyQueryService.findSurvey(surveyId)).thenReturn(surveyMock);
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
-        when(aiModerationFacade.checkOptionsModeration(eq("테스트선택지내용")))
+        when(surveyModerationFacade.checkOptionsModeration(eq(userId), eq("테스트선택지내용")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         // when
@@ -158,7 +158,7 @@ public class OptionsServiceTest{
         when(surveyQuestionService.getQuestionById(surveyMock, questionId)).thenReturn(questionMock);
         doNothing().when(surveyValidator).validateUpdatable(userId, surveyMock);
         when(questionMock.updateOption(optionId, requestDto.getNumber(), requestDto.getContent())).thenReturn(optionMock);
-        when(aiModerationFacade.checkOptionsModeration(eq("테스트질문지내용수정")))
+        when(surveyModerationFacade.checkOptionsModeration(eq(userId), eq("테스트질문지내용수정")))
                 .thenReturn(AiModerationResult.of(null, AiModerationResultStatusEnum.APPROVED));
 
         when(optionMock.getId()).thenReturn(optionId);

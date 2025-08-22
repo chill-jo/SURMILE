@@ -10,12 +10,18 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "moderation_events")
+@Table(name = "moderation_results")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AiModeration extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column
+    private Long userId;
+
+    @Column
+    private String email;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -27,13 +33,17 @@ public class AiModeration extends BaseEntity {
     private boolean isDeleted = false;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private AiModeration(AiModerationTargetType targetType, String content) {
+    private AiModeration(Long userId, String email, AiModerationTargetType targetType, String content) {
+        this.userId = userId;
+        this.email = email;
         this.targetType = targetType;
         this.content = content;
     }
 
-    public static AiModeration of(AiModerationTargetType targetType, String content) {
+    public static AiModeration of(Long userId, String email, AiModerationTargetType targetType, String content) {
         return AiModeration.builder()
+                .userId(userId)
+                .email(email)
                 .targetType(targetType)
                 .content(content)
                 .build();

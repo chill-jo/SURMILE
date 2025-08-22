@@ -21,7 +21,7 @@ public class AiModerationService {
     private final AiModerationRepository aiModerationRepository;
 
     @Transactional
-    public AiModerationResult moderate(AiModerationTargetType targetType, String content) {
+    public AiModerationResult moderate(Long userId, String email, AiModerationTargetType targetType, String content) {
         // 프롬프트 구성
         PromptTemplate prompt = new PromptTemplate(AiModerationPromptTemplate.promptTemplate);
         prompt.add("targetType", targetType.name());
@@ -39,7 +39,7 @@ public class AiModerationService {
 
         // 결과가 DENIED면 저장
         if (status == AiModerationResultStatusEnum.DENIED) {
-            AiModeration moderation = AiModeration.of(targetType, content);
+            AiModeration moderation = AiModeration.of(userId, email, targetType, content);
             aiModerationRepository.save(moderation);
 
             log.warn("Inappropriate content detected. Target={}, Content={}", targetType, content);
