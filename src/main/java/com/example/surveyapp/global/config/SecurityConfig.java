@@ -43,8 +43,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 비회원 허용
                         .requestMatchers(
-                                "/",
-                                "/index.html",
                                 "/api/register",
                                 "/api/login",
                                 "/api/logout",
