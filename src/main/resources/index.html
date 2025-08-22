@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>설문은 간단하게, 보상은 확실하게! 써마일!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+        button {
+            display: block;
+            width: 220px;
+            margin: 12px auto;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        .google { background-color: #4285F4; color: white; }
+        .kakao { background-color: #FEE500; color: #000000; }
+    </style>
+</head>
+<body>
+
+<h2>써마일에 오신 것을 환영합니다!</h2>
+
+<!-- 구글 OAuth 로그인 URL로 연결 -->
+<button class="google"
+        onclick="location.href='https://accounts.google.com/o/oauth2/v2/auth?client_id=327848907069-5vcnae83kl65h92emqnqhm36b2gtg70s.apps.googleusercontent.com&redirect_uri=https://xn--hz2b19osld.o-r.kr/login/oauth2/code/google&response_type=code&scope=email%20profile'">
+    Google 로그인
+</button>
+
+
+<!-- Kakao 로그인 (테스트용) -->
+<button class="kakao" onclick="alert('Kakao 로그인 테스트')">
+    Kakao 로그인
+</button>
+
+</body>
+</html>

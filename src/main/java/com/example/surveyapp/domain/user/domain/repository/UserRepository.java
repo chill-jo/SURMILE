@@ -10,7 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository {
+    Optional<User> findById(Long id);
     Optional<User> findByEmailAndIsDeletedFalse(String email);
     Optional<User> findByIdAndIsDeletedFalse(Long userId);
 
@@ -44,5 +45,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // 필요 시 이메일 기반 조회(활성만) — 기존 메서드로 대체 가능하지만 명시적으로 ㅇ일단 둠
     Optional<User> findByEmail(String email); // 폼 로그인/이메일 링크드 계정 처리 시 유용
-
 }

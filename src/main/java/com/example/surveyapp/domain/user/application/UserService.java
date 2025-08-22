@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.surveyapp.domain.user.domain.repository.UserR2dbcRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,6 +57,12 @@ public class UserService {
 	@Value("${jwt.access-token.expiration.refresh-token}")
 	private long REFRESH_TOKEN_TIME;
 
+	/**
+	 * 회원 가입 비지니스 로직
+	 * - 회원 가입 요청 데이터를 이용해서 회원 중복 가입 여부를 검증
+	 * - 비밀번호 요청 데이터를 암호화
+	 * - 회원 데이터를 저장
+	 */
 	@Transactional
 	public void register(RegisterRequestDto requestDto) {
 		if (userRepository.existsByEmail(requestDto.getEmail())) {

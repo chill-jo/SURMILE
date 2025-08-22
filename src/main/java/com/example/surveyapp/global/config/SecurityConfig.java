@@ -61,7 +61,10 @@ public class SecurityConfig {
                                 // OAuth2 엔드포인트 허용
                                 "/oauth2/**",
                                 "/login/oauth2/code/**",
-                                "/oauth2/authorization/**"
+                                "/oauth2/authorization/**",
+
+                                "/써마일.o-r.kr/**",
+                                "/index.html/**"
                         ).permitAll()
 
                         // 관리자 권한 필요

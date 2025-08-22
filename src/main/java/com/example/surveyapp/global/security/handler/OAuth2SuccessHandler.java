@@ -35,6 +35,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         CustomOauth2UserDetails principal = (CustomOauth2UserDetails) authentication.getPrincipal();
         User user = principal.getUser();
 
+
+
         // 1) JWT 발급 (UserRoleEnum 그대로 넘김)
         String rawAccessToken  = jwtUtil.createAccessToken(user.getId(), user.getUserRole());
         String rawRefreshToken = jwtUtil.createRefreshToken(user.getId());

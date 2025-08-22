@@ -10,8 +10,8 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
       cache-access-token: accessToken
       cache-refresh-token: refreshToken
       default-ttl-sec: 86400
@@ -42,7 +42,7 @@ spring:
             scope:
               - email
               - profile
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: "${BASE_URL}/login/oauth2/code/google"
         provider:
           google:
             issuer-uri: https://accounts.google.com
