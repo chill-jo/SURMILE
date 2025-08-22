@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "moderation_events")
+@Table(name = "moderation_results")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AiModeration extends BaseEntity {
     @Id
