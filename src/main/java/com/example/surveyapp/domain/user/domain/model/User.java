@@ -1,11 +1,9 @@
 package com.example.surveyapp.domain.user.domain.model;
 
-import com.example.surveyapp.domain.user.domain.model.AuthProvider;
 import com.example.surveyapp.global.config.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 
 @Entity
 @Getter
@@ -32,37 +30,36 @@ public class User extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum userRole;
 
-    private boolean isDeleted = false;
+    // 소셜 로그인 provider (google, kakao 등)
+    @Column(length = 20)
+    private String provider;
 
-    // 어떤 로그인 제공자인지
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private AuthProvider provider = AuthProvider.LOCAL;
-
-    // 소셜 고유 식별자(구글의 sub 등). 소셜 미연동이면 null
-    @Column(unique = true, length = 64)
+    // 소셜 로그인 providerId (해당 provider의 고유 ID)
+    @Column(length = 50)
     private String providerId;
 
+    private boolean isDeleted = false;
+
     @Builder(access = AccessLevel.PRIVATE)
-    private User(String email, String password, String name, String nickname,
-                 UserRoleEnum userRole, AuthProvider provider, String providerId) {
+    private User(String email, String password, String name, String nickname, UserRoleEnum userRole, String provider, String providerId) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.nickname = nickname;
         this.userRole = userRole;
-        this.provider = provider == null ? AuthProvider.LOCAL : provider;
+        this.provider = provider;
         this.providerId = providerId;
     }
 
-    public static User of(String email, String password, String name, String nickname, UserRoleEnum role) {
+    public static User of(String email, String password, String name, String nickname, UserRoleEnum role, String provider, String providerId) {
         return User.builder()
                 .email(email)
                 .password(password)
                 .name(name)
                 .nickname(nickname)
                 .userRole(role)
-                .provider(AuthProvider.LOCAL)
+                .provider(provider)
+                .providerId(providerId)
                 .build();
     }
 
@@ -74,7 +71,6 @@ public class User extends BaseEntity {
                 .nickname(adminNickname)
                 .password(adminPassword)
                 .userRole(UserRoleEnum.ADMIN)
-                .provider(AuthProvider.LOCAL)
                 .build();
     }
 
@@ -104,14 +100,5 @@ public class User extends BaseEntity {
     }
     public boolean isUserRoleSurveyor(){
         return userRole.equals(UserRoleEnum.SURVEYOR);
-    }
-
-    // 소셜 연동(LOCAL → GOOGLE/KAKAO)
-    public void linkSocial(AuthProvider provider, String providerId) {
-        if (this.provider != AuthProvider.LOCAL && this.provider != provider) {
-            throw new IllegalStateException("이미 다른 소셜로 연동된 계정입니다.");
-        }
-        this.provider = provider;
-        this.providerId = providerId;
     }
 }
