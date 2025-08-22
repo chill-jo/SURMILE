@@ -1,7 +1,7 @@
-package com.example.surveyapp.domain.point.application;
+package com.example.surveyapp.domain.payment.application;
 
-import com.example.surveyapp.domain.point.domain.model.entity.vo.Money;
-import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
+import com.example.surveyapp.domain.payment.domain.model.vo.Money;
+import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

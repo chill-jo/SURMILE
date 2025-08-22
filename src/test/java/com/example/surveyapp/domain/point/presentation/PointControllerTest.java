@@ -1,15 +1,13 @@
 package com.example.surveyapp.domain.point.presentation;
 
 import com.example.surveyapp.config.custommockuser.WithCustomMockUser;
-import com.example.surveyapp.domain.admin.application.AdminService;
-import com.example.surveyapp.domain.admin.presentation.dto.UserDto;
 import com.example.surveyapp.domain.point.application.PointService;
 import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
 import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
-import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
+import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
 import com.example.surveyapp.domain.point.domain.model.enums.PointType;
 import com.example.surveyapp.domain.point.domain.model.enums.Target;
-import com.example.surveyapp.domain.point.presentation.dto.request.PointChargeRequestDto;
+import com.example.surveyapp.domain.payment.presentation.dto.request.PointChargeRequestDto;
 import com.example.surveyapp.domain.point.presentation.dto.response.PointHistoryResponseDto;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import com.example.surveyapp.global.filter.JwtFilter;
@@ -33,7 +31,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -64,43 +61,7 @@ public class PointControllerTest {
     @MockitoBean
     private PointService pointService;
 
-    @Test
-    @DisplayName("기능_포인트를 충전한다.")
-    @WithCustomMockUser(id = 1L, role = UserRoleEnum.SURVEYOR)
-    void 포인트를_충전한다() throws Exception{
 
-        Long userId = 1L;
-        PointChargeRequestDto requestDto = new PointChargeRequestDto(5000L);
-
-        doNothing().when(pointService).charge(userId, requestDto);
-
-        ResultActions actions = mockMvc.perform(post("/api/points/charge")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer {jwt_token}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDto)));
-
-        actions.andExpect(status().isCreated())
-                .andDo(document("point/charge-point",
-                        requestHeaders(
-                                headerWithName(HttpHeaders.AUTHORIZATION)
-                                        .description("JWT 인증 토큰 (Bearer + 토큰 값")
-                                        .attributes(key("format").value("Bearer {jwt_token"))
-                        ),
-                        requestFields(
-                                fieldWithPath("price").description("충전 금액")
-                        ),
-                        responseFields(
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
-                        )
-                ))
-        ;
-
-        verify(pointService).charge(anyLong(), any(PointChargeRequestDto.class));
-
-    }
 
     @Test
     @DisplayName("기능_포인트 내역을 조회한다.")

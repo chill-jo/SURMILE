@@ -1,15 +1,12 @@
 package com.example.surveyapp.domain.point.presentation;
 
-import com.example.surveyapp.domain.point.presentation.dto.request.PointChargeRequestDto;
 import com.example.surveyapp.domain.point.presentation.dto.response.PointHistoryResponseDto;
 import com.example.surveyapp.domain.point.application.PointService;
 import com.example.surveyapp.global.response.ApiResponse;
 import com.example.surveyapp.global.security.jwt.CustomUserDetails;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,17 +20,6 @@ import org.springframework.data.domain.Pageable;
 public class PointController {
 
     private final PointService pointService;
-
-    //포인트 충전
-    @PreAuthorize("hasAnyRole('SURVEYOR')")
-    @PostMapping("/charge")
-    public ResponseEntity<ApiResponse<Void>> charge(
-            @Valid @RequestBody PointChargeRequestDto dto,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ){
-        pointService.charge(userDetails.getId(), dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("결제가 되었습니다.",null));
-    }
 
     //포인트 조회
     @PreAuthorize("hasAnyRole('SURVEYOR', 'SURVEYEE')")

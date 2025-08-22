@@ -2,8 +2,8 @@ package com.example.surveyapp.domain.point.application.eventhandler;
 
 import com.example.surveyapp.domain.order.domain.event.OrderCreateEvent;
 import com.example.surveyapp.domain.point.application.PointEarnRedeemService;
-import com.example.surveyapp.domain.point.domain.model.entity.event.PointRedeemFailedEvent;
-import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
+import com.example.surveyapp.domain.point.domain.event.PointRedeemFailedEvent;
+import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
 import com.example.surveyapp.domain.point.exception.PointException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,16 +32,20 @@ public class OrderPointEventHandler {
 
         }
         catch (PointException e) {
-            eventPublisher.publishEvent(new PointRedeemFailedEvent(event.getOrderId(),
-                    event.getUserId()));
+            eventPublisher.publishEvent(new PointRedeemFailedEvent(
+                    event.getUserId(),
+                    event.getOrderId()
+                    ));
             log.info("포인트 차감 실패(PointException) – orderId={}, userId={}, reason={}",
                     event.getOrderId(), event.getUserId(), e.getMessage(), e);
                     log.info("포인트 차감 메서드 금액 실패 후 이밴트 발행");
 
         }
         catch (Exception e){
-            eventPublisher.publishEvent(new PointRedeemFailedEvent(event.getOrderId(),
-                    event.getUserId()));
+            eventPublisher.publishEvent(new PointRedeemFailedEvent(
+                    event.getUserId(),
+                    event.getOrderId()
+                    ));
             log.info("포인트 차감 실패(기타) – orderId={}, userId={}", event.getOrderId(), event.getUserId(), e);
 
             log.info("포인트 차감 메서드 실패 후 이밴트 발행");

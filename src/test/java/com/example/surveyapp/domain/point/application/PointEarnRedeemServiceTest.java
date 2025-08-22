@@ -1,9 +1,9 @@
 package com.example.surveyapp.domain.point.application;
 
-import com.example.surveyapp.domain.point.domain.event.PointRedeemSuccessEvent;
+import com.example.surveyapp.domain.point.domain.event.SurveyPointRedeemSucceededEvent;
 import com.example.surveyapp.domain.point.domain.model.entity.PointHistory;
 import com.example.surveyapp.domain.point.domain.model.entity.PointWallet;
-import com.example.surveyapp.domain.point.domain.model.entity.vo.PointBalance;
+import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
 import com.example.surveyapp.domain.point.domain.repository.PointHistoryRepository;
 import com.example.surveyapp.domain.point.domain.repository.PointRepository;
 import com.example.surveyapp.domain.point.exception.PointErrorCode;
@@ -49,7 +49,7 @@ public class PointEarnRedeemServiceTest {
 
         PointWallet point = mock(PointWallet.class);
         PointBalance currentBalance = PointBalance.of(10000L);
-        PointRedeemSuccessEvent event = new PointRedeemSuccessEvent(userId, surveyId);
+        SurveyPointRedeemSucceededEvent event = new SurveyPointRedeemSucceededEvent(userId, surveyId);
 
         when(pointRepository.findByUserId(userId)).thenReturn(Optional.of(point));
         when(point.getPointBalance()).thenReturn(currentBalance);
@@ -67,7 +67,7 @@ public class PointEarnRedeemServiceTest {
         // then
         assertThat(point.getPointBalance().getValue()).isEqualTo(8000L);
 
-        verify(eventPublisher).publishEvent(any(PointRedeemSuccessEvent.class));
+        verify(eventPublisher).publishEvent(any(SurveyPointRedeemSucceededEvent.class));
         verify(pointHistoryRepository, times(1)).save(any(PointHistory.class));
     }
 
