@@ -1,16 +1,40 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: survey-mysql
-    restart: always
+  redis:
+    image: redis/redis-stack:latest
     ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: root-password
-      MYSQL_DATABASE: survey_app
-      MYSQL_USER: dev-user
-      MYSQL_PASSWORD: dev-password
-    command: >
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-      --lower_case_table_names=1
+      - "6379:6379"
+    container_name: redis
+
+  app:
+    image: app:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/app/logs   # 호스트 ./logs ↔ 컨테이너 /app/logs 연결
+    restart: always
+    container_name: survey-app
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /home/ec2-user/nginx:/etc/nginx/conf.d
+      - /home/ec2-user/certbot/conf:/etc/letsencrypt
+      - /home/ec2-user/certbot/www:/var/www/certbot
+    depends_on:
+      - app
+
+#  certbot:
+#    image: certbot/certbot
+#    command: certonly --webroot --non-interactive --agree-tos --webroot-path=/var/www/certbot -d surmile.o-r.kr
+#    volumes:
+#      - /home/ec2-user/certbot/conf:/etc/letsencrypt
+#      - /home/ec2-user/certbot/www:/var/www/certbot
+#    depends_on:
+#      - nginx
