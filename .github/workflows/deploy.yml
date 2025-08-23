@@ -52,7 +52,7 @@ jobs:
 #        run: mv ./Dockerfile ./survey-app
 
       - name: Docker image 생성
-        run: docker build -t app:latest
+        run: docker build -t app:latest .
 
       - name: Docker 이미지 .tar 파일 생성
         run: docker save -o ./survey-app/app.tar app:latest
