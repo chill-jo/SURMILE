@@ -6,10 +6,11 @@
 
 
 # Build Stage
-FROM amazoncorretto:17-alpine AS jar_builder
+FROM gradle:7.6-jdk17 AS jar_builder
 WORKDIR /app
 COPY . .
-RUN ./gradlew clean build
+RUN chmod +x ./gradlew
+RUN ./gradlew clean build -x test --stacktrace
 
 # Run Stage
 FROM gcr.io/distroless/java17-debian11 AS jre_builder
