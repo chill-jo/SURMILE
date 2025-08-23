@@ -1,9 +1,8 @@
 package com.example.surveyapp.domain.point.domain.model.entity;
 
-
+import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
 import com.example.surveyapp.domain.point.domain.model.enums.PointType;
 import com.example.surveyapp.domain.point.domain.model.enums.Target;
-import com.example.surveyapp.domain.user.domain.model.User;
 import com.example.surveyapp.global.config.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -12,23 +11,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-
 public class PointHistory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long currentBalance;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name="current_balance", nullable = false))
+    private PointBalance currentBalance;
 
-    @Column(nullable = false)
-    private Long amount;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name="amount", nullable = false))
+    private PointBalance amount;
 
-    @Column(nullable = false)
-    private Long afterBalance;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name="after_balance", nullable = false))
+    private PointBalance afterBalance;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -44,17 +45,14 @@ public class PointHistory extends BaseEntity {
     @Column(length = 255, nullable = false)
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "point_id")
-    private Point point;
-
+    @JoinColumn(name = "point_wallet_id")
+    private PointWallet point;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private PointHistory (Long currentBalance, Long amount, Long afterBalance, PointType type, Target target, Long targetId, String description, User user, Point point){
+    private PointHistory (PointBalance currentBalance, PointBalance amount, PointBalance afterBalance, PointType type, Target target, Long targetId, String description, Long userId, PointWallet point){
         this.currentBalance=currentBalance;
         this.amount=amount;
         this.afterBalance=afterBalance;
@@ -62,11 +60,11 @@ public class PointHistory extends BaseEntity {
         this.target=target;
         this.targetId=targetId;
         this.description=description;
-        this.user=user;
+        this.userId = userId;
         this.point=point;
     }
 
-    public static PointHistory of(Long currentBalance, Long amount, Long afterBalance, PointType type, Target target, Long targetId, String description, User user, Point point){
+    public static PointHistory of(PointBalance currentBalance, PointBalance amount, PointBalance afterBalance, PointType type, Target target, Long targetId, String description, Long userId, PointWallet point){
         return PointHistory.builder()
                 .currentBalance(currentBalance)
                 .amount(amount)
@@ -75,7 +73,7 @@ public class PointHistory extends BaseEntity {
                 .target(target)
                 .targetId(targetId)
                 .description(description)
-                .user(user)
+                .userId(userId)
                 .point(point)
                 .build();
     }

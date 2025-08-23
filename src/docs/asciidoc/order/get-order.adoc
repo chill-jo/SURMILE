@@ -1,0 +1,11 @@
+== Read One Order API
+
+[example]
+`GET` 요청을 사용하여 관리자는 단건 주문을 조회할 수 있습니다.
+
+
+
+=== Http Response
+include::{snippets}/order/get-orders/http-response.adoc[]
+include::{snippets}/order/get-order/response-fields.adoc[]
+

@@ -1,0 +1,19 @@
+== Create Order API
+
+[example]
+`POST` 요청을 사용하여 참여자는 주문을 등록할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/order/create-order/http-request.adoc[]
+include::{snippets}/order/create-order/request-headers.adoc[]
+include::{snippets}/order/create-order/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/order/create-order/http-response.adoc[]
+
+====

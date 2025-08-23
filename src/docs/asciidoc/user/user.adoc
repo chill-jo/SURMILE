@@ -1,0 +1,13 @@
+[[user-resource]]
+= User API
+
+include::register.adoc[]
+include::login.adoc[]
+include::logout.adoc[]
+include::refresh.adoc[]
+include::withdraw.adoc[]
+include::get-my-page.adoc[]
+include::update-my-page.adoc[]
+include::get-base-data-info.adoc[]
+include::save-base-datas.adoc[]
+include::get-base-datas.adoc[]

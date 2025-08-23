@@ -1,0 +1,18 @@
+== Refresh API
+
+[example]
+`POST` 요청을 사용하여 토큰을 재발급 할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/user/refresh/http-request.adoc[]
+include::{snippets}/user/refresh/request-headers.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/user/refresh/http-response.adoc[]
+include::{snippets}/user/refresh/response-fields.adoc[]
+====

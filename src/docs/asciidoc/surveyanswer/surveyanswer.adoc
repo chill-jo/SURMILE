@@ -1,0 +1,6 @@
+[[surveyanswer-resource]]
+= Survey Answer API
+
+include::create-survey-answer.adoc[]
+include::get-survey-statistics.adoc[]
+include::get-participated-surveys.adoc[]

@@ -1,0 +1,4 @@
+[[payment-resource]]
+= Payment API
+
+include::charge-point.adoc[]

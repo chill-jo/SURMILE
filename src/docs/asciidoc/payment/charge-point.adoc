@@ -1,0 +1,19 @@
+== Charge Point API
+
+[example]
+`POST` 요청을 사용하여 포인트를 충전할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/payment/charge-point/http-request.adoc[]
+include::{snippets}/payment/charge-point/request-headers.adoc[]
+include::{snippets}/payment/charge-point/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/payment/charge-point/http-response.adoc[]
+include::{snippets}/payment/charge-point/response-fields.adoc[]
+====

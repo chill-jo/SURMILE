@@ -1,0 +1,105 @@
+package com.example.surveyapp.domain.survey.presentation;
+
+import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionCreateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.request.QuestionUpdateRequestDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.PageQuestionResponseDto;
+import com.example.surveyapp.domain.survey.presentation.dto.response.QuestionResponseDto;
+import com.example.surveyapp.domain.survey.application.QuestionService;
+import com.example.surveyapp.global.security.jwt.CustomUserDetails;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/survey")
+public class QuestionController {
+
+    private final QuestionService questionService;
+
+    @PostMapping("/{surveyId}")
+    @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
+    public ResponseEntity<QuestionResponseDto> createQuestion(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long surveyId,
+            @Valid @RequestBody QuestionCreateRequestDto requestDto
+    ){
+        Long userId = userDetails.getId();
+        QuestionResponseDto responseDto = questionService.createQuestion(userId, surveyId, requestDto);
+
+        URI location = URI.create("/api/survey/" + surveyId + "/question/" + responseDto.getId());
+        return ResponseEntity
+                .created(location)
+                .body(responseDto);
+    }
+
+    //질문 목록 조회
+    @GetMapping("/{surveyId}/question")
+    public ResponseEntity<PageQuestionResponseDto<QuestionResponseDto>> getQuestions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long surveyId
+    ){
+        Long userId = userDetails.getId();
+        PageQuestionResponseDto<QuestionResponseDto> responseDto = questionService.getQuestions(page, size, userId, surveyId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseDto);
+    }
+
+    //질문 단건 조회
+    @GetMapping("/{surveyId}/question/{questionId}")
+    public ResponseEntity<QuestionResponseDto> getQuestion(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long surveyId,
+            @PathVariable Long questionId
+    ){
+        Long userId = userDetails.getId();
+        QuestionResponseDto responseDto = questionService.getQuestion(userId, surveyId, questionId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body( responseDto);
+    }
+
+    //***인증인가 추가 후 userId 부분 수정***
+    @PatchMapping("/{surveyId}/question/{questionId}")
+    @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
+    public ResponseEntity<QuestionResponseDto> updateQuestion(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long surveyId,
+            @PathVariable Long questionId,
+            @Valid @RequestBody QuestionUpdateRequestDto requestDto
+    ){
+        Long userId = userDetails.getId();
+        QuestionResponseDto responseDto = questionService.updateQuestion(userId, surveyId, questionId, requestDto);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseDto);
+    }
+
+    //***인증인가 추가 후 userId 부분 수정***
+    @DeleteMapping("/{surveyId}/question/{questionId}")
+    @PreAuthorize("hasAnyRole('ADMIN','SURVEYOR')")
+    public ResponseEntity<Void> deleteQuestion(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long surveyId,
+            @PathVariable Long questionId
+    ){
+        Long userId = userDetails.getId();
+        questionService.deleteQuestion(userId, surveyId, questionId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(null);
+    }
+}

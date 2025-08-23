@@ -1,0 +1,18 @@
+== Ask Question To ChatBot API
+
+[example]
+`POST` 요청을 사용하여 챗봇에게 질문할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/ai/ask-question/http-request.adoc[]
+include::{snippets}/ai/ask-question/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/ai/ask-question/http-response.adoc[]
+include::{snippets}/ai/ask-question/response-fields.adoc[]
+====

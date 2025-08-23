@@ -1,0 +1,9 @@
+[[order-resource]]
+= Order API
+
+include::create-order.adoc[]
+include::get-orders.adoc[]
+include::get-order.adoc[]
+include::get-my-orders.adoc[]
+include::get-my-order.adoc[]
+include::delete-order.adoc[]

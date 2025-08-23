@@ -1,9 +1,7 @@
 package com.example.surveyapp.domain.point.domain.model.enums;
 
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
 
 @Getter
 @RequiredArgsConstructor
