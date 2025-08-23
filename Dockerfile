@@ -5,11 +5,11 @@
 #ENTRYPOINT ["java", "-jar", "app.jar", "--spring.config.import=optional:file:.env[.properties]"]
 
 
-## Build Stage
-#FROM amazoncorretto:17-alpine AS jar_builder
-#WORKDIR /app
-#COPY . .
-#RUN ./gradlew clean bootJar
+# Build Stage
+FROM amazoncorretto:17-alpine AS jar_builder
+WORKDIR /app
+COPY . .
+RUN ./gradlew clean bootJar
 
 # Run Stage
 FROM gcr.io/distroless/java17-debian11 AS jre_builder
