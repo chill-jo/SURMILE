@@ -9,9 +9,11 @@ import com.example.surveyapp.domain.ai.moderation.prompt.AiModerationPromptTempl
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -19,17 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class AiModerationService {
     private final ChatClient chatClient;
     private final AiModerationRepository aiModerationRepository;
+    private final AiModerationPromptTemplate moderationPromptTemplate;
 
     @Transactional
     public AiModerationResult moderate(Long userId, String email, AiModerationTargetType targetType, String content) {
         // 프롬프트 구성
-        PromptTemplate prompt = new PromptTemplate(AiModerationPromptTemplate.promptTemplate);
-        prompt.add("targetType", targetType.name());
-        prompt.add("content", content);
+        Prompt prompt = moderationPromptTemplate.build(targetType.name(), content);
 
         // AI 호출
-        String result = chatClient.prompt()
-                .user(user -> user.text(prompt.render()))
+        String result = chatClient
+                .prompt(prompt)
                 .call()
                 .content()
                 .trim()

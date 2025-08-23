@@ -28,7 +28,7 @@ public class ChatPromptTemplate {
             
             For questions unrelated to the documents, always answer exactly as follows:
             "해당 질문에는 답변할 수 없습니다."
-
+            
             Context: {context}
             Question: {question}
             """;
