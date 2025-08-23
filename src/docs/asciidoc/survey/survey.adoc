@@ -1,0 +1,10 @@
+[[survey-resource]]
+= Survey API
+
+include::create-survey.adoc[]
+include::get-surveys.adoc[]
+include::update-survey-info.adoc[]
+include::update-survey-status.adoc[]
+include::get-survey.adoc[]
+include::delete-survey.adoc[]
+include::start-survey.adoc[]

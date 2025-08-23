@@ -1,0 +1,18 @@
+== Register API
+
+[example]
+`POST` 요청을 사용하여 회원가입 할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/user/register/http-request.adoc[]
+include::{snippets}/user/register/request-fields.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/user/register/http-response.adoc[]
+include::{snippets}/user/register/response-fields.adoc[]
+====

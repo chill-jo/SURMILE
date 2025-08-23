@@ -1,0 +1,19 @@
+== Get User API
+
+[example]
+`GET` 요청을 사용하여 단일 회원을 조회할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/admin/get-user/http-request.adoc[]
+include::{snippets}/admin/get-user/request-headers.adoc[]
+include::{snippets}/admin/get-user/path-parameters.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/admin/get-user/http-response.adoc[]
+include::{snippets}/admin/get-user/response-fields.adoc[]
+====

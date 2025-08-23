@@ -20,7 +20,6 @@ public class ChatController {
     private final ChatService chatService;
     private final DocumentIndexer indexer;
 
-    // 챗봇 답변 반환 API
     @PostMapping("/ask")
     public ResponseEntity<ChatResponseDto> ask(@RequestBody ChatRequestDto requestDto) {
         String answer = chatService.chat(requestDto.getQuestion());
@@ -30,7 +29,6 @@ public class ChatController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 관리자 전용 문서 인덱싱 API
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping(value = "/index")
     public ResponseEntity<ChatResponseDto> indexText(

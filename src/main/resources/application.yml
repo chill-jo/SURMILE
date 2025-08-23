@@ -3,9 +3,18 @@ spring:
     import: optional:file:.env[.properties]
   application:
     name: surveyApp
+
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      cache-access-token: accessToken
+      cache-refresh-token: refreshToken
+      default-ttl-sec: 86400
 
   datasource:
     url: ${DB_URL}
@@ -23,6 +32,21 @@ spring:
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQLDialect
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+            redirect-uri: "${BASE_URL}/login/oauth2/code/google"
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com
+
 logging:
   level:
     org:
@@ -33,10 +57,12 @@ logging:
               BasicBinder: info
         org:
           hibernate: debug
+    org.springframework.cache: trace
 
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
   access-token:
-      expiration:
-        mills: 1800000
+    expiration:
+      access-token: 1800000 # 30 minutes
+      refresh-token: 1209600000 # 14 days

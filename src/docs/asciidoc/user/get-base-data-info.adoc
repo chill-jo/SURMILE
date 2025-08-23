@@ -1,0 +1,17 @@
+== Get Base-Data-Info API
+
+[example]
+`GET` 요청을 사용하여 유저 기초정보 설문 정보를 조회할 수 있습니다.
+
+=== Http Request
+
+====
+include::{snippets}/user/get-base-data-info/http-request.adoc[]
+====
+
+=== Http Response
+
+====
+include::{snippets}/user/get-base-data-info/http-response.adoc[]
+include::{snippets}/user/get-base-data-info/response-fields.adoc[]
+====

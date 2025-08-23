@@ -1,0 +1,7 @@
+[[option-resource]]
+= Options API
+
+include::create-option.adoc[]
+include::get-options.adoc[]
+include::delete-option.adoc[]
+include::update-option.adoc[]

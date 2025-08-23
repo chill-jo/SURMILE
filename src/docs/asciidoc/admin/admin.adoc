@@ -1,0 +1,8 @@
+[[admin-resource]]
+= Admin API
+
+include::get-user.adoc[]
+include::get-users.adoc[]
+include::get-stats.adoc[]
+include::add-blacklist.adoc[]
+include::delete-blacklist.adoc[]

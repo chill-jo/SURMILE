@@ -9,11 +9,6 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-/**
- * 초기 운영 정책/가이드 문서를 VectorStore에 저장하는 컴포넌트.
- * - @Async로 비동기 처리
- * - 문서 내용은 "설문조사 앱의 운영 정책/정보"로만 구성되어야 한다(외부 지식 금지).
- */
 @Component
 @RequiredArgsConstructor
 public class InitialDocumentSaver {
