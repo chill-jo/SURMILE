@@ -21,7 +21,7 @@ public class ChatService {
 
     @Transactional
     public String chat(String question) {
-        List<Document> docs = searcher.search(question, 4, 0.7);
+        List<Document> docs = searcher.search(question, 4, 0.3);
 
         String context = docs.stream()
                 .map(Document::getText)
