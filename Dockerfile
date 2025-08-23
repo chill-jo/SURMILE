@@ -9,7 +9,7 @@
 FROM amazoncorretto:17-alpine AS jar_builder
 WORKDIR /app
 COPY . .
-RUN ./gradlew clean bootJar
+RUN ./gradlew clean build
 
 # Run Stage
 FROM gcr.io/distroless/java17-debian11 AS jre_builder
