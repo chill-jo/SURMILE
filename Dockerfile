@@ -16,4 +16,4 @@ RUN ./gradlew clean build -x test --stacktrace
 FROM gcr.io/distroless/java17-debian11 AS jre_builder
 WORKDIR /app
 COPY --from=jar_builder /app/build/libs/*SNAPSHOT.jar app.jar
-ENTRYPOINT ["sh", "-c", "mkdir -p /app/logs && java -jar app.jar >> /app/logs/app.log 2>&1"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
