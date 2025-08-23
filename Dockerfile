@@ -3,7 +3,7 @@
 #COPY app.jar app.jar
 #COPY .env .env
 #ENTRYPOINT ["java", "-jar", "app.jar", "--spring.config.import=optional:file:.env[.properties]"]
-
+#
 
 # Build Stage
 FROM gradle:7.6-jdk17 AS jar_builder
