@@ -45,11 +45,11 @@ jobs:
 #      - name: Gradle build
 #        run: ./gradlew clean build
 
-      - name: Archive 파일명 변경
-        run: mv ./build/libs/*SNAPSHOT.jar ./survey-app/app.jar
+#      - name: Archive 파일명 변경
+#        run: mv ./build/libs/*SNAPSHOT.jar ./survey-app/app.jar
 
-      - name: Dockerfile 생성
-        run: mv ./Dockerfile ./survey-app
+#      - name: Dockerfile 생성
+#        run: mv ./Dockerfile ./survey-app
 
       - name: Docker image 생성
         run: docker build -t app:latest
