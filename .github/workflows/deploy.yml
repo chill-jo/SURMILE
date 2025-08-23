@@ -29,9 +29,6 @@ jobs:
           echo "${{ secrets.ENV_PROPERTIES }}" > ./.env
           echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
 
-      - name: Dockerfile 생성
-        run: mv ./Dockerfile ./survey-app
-
       - name: docker-compose.yml 파일 생성
         run: mv ./docker-compose.yml ./survey-app
 
@@ -50,6 +47,16 @@ jobs:
 
       - name: Archive 파일명 변경
         run: mv ./build/libs/*SNAPSHOT.jar ./survey-app/app.jar
+
+      - name: Dockerfile 생성
+        run: mv ./Dockerfile ./survey-app
+
+      - name: Build Docker image 생성
+        run: |
+          docker build -t app:latest .
+
+      - name: Docker 이미지 .tar 파일 생성
+        run: docker save -o app.tar app:latest
 
       - name: 파일 생성 확인
         run: |
@@ -73,6 +80,7 @@ jobs:
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
             # 파일 전송 확인
+            echo "===== 파일 전송 확인 ====="
             ls -la /home/ec2-user/deploy/survey-app
             
             # 롤백 디렉토리 생성 및 이전 버전 백업
@@ -93,6 +101,7 @@ jobs:
             
             # Docker Compose로 서비스 시작
             cd /home/ec2-user/survey-app
+            docker load -i app.tar
             docker-compose build --no-cache
             docker-compose up -d
             
