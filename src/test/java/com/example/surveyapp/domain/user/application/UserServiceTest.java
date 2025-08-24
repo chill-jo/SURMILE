@@ -1,7 +1,7 @@
 package com.example.surveyapp.domain.user.application;
 
-import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
+import com.example.surveyapp.domain.moderation.domain.model.enums.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.moderation.domain.model.vo.AiModerationResult;
 import com.example.surveyapp.domain.user.application.facade.UserModerationFacade;
 import com.example.surveyapp.domain.user.exception.UserErrorCode;
 import com.example.surveyapp.domain.user.exception.UserException;
