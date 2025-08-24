@@ -93,10 +93,10 @@ public class OptionsControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("선택지 ID"),
                                 fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("선택지 번호"),
-                                fieldWithPath("data.content").type(JsonFieldType.STRING).description("선택지 내용")
+                                fieldWithPath("data.content").type(JsonFieldType.STRING).description("선택지 내용"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -149,10 +149,10 @@ public class OptionsControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("선택지 ID"),
                                 fieldWithPath("data[].number").type(JsonFieldType.NUMBER).description("선택지 번호"),
-                                fieldWithPath("data[].content").type(JsonFieldType.STRING).description("선택지 내용")
+                                fieldWithPath("data[].content").type(JsonFieldType.STRING).description("선택지 내용"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -208,10 +208,10 @@ public class OptionsControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("선택지 ID"),
                                 fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("선택지 번호"),
-                                fieldWithPath("data.content").type(JsonFieldType.STRING).description("선택지 내용")
+                                fieldWithPath("data.content").type(JsonFieldType.STRING).description("선택지 내용"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -249,8 +249,8 @@ public class OptionsControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;

@@ -88,11 +88,11 @@ public class PaymentControllerTest {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.paymentId").type(JsonFieldType.NUMBER).description("payment ID"),
                                 fieldWithPath("data.amount").type(JsonFieldType.NUMBER).description("충전 금액"),
                                 fieldWithPath("data.status").type(JsonFieldType.STRING).description("충전 결제 상태"),
-                                fieldWithPath("data.method").type(JsonFieldType.STRING).description("충전 결제 방법")
+                                fieldWithPath("data.method").type(JsonFieldType.STRING).description("충전 결제 방법"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;

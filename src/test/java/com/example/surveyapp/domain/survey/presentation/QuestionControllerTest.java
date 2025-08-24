@@ -99,11 +99,11 @@ public class QuestionControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("질문 ID"),
                                 fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("질문 번호"),
                                 fieldWithPath("data.content").type(JsonFieldType.STRING).description("질문 내용"),
-                                fieldWithPath("data.type").type(JsonFieldType.STRING).description("질문 유형")
+                                fieldWithPath("data.type").type(JsonFieldType.STRING).description("질문 유형"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -164,7 +164,6 @@ public class QuestionControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("질문 ID"),
                                 fieldWithPath("data.content[].number").type(JsonFieldType.NUMBER).description("질문 번호"),
                                 fieldWithPath("data.content[].content").type(JsonFieldType.STRING).description("질문 내용"),
@@ -172,7 +171,8 @@ public class QuestionControllerTest extends WebMvcTestBase {
                                 fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 결과 수"),
                                 fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("페이지 수"),
                                 fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 size"),
-                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("페이지 number")
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("페이지 number"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -218,11 +218,11 @@ public class QuestionControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("질문 ID"),
                                 fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("질문 번호"),
                                 fieldWithPath("data.content").type(JsonFieldType.STRING).description("질문 내용"),
-                                fieldWithPath("data.type").type(JsonFieldType.STRING).description("질문 유형")
+                                fieldWithPath("data.type").type(JsonFieldType.STRING).description("질문 유형"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -279,11 +279,11 @@ public class QuestionControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("질문 ID"),
                                 fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("질문 번호"),
                                 fieldWithPath("data.content").type(JsonFieldType.STRING).description("질문 내용"),
-                                fieldWithPath("data.type").type(JsonFieldType.STRING).description("질문 유형")
+                                fieldWithPath("data.type").type(JsonFieldType.STRING).description("질문 유형"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -320,8 +320,8 @@ public class QuestionControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
