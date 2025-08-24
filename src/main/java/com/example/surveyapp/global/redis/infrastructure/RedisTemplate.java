@@ -1,8 +1,8 @@
-package com.example.surveyapp.global.redis.application;
+package com.example.surveyapp.global.redis.infrastructure;
 
 import java.time.Duration;
 
-public interface RedisTemplateFacade {
+public interface RedisTemplate {
 
 	<T> void write(String key, T value, Duration ttl);
 

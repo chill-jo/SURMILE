@@ -1,8 +1,7 @@
-package com.example.surveyapp.global.redis.application;
+package com.example.surveyapp.global.redis.infrastructure;
 
 import java.time.Duration;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,9 +11,9 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class RedisTemplateFacadeImpl implements RedisTemplateFacade {
+public class RedisTemplateImpl implements RedisTemplate {
 
-	private final RedisTemplate<String, String> redisTemplate;
+	private final org.springframework.data.redis.core.RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
 
     @Override
