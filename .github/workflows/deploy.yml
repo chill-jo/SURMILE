@@ -32,8 +32,8 @@ jobs:
       - name: docker-compose.yml 파일 생성
         run: mv ./docker-compose.yml ./survey-app
 
-      - name: Test with JaCoCo
-        run: ./gradlew clean test jacocoTestReport
+      - name: build & Test with JaCoCo
+        run: ./gradlew clean build jacocoTestReport
 
       # PR에 커버리지 댓글 작성
       - name: Comment JaCoCo Coverage on PR
