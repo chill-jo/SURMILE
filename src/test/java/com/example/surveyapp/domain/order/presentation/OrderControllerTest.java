@@ -103,7 +103,8 @@ public class OrderControllerTest extends WebMvcTestBase {
                                 fieldWithPath("data.status").type(JsonFieldType.STRING).description("주문 상품 상태"),
                                 fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
                                 fieldWithPath("data.orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("주문 생성일"))));
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
+                        )));
 
     }
 
@@ -159,19 +160,21 @@ public class OrderControllerTest extends WebMvcTestBase {
                                 fieldWithPath("data.content[].orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
                                 fieldWithPath("data.content[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
                                 fieldWithPath("data.content[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
-                                fieldWithPath("data.pageable").type(JsonFieldType.STRING).description("주문 생성일"),
-                                fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("주문 생성일"),
-                                fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("주문 생성일"),
-                                fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("주문 생성일"),
-                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("주문 생성일"),
-                                fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("주문 생성일"),
-                                fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
+                                fieldWithPath("data.pageable").type(JsonFieldType.STRING).description("요청한 페이지 관련 정보"),
+                                fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 데이터 건수"),
+                                fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                                fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("현재 페이지가 마지막 페이지인지 여부"),
+                                fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("한 페이지에 보여지는 데이터 수"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호 (0부터 시작)"),
+                                fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 기준이 비어있는지 여부"),
+                                fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("데이터가 정렬되어 있는지 여부"),
+                                fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("데이터가 정렬되지 않았는지 여부"),
+                                fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지에 포함된 데이터 수"),
+                                fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("현재 페이지가 첫 페이지인지 여부"),
+                                fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("현재 페이지에 데이터가 존재하지 않는지 여부"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
+                        )));
+
 
 
     }
@@ -225,20 +228,20 @@ public class OrderControllerTest extends WebMvcTestBase {
                                 fieldWithPath("data.content[].price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
                                 fieldWithPath("data.content[].orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
                                 fieldWithPath("data.content[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
-                                fieldWithPath("data.content[].createAt").type(JsonFieldType.STRING).description("주문 생성일"),
-                                fieldWithPath("data.pageable").type(JsonFieldType.STRING).description("주문 생성일"),
-                                fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("주문 생성일"),
-                                fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("주문 생성일"),
-                                fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("주문 생성일"),
-                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("주문 생성일"),
-                                fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("주문 생성일"),
-                                fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("주문 생성일"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
+                                fieldWithPath("data.pageable").type(JsonFieldType.STRING).description("요청한 페이지 관련 정보"),
+                                fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 데이터 건수"),
+                                fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                                fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("현재 페이지가 마지막 페이지인지 여부"),
+                                fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("한 페이지에 보여지는 데이터 수"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호 (0부터 시작)"),
+                                fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 기준이 비어있는지 여부"),
+                                fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("데이터가 정렬되어 있는지 여부"),
+                                fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("데이터가 정렬되지 않았는지 여부"),
+                                fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지에 포함된 데이터 수"),
+                                fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("현재 페이지가 첫 페이지인지 여부"),
+                                fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("현재 페이지에 데이터가 존재하지 않는지 여부"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
+                        )));
 
 
     }
@@ -280,7 +283,6 @@ public class OrderControllerTest extends WebMvcTestBase {
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
                                 fieldWithPath("data").description("null"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
-
     }
 
     @Test
@@ -327,7 +329,8 @@ public class OrderControllerTest extends WebMvcTestBase {
                                 fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
                                 fieldWithPath("data.orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
                                 fieldWithPath("data.createAt").type(JsonFieldType.STRING).description("주문 생성일"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각")
+                        )));
 
     }
 
@@ -369,7 +372,8 @@ public class OrderControllerTest extends WebMvcTestBase {
                                 fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("주문 상품 금액"),
                                 fieldWithPath("data.orderStatus").type(JsonFieldType.STRING).description("주문 상태"),
                                 fieldWithPath("data.createAt").type(JsonFieldType.STRING).description("주문 생성일"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각"))));
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("응답 시각")
+                                )));
 
     }
 }

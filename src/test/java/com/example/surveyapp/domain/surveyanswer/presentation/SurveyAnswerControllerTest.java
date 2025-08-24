@@ -92,8 +92,8 @@ public class SurveyAnswerControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -142,10 +142,10 @@ public class SurveyAnswerControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.survey[].surveyId").type(JsonFieldType.NUMBER).description("설문 ID"),
                                 fieldWithPath("data.survey[].title").type(JsonFieldType.STRING).description("설문 제목"),
-                                fieldWithPath("data.survey[].date").type(JsonFieldType.STRING).description("응답 제출한 날짜")
+                                fieldWithPath("data.survey[].date").type(JsonFieldType.STRING).description("응답 제출한 날짜"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -237,7 +237,6 @@ public class SurveyAnswerControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.surveyId").type(JsonFieldType.NUMBER).description("설문 ID"),
                                 fieldWithPath("data.title").type(JsonFieldType.STRING).description("설문 제목"),
                                 fieldWithPath("data.description").type(JsonFieldType.STRING).description("설문 상세설명"),
@@ -253,7 +252,8 @@ public class SurveyAnswerControllerTest extends WebMvcTestBase {
                                 fieldWithPath("data.questions[].options[].optionId").type(JsonFieldType.NUMBER).description("선택지 ID"),
                                 fieldWithPath("data.questions[].options[].number").type(JsonFieldType.NUMBER).description("선택지 번호"),
                                 fieldWithPath("data.questions[].options[].content").type(JsonFieldType.STRING).description("선택지 내용"),
-                                fieldWithPath("data.questions[].options[].count").type(JsonFieldType.NUMBER).description("응답한 참여자 수")
+                                fieldWithPath("data.questions[].options[].count").type(JsonFieldType.NUMBER).description("응답한 참여자 수"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;

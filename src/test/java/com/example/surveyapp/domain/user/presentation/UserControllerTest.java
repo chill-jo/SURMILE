@@ -76,12 +76,12 @@ public class UserControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("유저 ID"),
                                 fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
                                 fieldWithPath("data.name").type(JsonFieldType.STRING).description("유저 이름"),
                                 fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
-                                fieldWithPath("data.userRole").type(JsonFieldType.STRING).description("유저 권한")
+                                fieldWithPath("data.userRole").type(JsonFieldType.STRING).description("유저 권한"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -137,12 +137,12 @@ public class UserControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("유저 ID"),
                                 fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
                                 fieldWithPath("data.name").type(JsonFieldType.STRING).description("유저 이름"),
                                 fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
-                                fieldWithPath("data.userRole").type(JsonFieldType.STRING).description("유저 권한")
+                                fieldWithPath("data.userRole").type(JsonFieldType.STRING).description("유저 권한"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -185,8 +185,8 @@ public class UserControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -227,11 +227,11 @@ public class UserControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").type(JsonFieldType.STRING).description("유저 ID"),
                                 fieldWithPath("data.name").type(JsonFieldType.STRING).description("유저 이름"),
                                 fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("Access Token"),
-                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("Refresh Token")
+                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -263,8 +263,8 @@ public class UserControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -303,11 +303,11 @@ public class UserControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").type(JsonFieldType.STRING).description("유저 ID"),
                                 fieldWithPath("data.name").type(JsonFieldType.STRING).description("유저 이름"),
                                 fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("Access Token"),
-                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("Refresh Token")
+                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -345,8 +345,8 @@ public class UserControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -375,13 +375,13 @@ public class UserControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.question_1").type(JsonFieldType.STRING).description("질문"),
                                 fieldWithPath("data.question_2").type(JsonFieldType.STRING).description("유저 이메일"),
                                 fieldWithPath("data.question_3").type(JsonFieldType.STRING).description("유저 이름"),
                                 fieldWithPath("data.option_1").type(JsonFieldType.STRING).description("유저 닉네임"),
                                 fieldWithPath("data.option_2").type(JsonFieldType.STRING).description("유저 권한"),
-                                fieldWithPath("data.option_3").type(JsonFieldType.STRING).description("유저 권한")
+                                fieldWithPath("data.option_3").type(JsonFieldType.STRING).description("유저 권한"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -422,8 +422,8 @@ public class UserControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
 
                         )
                 ))
@@ -459,9 +459,9 @@ public class UserControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.list[].category").type(JsonFieldType.STRING).description("질문 카테고리"),
-                                fieldWithPath("data.list[].data").type(JsonFieldType.NUMBER).description("질문 응답")
+                                fieldWithPath("data.list[].data").type(JsonFieldType.NUMBER).description("질문 응답"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
