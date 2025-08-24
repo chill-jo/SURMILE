@@ -7,9 +7,9 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import com.example.surveyapp.domain.admin.application.AdminService;
-import com.example.surveyapp.domain.ai.chat.application.ChatService;
-import com.example.surveyapp.domain.ai.chat.application.rag.DocumentIndexer;
-import com.example.surveyapp.domain.ai.chat.application.rag.DocumentSearcher;
+import com.example.surveyapp.domain.chat.application.ChatService;
+import com.example.surveyapp.domain.chat.application.rag.DocumentIndexer;
+import com.example.surveyapp.domain.chat.application.rag.DocumentSearcher;
 import com.example.surveyapp.domain.order.application.OrderService;
 import com.example.surveyapp.domain.point.application.PointService;
 import com.example.surveyapp.domain.product.application.ProductService;
