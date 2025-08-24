@@ -1,6 +1,6 @@
 package com.example.surveyapp.domain.survey.application.facade;
 
-import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
+import com.example.surveyapp.domain.moderation.domain.model.vo.AiModerationResult;
 
 public interface SurveyModerationFacade {
     AiModerationResult checkTitleModeration(Long userId, String title);

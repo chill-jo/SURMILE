@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
-import com.example.surveyapp.global.redis.application.RedisTemplateFacade;
+import com.example.surveyapp.global.redis.infrastructure.RedisTemplate;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtUtil {
 
-	private final RedisTemplateFacade redisTemplateFacade;
+	private final RedisTemplate redisTemplate;
 
 	private static final String BEARER_PREFIX = "Bearer ";
 	//    private static final long TOKEN_TIME = 30 * 60 * 1000L; // 30분
@@ -94,7 +94,7 @@ public class JwtUtil {
 	public boolean isValidRefreshToken(String refreshToken) {
 
 		Long userId = Long.parseLong(extractUserId(refreshToken));
-		return refreshToken.equals(redisTemplateFacade.read(REFRESH_TOKEN + ":" + userId, String.class));
+		return refreshToken.equals(redisTemplate.read(REFRESH_TOKEN + ":" + userId, String.class));
 
 	}
 
@@ -135,7 +135,7 @@ public class JwtUtil {
 	public boolean validateToken(String token) {
 
 		Long userId = Long.parseLong(extractUserId(token));
-		String expiredToken = redisTemplateFacade.read(ACCESS_TOKEN + ":" + userId, String.class);
+		String expiredToken = redisTemplate.read(ACCESS_TOKEN + ":" + userId, String.class);
 		if (expiredToken != null && expiredToken.equals(token)) {
 			return false;
 		}

@@ -36,7 +36,7 @@ import com.example.surveyapp.domain.user.presentation.dto.RegisterRequestDto;
 import com.example.surveyapp.domain.user.presentation.dto.UserRequestDto;
 import com.example.surveyapp.domain.user.presentation.dto.UserResponseDto;
 import com.example.surveyapp.domain.user.presentation.dto.WithdrawRequestDto;
-import com.example.surveyapp.global.redis.application.RedisTemplateFacade;
+import com.example.surveyapp.global.redis.infrastructure.RedisTemplate;
 import com.example.surveyapp.global.response.exception.UnauthorizedException;
 
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,7 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final UserBaseDataRepository userBaseDataRepository;
 	private final ApplicationEventPublisher eventPublisher;
-	private final RedisTemplateFacade redisTemplateFacade;
+	private final RedisTemplate redisTemplate;
 	private final UserModerationFacade userModerationFacade;
 	private final JwtProvider jwtProvider;
 	private final ObjectMapper objectMapper;
@@ -117,7 +117,7 @@ public class UserService {
 
 		String accessToken = jwtProvider.createAccessToken(user.getId(), user.getUserRole());
 		String refreshToken = jwtProvider.createRefreshToken(user.getId());
-		redisTemplateFacade.write(REFRESH_TOKEN + ":" + user.getId(), jwtProvider.substringToken(refreshToken),
+		redisTemplate.write(REFRESH_TOKEN + ":" + user.getId(), jwtProvider.substringToken(refreshToken),
 			Duration.ofMillis(REFRESH_TOKEN_TIME));
 
 		return LoginResponseDto.builder()
@@ -131,7 +131,7 @@ public class UserService {
 	@Transactional
 	public void logout(String accessToken) {
 		Long userId = Long.parseLong(jwtProvider.extractUserId(jwtProvider.substringToken(accessToken)));
-		redisTemplateFacade.write(ACCESS_TOKEN + ":" + userId, jwtProvider.substringToken(accessToken),
+		redisTemplate.write(ACCESS_TOKEN + ":" + userId, jwtProvider.substringToken(accessToken),
 			Duration.ofMillis(ACCESS_TOKEN_TIME));
 	}
 
@@ -150,7 +150,7 @@ public class UserService {
 
 		String accessToken = jwtProvider.createAccessToken(userId, user.getUserRole());
 		String refreshToken = jwtProvider.createRefreshToken(userId);
-		redisTemplateFacade.write(REFRESH_TOKEN + ":" + userId, jwtProvider.substringToken(refreshToken),
+		redisTemplate.write(REFRESH_TOKEN + ":" + userId, jwtProvider.substringToken(refreshToken),
 			Duration.ofMillis(REFRESH_TOKEN_TIME));
 		;
 

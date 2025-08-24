@@ -6,19 +6,16 @@ services:
     container_name: redis
 
   app:
-    build: .
+    image: app:latest
     ports:
       - "8080:8080"
     volumes:
       - ./logs:/app/logs   # 호스트 ./logs ↔ 컨테이너 /app/logs 연결
-    command: >
-      sh -c "java -jar /app/app.jar >> /app/logs/app.log 2>&1"
+    user: "1000:1000"
     restart: always
     container_name: survey-app
     env_file:
       - .env
-    environment:
-      - REDIS_HOST=redis
     depends_on:
       - redis
 
