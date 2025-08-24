@@ -1,16 +1,9 @@
-#FROM openjdk:17-jdk-slim
+## Build Stage
+#FROM gradle:7.6-jdk17 AS jar_builder
 #WORKDIR /app
-#COPY app.jar app.jar
-#COPY .env .env
-#ENTRYPOINT ["java", "-jar", "app.jar", "--spring.config.import=optional:file:.env[.properties]"]
-#
-
-# Build Stage
-FROM gradle:7.6-jdk17 AS jar_builder
-WORKDIR /app
-COPY . .
-RUN chmod +x ./gradlew
-RUN ./gradlew clean build jacocoTestReport
+#COPY . .
+#RUN chmod +x ./gradlew
+#RUN ./gradlew clean build jacocoTestReport
 
 # Run Stage
 FROM gcr.io/distroless/java17-debian11 AS jre_builder

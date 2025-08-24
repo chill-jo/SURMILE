@@ -10,6 +10,12 @@ jobs:
       - name: Git repository checkout
         uses: actions/checkout@v4
 
+      - name: Setup JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       - name: 파일 전송을 위한 디렉토리 생성
         run: mkdir ./survey-app
 
@@ -25,6 +31,9 @@ jobs:
 
       - name: docker-compose.yml 파일 생성
         run: mv ./docker-compose.yml ./survey-app
+
+      - name: Build & Test with JaCoCo
+        run: ./gradlew clean test jacocoTestReport
 
       - name: Docker image 생성
         run: docker build -t app:latest .
