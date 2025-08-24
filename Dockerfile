@@ -6,7 +6,7 @@
 #
 
 # Build Stage
-FROM gradle:7.6-jdk17 AS jar_builder
+FROM amazoncorretto:17-alpine AS jar_builder
 WORKDIR /app
 COPY . .
 RUN chmod +x ./gradlew
@@ -15,5 +15,5 @@ RUN ./gradlew clean bootjar
 # Run Stage
 FROM gcr.io/distroless/java17-debian11 AS jre_builder
 WORKDIR /app
-COPY --from=jar_builder /app/build/libs/*SNAPSHOT.jar app.jar
+COPY --from=jar_builder /app/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
