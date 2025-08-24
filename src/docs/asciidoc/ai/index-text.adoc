@@ -1,7 +1,7 @@
 == Index Text API
 
 [example]
-`POST` 요청을 사용하여 챗봇에게 질문할 수 있습니다.
+`POST` 요청을 사용하여 운영 정책에 관한 문서를 추가할 수 있습니다.
 
 === Http Request
 
