@@ -42,6 +42,7 @@ public class User extends BaseEntity {
 	@Enumerated(value = EnumType.STRING)
 	private UserRoleEnum userRole;
 
+
 //	// 소셜 로그인 provider (google, kakao 등)
 //	@Column(length = 20)
 //	private String provider;
@@ -53,15 +54,22 @@ public class User extends BaseEntity {
 	private boolean isDeleted = false;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	private User(String email, String password, String name, String nickname, UserRoleEnum userRole, String provider,
-		String providerId) {
+	private User(
+		String email,
+		String password,
+		String name,
+		String nickname,
+		UserRoleEnum userRole,
+		String provider,
+		String providerId
+	) {
 		this.email = email;
 		this.password = password;
 		this.name = name;
 		this.nickname = nickname;
 		this.userRole = userRole;
-//		this.provider = provider;
-//		this.providerId = providerId;
+		this.provider = provider;
+		this.providerId = providerId;
 	}
 
 	public static User of(String email, String password, String name, String nickname, UserRoleEnum role) {
