@@ -68,8 +68,8 @@ public class User extends BaseEntity {
 		this.name = name;
 		this.nickname = nickname;
 		this.userRole = userRole;
-		this.provider = provider;
-		this.providerId = providerId;
+//		this.provider = provider;
+//		this.providerId = providerId;
 	}
 
 	public static User of(String email, String password, String name, String nickname, UserRoleEnum role) {
@@ -94,8 +94,8 @@ public class User extends BaseEntity {
 //			.name(name)
 //			.nickname(nickname)
 //			.userRole(role)
-////			.provider(provider)
-////			.providerId(providerId)
+//			.provider(provider)
+//			.providerId(providerId)
 //			.build();
 //	}
 
