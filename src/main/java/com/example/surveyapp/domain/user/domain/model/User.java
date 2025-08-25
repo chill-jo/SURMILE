@@ -43,12 +43,12 @@ public class User extends BaseEntity {
 	private UserRoleEnum userRole;
 
 	// 소셜 로그인 provider (google, kakao 등)
-//	@Column(length = 20)
-//	private String provider;
+	@Column(length = 20)
+	private String provider;
+	 // 소셜 로그인 providerId (해당 provider의 고유 ID)
+	@Column(length = 50)
+	private String providerId;
 
-	// 소셜 로그인 providerId (해당 provider의 고유 ID)
-//	@Column(length = 50)
-//	private String providerId;
 
 	private boolean isDeleted = false;
 
@@ -76,19 +76,20 @@ public class User extends BaseEntity {
 			.build();
 	}
 
-	// 소셜 가입용
-//	public static User ofSocial(String email, String name, String nickname,
-//		UserRoleEnum role, String provider, String providerId) {
-//		return User.builder()
-//			.email(email)
-//			.password(null) // 소셜은 보통 비번 없음
-//			.name(name)
-//			.nickname(nickname)
-//			.userRole(role)
-////			.provider(provider)
-////			.providerId(providerId)
-//			.build();
-//	}
+
+	 // 소셜 가입용
+	public static User ofSocial(String email, String name, String nickname,
+		UserRoleEnum role, String provider, String providerId) {
+		return User.builder()
+			.email(email)
+			.password(null) // 소셜은 보통 비번 없음
+			.name(name)
+			.nickname(nickname)
+			.userRole(role)
+			.provider(provider)
+			.providerId(providerId)
+			.build();
+	}
 
 	//admin 인프라 구축용
 	public static User createAdmin(String adminEmail, String adminName, String adminNickname, String adminPassword) {

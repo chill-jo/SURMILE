@@ -88,13 +88,15 @@ public class SecurityConfig {
 			)
 
 //			// OAuth2 로그인 연결
-//			.oauth2Login(o -> o
-//				// 기본 인가 엔드포인트 변경하고 싶으면 아래 주석 해제
-//				// .authorizationEndpoint(ep -> ep.baseUri("/oauth2/authorization"))
-//				// .redirectionEndpoint(r -> r.baseUri("/login/oauth2/code/*"))
-//				.userInfoEndpoint(u -> u.userService(customOauth2UserService))
-//				.successHandler(oAuth2SuccessHandler) // JWT 발급/쿠키/리다이렉트
-//			)
+
+			.oauth2Login(o -> o
+				// 기본 인가 엔드포인트 변경하고 싶으면 아래 주석 해제
+				// .authorizationEndpoint(ep -> ep.baseUri("/oauth2/authorization"))
+				// .redirectionEndpoint(r -> r.baseUri("/login/oauth2/code/*"))
+				.userInfoEndpoint(u -> u.userService(customOauth2UserService))
+				.successHandler(oAuth2SuccessHandler) // JWT 발급/쿠키/리다이렉트
+			)
+
 
 			//UsernamePasswordAuthenticationFilter : 스프링 시큐리티에서 기본적으로
 			// username, password와 같은 입력값을 이용해서 인증을 시도하고, 인증된 사용자 정보를
