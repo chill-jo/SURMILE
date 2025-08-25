@@ -106,25 +106,25 @@ public class AdminControllerTest {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.content[].id").description("회원 ID"),
                                 fieldWithPath("data.content[].name").description("회원 이름"),
                                 fieldWithPath("data.content[].nickname").description("회원 닉네임"),
                                 fieldWithPath("data.content[].email").description("회원 이메일"),
                                 fieldWithPath("data.content[].userRole").description("회원 역할"),
                                 fieldWithPath("data.content[].isDeleted").description("회원 삭제여부"),
-                                fieldWithPath("data.pageable").description("페이지 정보"),
-                                fieldWithPath("data.totalElements").description("총 요소 수"),
-                                fieldWithPath("data.totalPages").description("총 페이지 수"),
-                                fieldWithPath("data.last").description("총 페이지 수"),
-                                fieldWithPath("data.size").description("페이지 크기"),
-                                fieldWithPath("data.sort.empty").description("페이지 크기"),
-                                fieldWithPath("data.sort.unsorted").description("페이지 크기"),
-                                fieldWithPath("data.sort.sorted").description("페이지 크기"),
-                                fieldWithPath("data.first").description("페이지 크기"),
-                                fieldWithPath("data.numberOfElements").description("페이지 크기"),
-                                fieldWithPath("data.empty").description("페이지 크기"),
-                                fieldWithPath("data.number").description("페이지 크기")
+                                fieldWithPath("data.pageable").type(JsonFieldType.STRING).description("요청한 페이지 관련 정보"),
+                                fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 데이터 건수"),
+                                fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                                fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("현재 페이지가 마지막 페이지인지 여부"),
+                                fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("한 페이지에 보여지는 데이터 수"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호 (0부터 시작)"),
+                                fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 기준이 비어있는지 여부"),
+                                fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("데이터가 정렬되어 있는지 여부"),
+                                fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("데이터가 정렬되지 않았는지 여부"),
+                                fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지에 포함된 데이터 수"),
+                                fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("현재 페이지가 첫 페이지인지 여부"),
+                                fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("현재 페이지에 데이터가 존재하지 않는지 여부"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -165,13 +165,13 @@ public class AdminControllerTest {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").description("회원 ID"),
                                 fieldWithPath("data.name").description("회원 이름"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.email").description("회원 이메일"),
                                 fieldWithPath("data.userRole").description("회원 역할"),
-                                fieldWithPath("data.isDeleted").description("회원 삭제여부")
+                                fieldWithPath("data.isDeleted").description("회원 삭제여부"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -220,10 +220,10 @@ public class AdminControllerTest {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data[].question").type(JsonFieldType.STRING).description("질문 제목"),
                                 fieldWithPath("data[].list[].option").type(JsonFieldType.NUMBER).description("질문지 내용"),
-                                fieldWithPath("data[].list[].count").type(JsonFieldType.NUMBER).description("질문지 선택 수")
+                                fieldWithPath("data[].list[].count").type(JsonFieldType.NUMBER).description("질문지 선택 수"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -263,13 +263,13 @@ public class AdminControllerTest {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").description("회원 ID"),
                                 fieldWithPath("data.name").description("회원 이름"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.email").description("회원 이메일"),
                                 fieldWithPath("data.userRole").description("회원 역할"),
-                                fieldWithPath("data.isDeleted").description("회원 삭제여부")
+                                fieldWithPath("data.isDeleted").description("회원 삭제여부"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -309,13 +309,13 @@ public class AdminControllerTest {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.id").description("회원 ID"),
                                 fieldWithPath("data.name").description("회원 이름"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.email").description("회원 이메일"),
                                 fieldWithPath("data.userRole").description("회원 역할"),
-                                fieldWithPath("data.isDeleted").description("회원 삭제여부")
+                                fieldWithPath("data.isDeleted").description("회원 삭제여부"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;

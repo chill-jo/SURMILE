@@ -1,3 +1,4 @@
+
 package com.example.surveyapp.global.security.handler;
 
 import java.io.IOException;
@@ -57,3 +58,4 @@ private String successRedirectUri = "https://surmile.o-r.kr";
 		response.sendRedirect(redirect);
 	}
 }
+

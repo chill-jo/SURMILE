@@ -1,3 +1,4 @@
+
 package com.example.surveyapp.global.security.oauth;
 
 import java.util.Map;
@@ -96,3 +97,4 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
 		return (base + "_" + suffix).toLowerCase();
 	}
 }
+

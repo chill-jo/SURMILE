@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.example.surveyapp.domain.user.application.UserService;
 import com.example.surveyapp.domain.user.presentation.dto.LoginRequestDto;
 import com.example.surveyapp.domain.user.presentation.dto.LoginResponseDto;
-import com.example.surveyapp.global.redis.application.RedisTemplateFacade;
+import com.example.surveyapp.global.redis.infrastructure.RedisTemplate;
 
 @SpringBootTest
 @ExtendWith(RedisTestContainersExtension.class)
@@ -24,7 +24,7 @@ import com.example.surveyapp.global.redis.application.RedisTemplateFacade;
 public class RedisTest {
 
 	@Autowired
-	private RedisTemplateFacade redisTemplateFacade;
+	private RedisTemplate redisTemplate;
 
 	@Autowired
 	private UserService userService;
@@ -60,7 +60,7 @@ public class RedisTest {
 		userService.logout(accessToken);
 
 		//Then
-		String actual = redisTemplateFacade.read("accessToken:" + loginResponseDto.getId(), String.class);
+		String actual = redisTemplate.read("accessToken:" + loginResponseDto.getId(), String.class);
 		assertThat("Bearer " + actual).isEqualTo(accessToken);
 	}
 

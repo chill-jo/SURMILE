@@ -5,7 +5,7 @@ import com.example.surveyapp.domain.survey.domain.repository.SurveyOutboxReposit
 import com.example.surveyapp.domain.survey.exception.SurveyErrorCode;
 import com.example.surveyapp.domain.survey.exception.SurveyException;
 import com.example.surveyapp.domain.survey.application.facade.SurveyModerationFacade;
-import com.example.surveyapp.global.redis.application.RedisTemplateFacade;
+import com.example.surveyapp.global.redis.infrastructure.RedisTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -47,7 +47,7 @@ public class SurveyService {
 	private final SurveyValidator surveyValidator = new SurveyValidator();
 	private final SurveyAnswerFacade surveyAnswerFacade;
 	private final SurveyModerationFacade surveyModerationFacade;
-    private final RedisTemplateFacade redisTemplateFacade;
+    private final RedisTemplate redisTemplate;
 	private final ObjectMapper objectMapper;
 	private final SurveyOutboxRepository surveyOutboxRepository;
 

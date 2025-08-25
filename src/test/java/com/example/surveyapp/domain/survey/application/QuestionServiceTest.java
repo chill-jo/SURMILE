@@ -2,8 +2,8 @@ package com.example.surveyapp.domain.survey.application;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.example.surveyapp.domain.ai.moderation.domain.model.enums.AiModerationResultStatusEnum;
-import com.example.surveyapp.domain.ai.moderation.domain.model.vo.AiModerationResult;
+import com.example.surveyapp.domain.moderation.domain.model.enums.AiModerationResultStatusEnum;
+import com.example.surveyapp.domain.moderation.domain.model.vo.AiModerationResult;
 import com.example.surveyapp.domain.survey.domain.SurveyValidator;
 import com.example.surveyapp.domain.survey.domain.repository.QuestionRepository;
 import com.example.surveyapp.domain.survey.domain.service.SurveyQuestionService;

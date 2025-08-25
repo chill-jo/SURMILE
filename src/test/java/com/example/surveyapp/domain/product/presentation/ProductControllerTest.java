@@ -99,7 +99,6 @@ class ProductControllerTest extends WebMvcTestBase {
                                 fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("상품 가격"),
                                 fieldWithPath("data.status").type(JsonFieldType.STRING).description("상품 상태"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
-
                                 )));
 
     }
@@ -150,7 +149,6 @@ class ProductControllerTest extends WebMvcTestBase {
                                   fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("상품 가격"),
                                   fieldWithPath("data[].status").type(JsonFieldType.STRING).description("상품 상태"),
                                   fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
-
                           )));
 
     }
@@ -226,7 +224,6 @@ class ProductControllerTest extends WebMvcTestBase {
                                 fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("상품 가격"),
                                 fieldWithPath("data.status").type(JsonFieldType.STRING).description("상품 상태"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
-
                         )));
 
     }
@@ -328,7 +325,6 @@ class ProductControllerTest extends WebMvcTestBase {
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
                                 fieldWithPath("data").description("null"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
-
                         )));
     }
 
@@ -377,7 +373,6 @@ class ProductControllerTest extends WebMvcTestBase {
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
                                 fieldWithPath("data.newStatus").type(JsonFieldType.STRING).description("변경 된 상품 상태"),
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
-
                         )));
     }
 

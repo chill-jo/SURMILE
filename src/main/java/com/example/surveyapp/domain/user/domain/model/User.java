@@ -49,6 +49,7 @@ public class User extends BaseEntity {
 	@Column(length = 50)
 	private String providerId;
 
+
 	private boolean isDeleted = false;
 
 	@Builder(access = AccessLevel.PRIVATE)
@@ -59,8 +60,8 @@ public class User extends BaseEntity {
 		this.name = name;
 		this.nickname = nickname;
 		this.userRole = userRole;
-		this.provider = provider;
-		this.providerId = providerId;
+//		this.provider = provider;
+//		this.providerId = providerId;
 	}
 
 	public static User of(String email, String password, String name, String nickname, UserRoleEnum role) {
@@ -75,6 +76,7 @@ public class User extends BaseEntity {
 			.build();
 	}
 
+
 	 // 소셜 가입용
 	public static User ofSocial(String email, String name, String nickname,
 		UserRoleEnum role, String provider, String providerId) {
@@ -84,8 +86,8 @@ public class User extends BaseEntity {
 			.name(name)
 			.nickname(nickname)
 			.userRole(role)
-//			.provider(provider)
-//			.providerId(providerId)
+			.provider(provider)
+			.providerId(providerId)
 			.build();
 	}
 

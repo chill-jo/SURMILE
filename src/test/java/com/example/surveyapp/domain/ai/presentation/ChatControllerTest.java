@@ -3,11 +3,11 @@ package com.example.surveyapp.domain.ai.presentation;
 import com.example.surveyapp.config.custommockuser.WithCustomMockUser;
 import com.example.surveyapp.config.testbase.WebMvcTestBase;
 import com.example.surveyapp.config.testmockbeans.TestMockBeans;
-import com.example.surveyapp.domain.ai.chat.application.ChatService;
-import com.example.surveyapp.domain.ai.chat.presentation.dto.ChatRequestDto;
-import com.example.surveyapp.domain.ai.chat.presentation.dto.ChatResponseDto;
-import com.example.surveyapp.domain.ai.chat.presentation.dto.IndexRequestDto;
-import com.example.surveyapp.domain.ai.chat.application.rag.DocumentIndexer;
+import com.example.surveyapp.domain.chat.application.ChatService;
+import com.example.surveyapp.domain.chat.presentation.dto.ChatRequestDto;
+import com.example.surveyapp.domain.chat.presentation.dto.ChatResponseDto;
+import com.example.surveyapp.domain.chat.presentation.dto.IndexRequestDto;
+import com.example.surveyapp.domain.chat.application.rag.DocumentIndexer;
 import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,8 +66,8 @@ public class ChatControllerTest extends WebMvcTestBase {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
-                                fieldWithPath("data.answer").type(JsonFieldType.STRING).description("답변 내용")
+                                fieldWithPath("data.answer").type(JsonFieldType.STRING).description("답변 내용"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
@@ -100,13 +100,13 @@ public class ChatControllerTest extends WebMvcTestBase {
                                         .attributes(key("format").value("Bearer {jwt_token"))
                         ),
                         requestFields(
-                                fieldWithPath("document").type(JsonFieldType.STRING).description("설문 제목")
+                                fieldWithPath("document").type(JsonFieldType.STRING).description("문서")
                         ),
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data")
+                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 Data"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;

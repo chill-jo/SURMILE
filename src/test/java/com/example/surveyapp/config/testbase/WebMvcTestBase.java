@@ -1,7 +1,7 @@
 package com.example.surveyapp.config.testbase;
 
 import com.example.surveyapp.domain.admin.presentation.AdminController;
-import com.example.surveyapp.domain.ai.chat.presentation.ChatController;
+import com.example.surveyapp.domain.chat.presentation.ChatController;
 import com.example.surveyapp.domain.order.presentation.OrderController;
 import com.example.surveyapp.domain.payment.presentation.PaymentController;
 import com.example.surveyapp.domain.point.presentation.PointController;

@@ -11,6 +11,7 @@ services:
       - "8080:8080"
     volumes:
       - ./logs:/app/logs   # 호스트 ./logs ↔ 컨테이너 /app/logs 연결
+    user: "1000:1000"
     restart: always
     container_name: survey-app
     env_file:
