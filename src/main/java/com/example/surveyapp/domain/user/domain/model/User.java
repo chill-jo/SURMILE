@@ -45,23 +45,29 @@ public class User extends BaseEntity {
 	// 소셜 로그인 provider (google, kakao 등)
 	@Column(length = 20)
 	private String provider;
-	 // 소셜 로그인 providerId (해당 provider의 고유 ID)
+	// 소셜 로그인 providerId (해당 provider의 고유 ID)
 	@Column(length = 50)
 	private String providerId;
-
 
 	private boolean isDeleted = false;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	private User(String email, String password, String name, String nickname, UserRoleEnum userRole, String provider,
-		String providerId) {
+	private User(
+		String email,
+		String password,
+		String name,
+		String nickname,
+		UserRoleEnum userRole,
+		String provider,
+		String providerId
+	) {
 		this.email = email;
 		this.password = password;
 		this.name = name;
 		this.nickname = nickname;
 		this.userRole = userRole;
-//		this.provider = provider;
-//		this.providerId = providerId;
+		this.provider = provider;
+		this.providerId = providerId;
 	}
 
 	public static User of(String email, String password, String name, String nickname, UserRoleEnum role) {
@@ -76,8 +82,7 @@ public class User extends BaseEntity {
 			.build();
 	}
 
-
-	 // 소셜 가입용
+	// 소셜 가입용
 	public static User ofSocial(String email, String name, String nickname,
 		UserRoleEnum role, String provider, String providerId) {
 		return User.builder()
