@@ -109,13 +109,13 @@ OPENAI_API_KEY=your_api_key_here
 ## 💡기술적 의사결정
 - 기술적 의사결정#1 - [📚 CustomUserDetails (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90-CustomUserDetails)<br>
 - 기술적 의사결정#2 - [📚 Spring AI(Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90--Spring-AI)<br>
-- 기술적 의사결정#2 - [📚 Domain-Driven Design (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90-Domain%E2%80%90Driven-Design)<br>
-- 기술적 의사결정#2 - [📚 Lock (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90--Lock)<br>
-- 기술적 의사결정#2 - [📚 Cache (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90-Cache)<br>
-- 기술적 의사결정#2 - [📚 Spring RestDocs (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90--Spring-RestDocs)<br>
-- 기술적 의사결정#2 - [📚 OAUTH2 (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90-OAUTH2)<br>
-- 기술적 의사결정#2 - [📚 부하테스트 선택 (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90--%EB%B6%80%ED%95%98%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%84%A0%ED%83%9D)<br>
-- 기술적 의사결정#2 - [📚 CI/CD (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90--CI-CD)<br>
+- 기술적 의사결정#3 - [📚 Domain-Driven Design (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90-Domain%E2%80%90Driven-Design)<br>
+- 기술적 의사결정#4 - [📚 Lock (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90--Lock)<br>
+- 기술적 의사결정#5 - [📚 Cache (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90-Cache)<br>
+- 기술적 의사결정#6 - [📚 Spring RestDocs (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90--Spring-RestDocs)<br>
+- 기술적 의사결정#7 - [📚 OAUTH2 (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90-OAUTH2)<br>
+- 기술적 의사결정#8 - [📚 부하테스트 선택 (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90--%EB%B6%80%ED%95%98%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%84%A0%ED%83%9D)<br>
+- 기술적 의사결정#9 - [📚 CI/CD (Wiki)](https://github.com/chill-jo/surveyApp/wiki/Decision-Log-%E2%80%90--CI-CD)<br>
 
 ## 🐞트러블 슈팅
 
