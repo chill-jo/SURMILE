@@ -105,23 +105,22 @@ public class PointControllerTest {
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("요청 결과 메시지"),
-                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
                                 fieldWithPath("data.content[].pointType").description("포인트 내역 타입"),
                                 fieldWithPath("data.content[].amount").description("포인트 금액"),
                                 fieldWithPath("data.content[].date").description("포인트 내역 생성일"),
-                                fieldWithPath("data.pageable").description("페이지 정보"),
-                                fieldWithPath("data.totalPages").description("전체 페이지 수"),
-                                fieldWithPath("data.totalElements").description("전체 요소 수"),
-                                fieldWithPath("data.last").description("마지막 페이지 여부"),
-                                fieldWithPath("data.size").description("페이지 크기"),
-                                fieldWithPath("data.number").description("현재 페이지 번호"),
-                                fieldWithPath("data.sort").description("정렬 정보"),
-                                fieldWithPath("data.sort.empty").description("정렬 정보 여부"),
-                                fieldWithPath("data.sort.sorted").description("정렬 여부"),
-                                fieldWithPath("data.sort.unsorted").description("정렬 안됨 여부"),
-                                fieldWithPath("data.first").description("첫 페이지 여부"),
-                                fieldWithPath("data.numberOfElements").description("현재 페이지 요소 수"),
-                                fieldWithPath("data.empty").description("비어있는 페이지 여부")
+                                fieldWithPath("data.pageable").type(JsonFieldType.STRING).description("요청한 페이지 관련 정보"),
+                                fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 데이터 건수"),
+                                fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                                fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("현재 페이지가 마지막 페이지인지 여부"),
+                                fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("한 페이지에 보여지는 데이터 수"),
+                                fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호 (0부터 시작)"),
+                                fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 기준이 비어있는지 여부"),
+                                fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("데이터가 정렬되어 있는지 여부"),
+                                fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("데이터가 정렬되지 않았는지 여부"),
+                                fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지에 포함된 데이터 수"),
+                                fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("현재 페이지가 첫 페이지인지 여부"),
+                                fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("현재 페이지에 데이터가 존재하지 않는지 여부"),
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프")
                         )
                 ))
         ;
