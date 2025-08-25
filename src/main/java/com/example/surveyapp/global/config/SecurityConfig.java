@@ -37,8 +37,8 @@ public class SecurityConfig {
 	private final UserReader userReader;
 
 	// OAuth2 추가 주입
-	private final CustomOauth2UserService customOauth2UserService;
-	private final OAuth2SuccessHandler oAuth2SuccessHandler; // JWT 발급/리다이렉트 담당
+//	private final CustomOauth2UserService customOauth2UserService;
+//	private final OAuth2SuccessHandler oAuth2SuccessHandler; // JWT 발급/리다이렉트 담당
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
