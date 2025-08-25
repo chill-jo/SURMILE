@@ -9,9 +9,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import com.example.surveyapp.domain.user.domain.model.User;
-
-
-
 import com.example.surveyapp.global.security.auth.CustomOauth2UserDetails;
 import com.example.surveyapp.global.security.jwt.JwtUtil;
 
@@ -24,17 +21,15 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
-
 	private final JwtUtil jwtUtil;
 
-
-// private String successRedirectUri = "http://localhost:8080/";
-private String successRedirectUri = "https://surmile.o-r.kr";
+	// private String successRedirectUri = "http://localhost:8080/";
+	private String successRedirectUri = "https://surmile.o-r.kr";
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+		HttpServletResponse response,
+		Authentication authentication) throws IOException {
 
 		CustomOauth2UserDetails principal = (CustomOauth2UserDetails)authentication.getPrincipal();
 		User user = principal.getUser();
