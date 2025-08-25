@@ -17,8 +17,8 @@ import com.example.surveyapp.global.filter.JwtFilter;
 import com.example.surveyapp.global.reader.UserReader;
 import com.example.surveyapp.global.security.handler.CustomAccessDeniedHandler;
 import com.example.surveyapp.global.security.handler.CustomAuthenticationEntryPoint;
-//import com.example.surveyapp.global.security.handler.OAuth2SuccessHandler;
-//import com.example.surveyapp.global.security.oauth.CustomOauth2UserService;
+import com.example.surveyapp.global.security.handler.OAuth2SuccessHandler;
+import com.example.surveyapp.global.security.oauth.CustomOauth2UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,8 +34,8 @@ public class SecurityConfig {
 	private final UserReader userReader;
 
 	// OAuth2 추가 주입
-//	private final CustomOauth2UserService customOauth2UserService;
-//	private final OAuth2SuccessHandler oAuth2SuccessHandler; // JWT 발급/리다이렉트 담당
+	private final CustomOauth2UserService customOauth2UserService;
+	private final OAuth2SuccessHandler oAuth2SuccessHandler; // JWT 발급/리다이렉트 담당
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -88,13 +88,13 @@ public class SecurityConfig {
 			)
 
 //			// OAuth2 로그인 연결
-//			.oauth2Login(o -> o
-//				// 기본 인가 엔드포인트 변경하고 싶으면 아래 주석 해제
-//				// .authorizationEndpoint(ep -> ep.baseUri("/oauth2/authorization"))
-//				// .redirectionEndpoint(r -> r.baseUri("/login/oauth2/code/*"))
-//				.userInfoEndpoint(u -> u.userService(customOauth2UserService))
-//				.successHandler(oAuth2SuccessHandler) // JWT 발급/쿠키/리다이렉트
-//			)
+			.oauth2Login(o -> o
+				// 기본 인가 엔드포인트 변경하고 싶으면 아래 주석 해제
+				// .authorizationEndpoint(ep -> ep.baseUri("/oauth2/authorization"))
+				// .redirectionEndpoint(r -> r.baseUri("/login/oauth2/code/*"))
+				.userInfoEndpoint(u -> u.userService(customOauth2UserService))
+				.successHandler(oAuth2SuccessHandler) // JWT 발급/쿠키/리다이렉트
+			)
 
 			//UsernamePasswordAuthenticationFilter : 스프링 시큐리티에서 기본적으로
 			// username, password와 같은 입력값을 이용해서 인증을 시도하고, 인증된 사용자 정보를
