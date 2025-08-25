@@ -168,7 +168,9 @@ OPENAI_API_KEY=your_api_key_here
 
 - # 🔒 Lock 개선
 
-    - DB Lock: 포인트(Point) 도메인 안정성 확보
+    - 분산 락이 모두 적용되지 않았음
+  
+    - 포인트(Point) 도메인에는 DB 락
 
     - 대규모 트래픽 환경에서는 DB 부하 최소화를 위해 분산 락 도입 검토
 
