@@ -51,7 +51,7 @@ logging:
   file:
     name: /app/logs/app.log
   level:
-    root: error
+    root: INFO
     org:
       hibernate:
         type:
