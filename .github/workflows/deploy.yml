@@ -32,15 +32,8 @@ jobs:
       - name: docker-compose.yml 파일 생성
         run: mv ./docker-compose.yml ./survey-app
 
-      - name: build & Test with JaCoCo
-        run: ./gradlew clean build jacocoTestReport
-
-      # PR에 커버리지 댓글 작성
-      - name: Comment JaCoCo Coverage on PR
-        uses: madrapps/jacoco-report@v1.3
-        with:
-          paths: build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: build & Test
+        run: ./gradlew clean build
 
       - name: Docker image 생성
         run: docker build -t app:latest .
