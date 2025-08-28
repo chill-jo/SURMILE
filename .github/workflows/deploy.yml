@@ -1,7 +1,7 @@
 name: Spring Boot Application Deploy
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "dev-v2" ]
 
 jobs:
   deploy:
