@@ -28,8 +28,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 	private final JwtUtil jwtUtil;
 
 
-//private String successRedirectUri = "http://localhost:8080/";
-private String successRedirectUri = "https://surmile.o-r.kr";
+private String successRedirectUri = "http://localhost:8080/";
+//private String successRedirectUri = "https://surmile.o-r.kr";
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request,
