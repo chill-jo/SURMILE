@@ -51,6 +51,7 @@ logging:
   file:
     name: /app/logs/app.log
   level:
+    org.springframework.security.oauth2.client.endpoint: TRACE
     root: INFO
     org:
       hibernate:
