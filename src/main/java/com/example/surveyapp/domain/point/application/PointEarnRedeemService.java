@@ -31,7 +31,6 @@ public class PointEarnRedeemService {
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final PointOutboxRepository pointOutboxRepository;
-    private final ApplicationEventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
 
     @Transactional
