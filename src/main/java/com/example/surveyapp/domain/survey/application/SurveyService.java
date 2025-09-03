@@ -40,14 +40,12 @@ import lombok.RequiredArgsConstructor;
 public class SurveyService {
 
 	private final UserReader userReader;
-	private final ApplicationEventPublisher eventPublisher;
 	private final SurveyRepository surveyRepository;
 	private final SurveyMapper surveyMapper;
 	private final SurveyQueryService surveyQueryService;
 	private final SurveyValidator surveyValidator = new SurveyValidator();
 	private final SurveyAnswerFacade surveyAnswerFacade;
 	private final SurveyModerationFacade surveyModerationFacade;
-    private final RedisTemplate redisTemplate;
 	private final ObjectMapper objectMapper;
 	private final SurveyOutboxRepository surveyOutboxRepository;
 
