@@ -1,26 +1,26 @@
 services:
-  zookeeper:
-    image: zookeeper:latest
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-
-  kafka:
-    image: bitnami/kafka:3.4.0
-    container_name: kafka
-    ports:
-      - "9092:9092"
-    environment:
-      - KAFKA_BROKER_ID=1
-      - KAFKA_ENABLE_KRAFT=no
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-    volumes:
-      - /home/ec2-user/kafka_data:/bitnami/kafka
-    depends_on:
-      - zookeeper
+#  zookeeper:
+#    image: zookeeper:latest
+#    container_name: zookeeper
+#    ports:
+#      - "2181:2181"
+#
+#  kafka:
+#    image: bitnami/kafka:3.4.0
+#    container_name: kafka
+#    ports:
+#      - "9092:9092"
+#    environment:
+#      - KAFKA_BROKER_ID=1
+#      - KAFKA_ENABLE_KRAFT=no
+#      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+#      - ALLOW_PLAINTEXT_LISTENER=yes
+#      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+#      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+#    volumes:
+#      - /home/ec2-user/kafka_data:/bitnami/kafka
+#    depends_on:
+#      - zookeeper
 
   redis:
     image: redis/redis-stack:latest
@@ -37,13 +37,13 @@ services:
     user: "1000:1000"
     restart: always
     container_name: survey-app
-    environment:
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+#    environment:
+#      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     env_file:
       - .env
     depends_on:
       - redis
-      - kafka
+#      - kafka
 
   nginx:
     image: nginx:latest
