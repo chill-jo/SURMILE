@@ -21,7 +21,7 @@ public class PointOutboxScheduler {
 
     private final ObjectMapper objectMapper;
     private final PointOutboxRepository pointOutboxRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final PointEventPublisher eventPublisher;
 
     private static final int MAX_RETRY = 5;
 
