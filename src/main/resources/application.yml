@@ -47,7 +47,7 @@ spring:
           google:
             issuer-uri: https://accounts.google.com
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     consumer:
       group-id: my-group
       auto-offset-reset: earliest
