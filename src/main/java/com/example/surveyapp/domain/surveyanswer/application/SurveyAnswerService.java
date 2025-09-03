@@ -31,7 +31,7 @@ public class SurveyAnswerService {
 
     private final UserReader userReader;
     private final SurveyFacade surveyFacade;
-    private final ApplicationEventPublisher eventPublisher;
+    private final AnswerEventPublisher eventPublisher;
     private final List<SurveyQuestionStrategy> surveyQuestionStrategies;
     private final SurveyAnswerMapper surveyAnswerFactory;
     private final SurveyAnswerRepository surveyAnswerRepository;
@@ -52,7 +52,7 @@ public class SurveyAnswerService {
 
         saveAnswerWithStrategy(requestDto, surveyId, surveyAnswer);
 
-        eventPublisher.publishEvent(new SurveyAnswerEvent(
+        eventPublisher.answerPublishEvent(new SurveyAnswerEvent(
                 userId,
                 surveyFacade.getPointPerPersonBySurveyId(surveyId),
                 surveyAnswer.getId()
@@ -75,7 +75,7 @@ public class SurveyAnswerService {
         }
 
         if (surveyAnswerRepository.countBySurveyId(surveyId) >= surveyFacade.getSurveyInfo(surveyId).getMaxSurveyee()) {
-            eventPublisher.publishEvent(new SurveyDoneEvent(surveyId));
+            eventPublisher.donePublishEvent(new SurveyDoneEvent(surveyId));
         }
     }
 
