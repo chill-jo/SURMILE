@@ -9,7 +9,6 @@ import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.domain.product.domain.repository.ProductRepository;
 import com.example.surveyapp.domain.product.application.dto.ProductUpdateResponseDto;
 import com.example.surveyapp.global.reader.UserReader;
-import com.example.surveyapp.global.response.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,14 +87,14 @@ class ProductServiceTest {
         //실행할 행동
 
         doNothing().when(userReader).validateUserIdOrThrow(userId);
-        doThrow(new CustomException(ProductErrorCode.NOT_ADMIN_USER_ERROR))
+        doThrow(new ProductException(ProductErrorCode.NOT_ADMIN_USER_ERROR))
                 .when(userReader)
                 .validateUserRoleToAdmin(userId);
 
         // Then
         //검증 사항
         assertThatThrownBy(() -> productService.createProduct(requestDto, userId))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(ProductException.class)
                 .hasMessageContaining(ProductErrorCode.NOT_ADMIN_USER_ERROR.getMessage());
     }
 

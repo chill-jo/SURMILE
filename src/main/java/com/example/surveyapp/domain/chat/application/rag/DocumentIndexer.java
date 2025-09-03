@@ -1,8 +1,8 @@
 package com.example.surveyapp.domain.chat.application.rag;
 
 import com.example.surveyapp.domain.chat.exception.AiErrorCode;
+import com.example.surveyapp.domain.chat.exception.AiException;
 import com.example.surveyapp.global.reader.UserReader;
-import com.example.surveyapp.global.response.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -38,7 +38,7 @@ public class DocumentIndexer {
      */
     public void validateIndexerAccess(Long userId){
         if (userId == null || !userReader.validateUserRoleToAdmin(userId)) {
-            throw new CustomException(AiErrorCode.NOT_MATCH_ADMIN);
+            throw new AiException(AiErrorCode.NOT_MATCH_ADMIN);
         }
     }
 }
