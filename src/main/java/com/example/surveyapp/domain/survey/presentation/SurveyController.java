@@ -114,7 +114,6 @@ public class SurveyController {
     }
 
     // 설문 시작 테스트
-    @PreAuthorize("hasAnyRole('SURVEYEE')")
     @GetMapping("/{surveyId}/start/test")
     public ResponseEntity<SurveyQuestionDto> testStartSurvey(
             @PathVariable Long surveyId
