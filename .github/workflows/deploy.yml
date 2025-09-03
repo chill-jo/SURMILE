@@ -84,6 +84,7 @@ jobs:
             
             # Docker Compose로 서비스 시작
             cd /home/ec2-user/survey-app
+            docker compose down --volumes || true
             docker load -i app.tar
             docker-compose build --no-cache
             docker-compose up -d
