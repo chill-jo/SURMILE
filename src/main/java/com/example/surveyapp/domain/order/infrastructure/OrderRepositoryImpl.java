@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.order.infrastructor;
+package com.example.surveyapp.domain.order.infrastructure;
 
 import com.example.surveyapp.domain.order.domain.model.Order;
 import com.example.surveyapp.domain.order.domain.repository.OrderRepository;
