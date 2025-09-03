@@ -114,12 +114,21 @@ public class SurveyController {
     }
 
     // 설문 시작 테스트
-    @GetMapping("/{surveyId}/start/test")
-    public ResponseEntity<SurveyQuestionDto> testStartSurvey(
+    @GetMapping("/{surveyId}/start/test/noCache")
+    public ResponseEntity<SurveyQuestionDto> testNoCacheStartSurvey(
             @PathVariable Long surveyId
     ) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(surveyService.testStartSurvey(surveyId));
+        return ResponseEntity.status(HttpStatus.OK).body(surveyService.testNoCacheStartSurvey(surveyId));
+    }
+
+    // 설문 시작 테스트
+    @GetMapping("/{surveyId}/start/test/cache")
+    public ResponseEntity<SurveyQuestionDto> testCacheStartSurvey(
+            @PathVariable Long surveyId
+    ) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(surveyService.testCacheStartSurvey(surveyId));
     }
 
 }

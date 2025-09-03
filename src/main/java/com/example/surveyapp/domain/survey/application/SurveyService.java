@@ -167,8 +167,19 @@ public class SurveyService {
 
     // 설문 시작 테스트
     @Transactional(readOnly = true)
+    public SurveyQuestionDto testNoCacheStartSurvey(Long surveyId) {
+        Long userId = 3L;
+        userReader.validateUserIdOrThrow(userId);
+
+        Survey survey = surveyQueryService.findSurvey(surveyId);
+
+        return surveyMapper.toSurveyQuestionDto(survey);
+    }
+
+    // 설문 시작 테스트
+    @Transactional(readOnly = true)
     @Cacheable(cacheNames = "survey", key = "#surveyId")
-    public SurveyQuestionDto testStartSurvey(Long surveyId) {
+    public SurveyQuestionDto testCacheStartSurvey(Long surveyId) {
         Long userId = 3L;
         userReader.validateUserIdOrThrow(userId);
 
