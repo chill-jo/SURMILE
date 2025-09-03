@@ -1,7 +1,6 @@
 package com.example.surveyapp.global.aop;
 
-import com.example.surveyapp.global.response.exception.CustomException;
-import com.example.surveyapp.global.response.exception.ErrorCode;
+import com.example.surveyapp.global.response.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -42,7 +41,7 @@ public class LockAop {
             boolean isLocked = lock.tryLock(lockAnnotation.waitTime(), lockAnnotation.leaseTime(), lockAnnotation.timeUnit());
 
             if (!isLocked) {
-                throw new CustomException(AopErrorCode.FAILED_GET_LOCK, "락 획득 실패했습니다. : " + lockKey);
+                throw new AopException(AopErrorCode.FAILED_GET_LOCK);
             }
 
             return joinPoint.proceed();
