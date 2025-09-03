@@ -21,7 +21,7 @@ public class UserOutboxScheduler {
 
     private final ObjectMapper objectMapper;
     private final UserOutboxRepository userOutboxRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final UserEventPublisher eventPublisher;
 
     private static final int MAX_RETRY = 5;
 
