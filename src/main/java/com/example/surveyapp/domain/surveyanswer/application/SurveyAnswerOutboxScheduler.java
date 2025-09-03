@@ -20,7 +20,7 @@ public class SurveyAnswerOutboxScheduler {
 
     private final ObjectMapper objectMapper;
     private final SurveyAnswerOutboxRepository surveyAnswerOutboxRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final AnswerEventPublisher eventPublisher;
 
     private static final int MAX_RETRY = 5;
 
@@ -31,7 +31,7 @@ public class SurveyAnswerOutboxScheduler {
 
     for (SurveyAnswerOutbox answerOutbox : unpublished) {
         try {
-            eventPublisher.publishEvent(objectMapper.readValue(answerOutbox.getPayload(),SurveyAnswerEvent.class));
+            eventPublisher.answerPublishEvent(objectMapper.readValue(answerOutbox.getPayload(),SurveyAnswerEvent.class));
             answerOutbox.markPublished();
         }catch (AnswerException e) {
             answerOutbox.markFailed(MAX_RETRY);
