@@ -1,4 +1,4 @@
-package com.example.surveyapp.domain.order.infrastructor;
+package com.example.surveyapp.domain.order.infrastructure;
 
 import com.example.surveyapp.domain.order.domain.model.OrderOutbox;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderOutBoxEnum;
