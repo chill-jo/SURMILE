@@ -47,7 +47,6 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final UserBaseDataRepository userBaseDataRepository;
-	private final ApplicationEventPublisher eventPublisher;
 	private final RedisTemplate redisTemplate;
 	private final UserModerationFacade userModerationFacade;
 	private final JwtProvider jwtProvider;
