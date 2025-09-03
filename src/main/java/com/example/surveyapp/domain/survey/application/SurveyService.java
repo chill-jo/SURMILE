@@ -164,4 +164,16 @@ public class SurveyService {
 
 		return surveyMapper.toSurveyQuestionDto(survey);
 	}
+
+    // 설문 시작 테스트
+    @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "survey", key = "#surveyId")
+    public SurveyQuestionDto testStartSurvey(Long surveyId) {
+        Long userId = 3L;
+        userReader.validateUserIdOrThrow(userId);
+
+        Survey survey = surveyQueryService.findSurvey(surveyId);
+
+        return surveyMapper.toSurveyQuestionDto(survey);
+    }
 }
