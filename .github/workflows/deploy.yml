@@ -33,7 +33,7 @@ jobs:
         run: mv ./docker-compose.yml ./survey-app
 
       - name: build & Test
-        run: ./gradlew clean build
+        run: ./gradlew clean bootjar
 
       - name: Docker image 생성
         run: docker build -t app:latest .
