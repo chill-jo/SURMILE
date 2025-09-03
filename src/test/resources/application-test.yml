@@ -4,6 +4,9 @@ spring:
   application:
     name: surveyApp-test
 
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+
   datasource:
     url: jdbc:h2:mem:test_db;MODE=MySQL;
     driver-class-name: org.h2.Driver

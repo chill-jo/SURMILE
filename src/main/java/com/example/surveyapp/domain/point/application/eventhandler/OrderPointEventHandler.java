@@ -26,8 +26,8 @@ public class OrderPointEventHandler {
     private final PointEarnRedeemService pointEarnRedeemService;
     private final ObjectMapper objectMapper;
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+//    @Async
+//    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrderCreateEvent(OrderCreateEvent event) {
         log.info("포인트차감하러왓어유");
         try {
