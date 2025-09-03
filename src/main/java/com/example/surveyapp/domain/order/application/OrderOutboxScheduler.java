@@ -20,8 +20,8 @@ public class OrderOutboxScheduler {
 
     private final ObjectMapper objectMapper;
     private final OrderOutboxRepository orderOutboxRepository;
-    //private final EventPublisher eventPublisher;
-    private final ApplicationEventPublisher eventPublisher;
+    private final EventPublisher eventPublisher;
+    //private final ApplicationEventPublisher eventPublisher;
 
     private static final int MAX_RETRY = 5;
 
