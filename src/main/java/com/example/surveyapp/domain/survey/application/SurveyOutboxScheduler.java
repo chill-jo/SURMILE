@@ -20,7 +20,7 @@ public class SurveyOutboxScheduler {
 
     private final ObjectMapper objectMapper;
     private final SurveyOutboxRepository surveyOutboxRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final SurveyEventPublisher eventPublisher;
 
     private static final int MAX_RETRY = 5;
 
