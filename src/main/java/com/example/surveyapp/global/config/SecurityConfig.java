@@ -64,6 +64,7 @@ public class SecurityConfig {
 					"/api/refresh",
 					"/error",
 					"/api/chat/ask",
+                    "/api/survey/1/start/test",
 
 					// OAuth2 엔드포인트 허용
 					"/oauth2/**",
