@@ -7,6 +7,7 @@ import com.example.surveyapp.domain.order.domain.repository.OrderOutboxRepositor
 import com.example.surveyapp.domain.order.exception.OrderException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,8 @@ public class OrderOutboxScheduler {
 
     private final ObjectMapper objectMapper;
     private final OrderOutboxRepository orderOutboxRepository;
-    private final EventPublisher eventPublisher;
+    //private final EventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     private static final int MAX_RETRY = 5;
 
