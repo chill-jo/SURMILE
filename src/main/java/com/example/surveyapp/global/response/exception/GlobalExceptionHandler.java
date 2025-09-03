@@ -1,9 +1,7 @@
 package com.example.surveyapp.global.response.exception;
 
-import com.example.surveyapp.global.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,8 +21,8 @@ public class GlobalExceptionHandler {
         this.error = error;
     }
 
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponseDto> handleCustomException(CustomException e) {
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorResponseDto> handleCustomException(BaseException e) {
 
         ErrorCode errorCode = e.getErrorCode();
         ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorCode, e.getMessage());
