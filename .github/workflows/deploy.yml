@@ -57,6 +57,17 @@ jobs:
             mkdir -p /home/ec2-user/deploy
             echo "배포 디렉토리 생성 또는 확인 완료"
 
+      - name: Set permissions for deploy directory
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PEM_KEY }}
+          script: |
+            sudo chown -R ${{ secrets.EC2_USERNAME }}:${{ secrets.EC2_USERNAME }} /home/ec2-user/deploy
+            sudo chmod -R 755 /home/ec2-user/deploy
+            echo "디렉토리 권한 설정 완료"
+
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:
