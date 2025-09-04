@@ -1,12 +1,15 @@
 package com.example.surveyapp.domain.surveyanswer.domain.event;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class SurveyAnswerEvent {
-    private final Long userId;
-    private final Long pointPerPerson;
-    private final Long surveyAnswerId;
+    private Long userId;
+    private Long pointPerPerson;
+    private Long surveyAnswerId;
 }
