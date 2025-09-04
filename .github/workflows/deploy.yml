@@ -75,6 +75,7 @@ jobs:
           file id_rsa
           head -5 id_rsa
 
+
       ###########################################
       # ✅ Debug Steps (EC2 연결 문제 확인용)
       ###########################################
@@ -98,6 +99,7 @@ jobs:
         run: nc -vz -w 5 ${{ secrets.EC2_HOST }} 22 || echo "⚠️ 22번 포트 접근 불가"
 
       - name: Ensure deploy dir exists on EC2
+
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -105,19 +107,21 @@ jobs:
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
             mkdir -p /home/ec2-user/deploy
+
             echo "deploy dir ready"
 
       ###########################################
       # ✅ 실제 배포 단계
       ###########################################
 
+      # 🔹 survey-app 안의 파일만 전송
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PEM_KEY }}
-          source: ./survey-app
+          source: ./survey-app/*
           target: /home/ec2-user/deploy
           debug: true
 
@@ -130,6 +134,7 @@ jobs:
           script: |
 
             echo "===== 파일 전송 확인 ====="
+
             ls -la /home/ec2-user/deploy/survey-app
 
             rm -rf /home/ec2-user/rollback
@@ -141,10 +146,9 @@ jobs:
             fi
             mv /home/ec2-user/survey-app /home/ec2-user/rollback
 
-
             rm -rf /home/ec2-user/survey-app
             mkdir /home/ec2-user/survey-app
-            mv /home/ec2-user/deploy/survey-app /home/ec2-user
+            mv /home/ec2-user/deploy/* /home/ec2-user/survey-app/
 
             cd /home/ec2-user/survey-app
             docker compose down --volumes || true
