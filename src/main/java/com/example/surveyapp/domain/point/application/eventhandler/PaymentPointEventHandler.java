@@ -3,7 +3,6 @@ package com.example.surveyapp.domain.point.application.eventhandler;
 import com.example.surveyapp.domain.payment.domain.event.PointChargeEvent;
 import com.example.surveyapp.domain.point.application.PointEarnRedeemService;
 import com.example.surveyapp.domain.point.domain.event.PointChargeFailedEvent;
-import com.example.surveyapp.domain.point.domain.event.SurveyPointRedeemFailedEvent;
 import com.example.surveyapp.domain.point.domain.model.entity.PointOutbox;
 import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
 import com.example.surveyapp.domain.point.domain.repository.PointOutboxRepository;
@@ -12,21 +11,14 @@ import com.example.surveyapp.domain.point.exception.PointException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
 public class PaymentPointEventHandler {
 
     private final PointEarnRedeemService pointEarnRedeemService;
-    private final ApplicationEventPublisher eventPublisher;
-    private final ObjectMapper objectMapper;
+   private final ObjectMapper objectMapper;
     private final PointOutboxRepository pointOutboxRepository;
 
     @Async
@@ -36,7 +28,8 @@ public class PaymentPointEventHandler {
             pointEarnRedeemService.increaseSurveyorPoint(
                     event.getUserId(),
                     event.getPaymentId(),
-                    PointBalance.of(event.getAmount()));
+                    PointBalance.of(event.getAmount())
+            );
 
         }catch(Exception e){
             PointChargeFailedEvent pointFailedEvent = new PointChargeFailedEvent(event.getUserId(), event.getPaymentId());
