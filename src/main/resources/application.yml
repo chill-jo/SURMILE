@@ -1,105 +1,82 @@
-name: Spring Boot Application Deploy
-on:
-  push:
-    branches: [ "dev-v3", "main" ]
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: surveyApp
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git repository checkout
-        uses: actions/checkout@v4
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
 
-      - name: Setup JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      cache-access-token: accessToken
+      cache-refresh-token: refreshToken
+      default-ttl-sec: 86400
 
-      - name: 파일 전송을 위한 디렉토리 생성
-        run: mkdir ./survey-app
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-      - name: Fix Docker permissions
-        run: |
-          sudo chmod 666 /var/run/docker.sock
-          docker info
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.MySQLDialect
 
-      - name: ENV 파일 생성
-        run: |
-          echo "${{ secrets.ENV_PROPERTIES }}" > ./.env
-          echo "${{ secrets.ENV_PROPERTIES }}" > ./survey-app/.env
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+            redirect-uri: "${BASE_URL}/login/oauth2/code/google"
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: my-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-      - name: docker-compose.yml 파일 생성
-        run: mv ./docker-compose.yml ./survey-app
 
-      - name: build & Test
-        run: ./gradlew clean build
+logging:
+  file:
+    name: /app/logs/app.log
+  level:
+    org.springframework.security.oauth2.client.endpoint: TRACE
+    root: INFO
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: info
+        org:
+          hibernate: debug
+    org.springframework.cache: trace
 
-      - name: Docker image 생성
-        run: docker build -t app:latest .
-
-      - name: Docker 이미지 .tar 파일 생성
-        run: docker save -o ./survey-app/app.tar app:latest
-
-      - name: 파일 생성 확인 (로컬)
-        run: |
-          echo "===== 로컬 survey-app 디렉토리 확인 ====="
-          pwd
-          ls -R ./survey-app
-
-      - name: Ensure deploy dir exists on EC2
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PEM_KEY }}
-          script: |
-            mkdir -p /home/ec2-user/deploy
-            chmod 755 /home/ec2-user/deploy
-
-      - name: SCP로 EC2에 파일 전송
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PEM_KEY }}
-          source: ./survey-app
-          target: /home/ec2-user/deploy
-          debug: true
-
-      - name: SSH를 통해 EC2에 접속 후 Docker Compose로 서비스 재시작
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PEM_KEY }}
-          script: |
-            echo "===== EC2 전송된 파일 확인 ====="
-            ls -la /home/ec2-user/deploy/survey-app || echo "survey-app 디렉토리 없음"
-
-            # 롤백 디렉토리 생성 및 이전 버전 백업
-            rm -rf /home/ec2-user/rollback
-            mkdir /home/ec2-user/rollback
-
-            # 기존 서비스가 실행 중이면 중지하고 백업
-            if [ -d "/home/ec2-user/survey-app" ]; then
-              cd /home/ec2-user/survey-app
-              docker compose down || true
-            fi
-            mv /home/ec2-user/survey-app /home/ec2-user/rollback || true
-
-            # 새 버전 배포 준비
-            rm -rf /home/ec2-user/survey-app
-            mkdir /home/ec2-user/survey-app
-            mv /home/ec2-user/deploy/survey-app /home/ec2-user
-
-            # Docker Compose로 서비스 시작
-            cd /home/ec2-user/survey-app
-            docker compose down --volumes || true
-            docker load -i app.tar
-            docker compose build --no-cache
-            docker compose up -d
-
-            # 배포 후 임시 파일 정리
-            rm -rf /home/ec2-user/deploy
-            mkdir /home/ec2-user/deploy
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+  access-token:
+    expiration:
+      access-token: 1800000 # 30 minutes
+      refresh-token: 1209600000 # 14 days
