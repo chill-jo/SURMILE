@@ -21,8 +21,6 @@ public class PaymentPointEventHandler {
    private final ObjectMapper objectMapper;
     private final PointOutboxRepository pointOutboxRepository;
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePointChargeEvent(PointChargeEvent event){
         try{
             pointEarnRedeemService.increaseSurveyorPoint(
