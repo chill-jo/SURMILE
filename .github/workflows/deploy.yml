@@ -80,7 +80,7 @@ jobs:
           script: |
             mkdir -p /home/ec2-user/deploy
             chmod 755 /home/ec2-user/deploy
-
+            
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:
