@@ -41,10 +41,39 @@ jobs:
       - name: Docker 이미지 .tar 파일 생성
         run: docker save -o ./survey-app/app.tar app:latest
 
-      - name: 파일 생성 확인
+      - name: 파일 생성 확인 (로컬)
         run: |
-          echo "===== 파일 목록 확인 ====="
-          ls -la ./survey-app/
+          echo "===== 로컬 survey-app 디렉토리 확인 ====="
+          pwd
+          ls -R ./survey-app
+
+      - name: Ensure deploy dir exists on EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PEM_KEY }}
+          script: |
+            mkdir -p /home/ec2-user/deploy
+            chmod 755 /home/ec2-user/deploy
+
+      # 🔍 디버그 스텝 추가
+      - name: Check local survey-app content
+        run: |
+          echo "===== GitHub Actions 워크 디렉토리 ====="
+          pwd
+          ls -la
+          echo "===== survey-app 디렉토리 ====="
+          ls -R ./survey-app || echo "⚠️ survey-app 디렉토리가 없습니다"
+
+      - name: Try manual tar for debug
+        run: tar -zcf /tmp/test.tar.gz ./survey-app && ls -lh /tmp/test.tar.gz
+
+      - name: Debug PEM key format
+        run: |
+          echo "${{ secrets.EC2_PEM_KEY }}" > id_rsa
+          file id_rsa
+          head -5 id_rsa
 
       # 🔹 EC2에 deploy 디렉토리 보장
       - name: Ensure deploy directory exists on EC2
@@ -75,6 +104,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
+
             echo "===== 파일 전송 확인 ====="
             ls -la /home/ec2-user/deploy
 
@@ -83,9 +113,10 @@ jobs:
 
             if [ -d "/home/ec2-user/survey-app" ]; then
               cd /home/ec2-user/survey-app
-              docker-compose down || true
+              docker compose down || true
             fi
             mv /home/ec2-user/survey-app /home/ec2-user/rollback || true
+
 
             rm -rf /home/ec2-user/survey-app
             mkdir /home/ec2-user/survey-app
