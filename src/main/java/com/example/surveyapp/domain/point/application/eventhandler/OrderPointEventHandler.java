@@ -12,10 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -26,8 +23,6 @@ public class OrderPointEventHandler {
     private final PointEarnRedeemService pointEarnRedeemService;
     private final ObjectMapper objectMapper;
 
-//    @Async
-//    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrderCreateEvent(OrderCreateEvent event) {
         log.info("포인트차감하러왓어유");
         try {
