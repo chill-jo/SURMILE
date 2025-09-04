@@ -21,7 +21,7 @@ public class PaymentOutboxScheduler {
 
     private final ObjectMapper objectMapper;
     private final PaymentOutboxRepository paymentOutboxRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final PaymentEventPublisher eventPublisher;
 
     private static final int MAX_RETRY = 5;
 
