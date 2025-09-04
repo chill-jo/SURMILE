@@ -75,13 +75,25 @@ jobs:
           file id_rsa
           head -5 id_rsa
 
+      # 🔹 EC2에 deploy 디렉토리 보장
+      - name: Ensure deploy directory exists on EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PEM_KEY }}
+          script: |
+            mkdir -p /home/ec2-user/deploy
+            chmod 777 /home/ec2-user/deploy
+
+      # 🔹 survey-app 안의 파일만 전송
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PEM_KEY }}
-          source: ./survey-app
+          source: ./survey-app/*
           target: /home/ec2-user/deploy
           debug: true
 
@@ -92,32 +104,29 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
-            echo "===== EC2 전송된 파일 확인 ====="
-            ls -la /home/ec2-user/deploy/survey-app || echo "survey-app 디렉토리 없음"
 
-            # 롤백 디렉토리 생성 및 이전 버전 백업
+            echo "===== 파일 전송 확인 ====="
+            ls -la /home/ec2-user/deploy
+
             rm -rf /home/ec2-user/rollback
             mkdir /home/ec2-user/rollback
 
-            # 기존 서비스가 실행 중이면 중지하고 백업
             if [ -d "/home/ec2-user/survey-app" ]; then
               cd /home/ec2-user/survey-app
               docker compose down || true
             fi
             mv /home/ec2-user/survey-app /home/ec2-user/rollback || true
 
-            # 새 버전 배포 준비
+
             rm -rf /home/ec2-user/survey-app
             mkdir /home/ec2-user/survey-app
-            mv /home/ec2-user/deploy/survey-app /home/ec2-user
+            mv /home/ec2-user/deploy/* /home/ec2-user/survey-app/
 
-            # Docker Compose로 서비스 시작
             cd /home/ec2-user/survey-app
             docker compose down --volumes || true
             docker load -i app.tar
-            docker compose build --no-cache
-            docker compose up -d
+            docker-compose build --no-cache
+            docker-compose up -d
 
-            # 배포 후 임시 파일 정리
             rm -rf /home/ec2-user/deploy
             mkdir /home/ec2-user/deploy
