@@ -47,6 +47,30 @@ jobs:
           pwd
           ls -R ./survey-app
 
+      ###########################################
+      # ✅ Debug Steps (if: always() 추가)
+      ###########################################
+
+      - name: Ping EC2 Host
+        if: always()
+        run: ping -c 3 ${{ secrets.EC2_HOST }} || echo "⚠️ ping 실패 (ICMP 차단일 수도 있음)"
+
+      - name: Check SSH connectivity to EC2
+        if: always()
+        run: nc -vz -w 5 ${{ secrets.EC2_HOST }} 22 || echo "⚠️ 22번 포트 접근 불가"
+
+      - name: Debug PEM key format
+        if: always()
+        run: |
+          echo "${{ secrets.EC2_PEM_KEY }}" > id_rsa
+          file id_rsa || true
+          head -5 id_rsa || true
+          ssh-keygen -y -f id_rsa > /dev/null || echo "⚠️ PEM 키 문제 가능성"
+
+      ###########################################
+      # ✅ 실제 배포 단계
+      ###########################################
+
       - name: Ensure deploy dir exists on EC2
         uses: appleboy/ssh-action@v1
         with:
@@ -56,60 +80,6 @@ jobs:
           script: |
             mkdir -p /home/ec2-user/deploy
             chmod 755 /home/ec2-user/deploy
-
-      # 🔍 디버그 스텝 추가
-      - name: Check local survey-app content
-        run: |
-          echo "===== GitHub Actions 워크 디렉토리 ====="
-          pwd
-          ls -la
-          echo "===== survey-app 디렉토리 ====="
-          ls -R ./survey-app || echo "⚠️ survey-app 디렉토리가 없습니다"
-
-      - name: Try manual tar for debug
-        run: tar -zcf /tmp/test.tar.gz ./survey-app && ls -lh /tmp/test.tar.gz
-
-      - name: Debug PEM key format
-        run: |
-          echo "${{ secrets.EC2_PEM_KEY }}" > id_rsa
-          file id_rsa
-          head -5 id_rsa
-
-      ###########################################
-      # ✅ Debug Steps (EC2 연결 문제 확인용)
-      ###########################################
-
-      - name: Check local survey-app content
-        run: |
-          echo "===== survey-app 디렉토리 내용 ====="
-          ls -R ./survey-app || echo "⚠️ survey-app 없음"
-
-      - name: Try manual tar for debug
-        run: tar -zcf /tmp/test.tar.gz ./survey-app && ls -lh /tmp/test.tar.gz
-
-      - name: Debug PEM key format
-        run: |
-          echo "${{ secrets.EC2_PEM_KEY }}" > id_rsa
-          file id_rsa || true
-          head -5 id_rsa || true
-          ssh-keygen -y -f id_rsa > /dev/null || echo "⚠️ PEM 키 문제 가능성"
-
-      - name: Check SSH connectivity to EC2
-        run: nc -vz -w 5 ${{ secrets.EC2_HOST }} 22 || echo "⚠️ 22번 포트 접근 불가"
-
-      - name: Ensure deploy dir exists on EC2
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PEM_KEY }}
-          script: |
-            mkdir -p /home/ec2-user/deploy
-            echo "deploy dir ready"
-
-      ###########################################
-      # ✅ 실제 배포 단계
-      ###########################################
 
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
@@ -128,7 +98,6 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
-
             echo "===== 파일 전송 확인 ====="
             ls -la /home/ec2-user/deploy/survey-app
 
@@ -140,7 +109,6 @@ jobs:
               docker compose down || true
             fi
             mv /home/ec2-user/survey-app /home/ec2-user/rollback
-
 
             rm -rf /home/ec2-user/survey-app
             mkdir /home/ec2-user/survey-app
