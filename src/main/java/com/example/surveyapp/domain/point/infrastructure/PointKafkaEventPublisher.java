@@ -15,17 +15,17 @@ public class PointKafkaEventPublisher implements PointEventPublisher {
     @Override
     public void publishEvent(Object event) {
         if ( event instanceof PointChargeFailedEvent e) {
-            kafkaTemplate.send("pointCharge-Failed", event);
+            kafkaTemplate.send("point-charge-failed", event);
         } else if (event instanceof PointChargeSucceededEvent e) {
-            kafkaTemplate.send("pointCharge-Succeeded", event);
+            kafkaTemplate.send("point-charge-succeeded", event);
         } else if (event instanceof PointRedeemFailedEvent e) {
-            kafkaTemplate.send("pointRedeem-Failed", event);
+            kafkaTemplate.send("order-redeem-failed", event);
         } else if (event instanceof PointRedeemSucceededEvent e) {
-            kafkaTemplate.send("pointRedeem-Succeeded", event);
+            kafkaTemplate.send("order-redeem-succeeded", event);
         } else if (event instanceof SurveyPointRedeemFailedEvent e) {
-            kafkaTemplate.send("surveyRedeem-Failed", event);
+            kafkaTemplate.send("survey-redeem-failed", event);
         } else if (event instanceof SurveyPointRedeemSucceededEvent e) {
-            kafkaTemplate.send("surveyRedeem-Succeeded", event);
+            kafkaTemplate.send("survey-redeem-succeeded", event);
         }
     }
 
