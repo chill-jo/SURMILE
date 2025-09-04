@@ -14,6 +14,6 @@ public class SurveyKafkaEventPublisher implements SurveyEventPublisher {
 
     @Override
     public void publishEvent(SurveyCreateEvent event) {
-        kafkaTemplate.send("Survey-created", event);
+        kafkaTemplate.send("survey-created", event);
     }
 }

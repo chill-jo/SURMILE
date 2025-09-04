@@ -7,7 +7,6 @@ import com.example.surveyapp.domain.payment.domain.repository.PaymentOutboxRepos
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +20,7 @@ public class PaymentOutboxScheduler {
 
     private final ObjectMapper objectMapper;
     private final PaymentOutboxRepository paymentOutboxRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final PaymentEventPublisher eventPublisher;
 
     private static final int MAX_RETRY = 5;
 

@@ -13,10 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Component
@@ -27,8 +24,6 @@ public class SurveyPointEventHandler {
     private final ObjectMapper objectMapper;
     private final PointOutboxRepository pointOutboxRepository;
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSurveyCreateEvent(SurveyCreateEvent event){
         try{
             pointEarnRedeemService.decreaseSurveyorPoint(
@@ -42,8 +37,6 @@ public class SurveyPointEventHandler {
         }
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSurveyAnswerEvent(SurveyAnswerEvent event){
         pointEarnRedeemService.increaseSurveyeePoint(
                 event.getUserId(),

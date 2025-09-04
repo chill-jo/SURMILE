@@ -25,7 +25,7 @@ public class OrderCreatedEventHandler {
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void PointSucceedEvent(PointRedeemSucceededEvent event) {
+    public void pointSucceedEvent(PointRedeemSucceededEvent event) {
         Order order = orderRepository.findByIdAndIsDeletedFalse(event.getTargetId())
                 .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
         order.confirm();
@@ -35,7 +35,7 @@ public class OrderCreatedEventHandler {
     @Async
     @EventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void PointFailedEvent(PointRedeemFailedEvent event) {
+    public void pointFailedEvent(PointRedeemFailedEvent event) {
            Order order = orderRepository.findByIdAndIsDeletedFalse(event.getTargetId())
                 .orElseThrow(() -> new OrderException(OrderErrorCode.NOT_FOUND_ORDER));
 

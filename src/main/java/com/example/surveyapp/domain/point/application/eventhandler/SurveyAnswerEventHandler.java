@@ -1,60 +1,57 @@
 package com.example.surveyapp.domain.point.application.eventhandler;
 
-import com.example.surveyapp.domain.order.domain.event.OrderCreateEvent;
 import com.example.surveyapp.domain.point.application.PointEarnRedeemService;
-import com.example.surveyapp.domain.point.domain.event.PointRedeemFailedEvent;
 import com.example.surveyapp.domain.point.domain.model.entity.PointOutbox;
 import com.example.surveyapp.domain.point.domain.model.vo.PointBalance;
 import com.example.surveyapp.domain.point.domain.repository.PointOutboxRepository;
 import com.example.surveyapp.domain.point.exception.PointErrorCode;
 import com.example.surveyapp.domain.point.exception.PointException;
+import com.example.surveyapp.domain.surveyanswer.domain.event.SurveyAnswerEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
-public class OrderPointEventHandler {
+public class SurveyAnswerEventHandler {
 
     private final PointOutboxRepository pointOutboxRepository;
     private final PointEarnRedeemService pointEarnRedeemService;
     private final ObjectMapper objectMapper;
 
-    public void handleOrderCreateEvent(OrderCreateEvent event) {
-        log.info("포인트차감하러왓어유");
+    public void handleAnswerCreateEvent(SurveyAnswerEvent event) {
         try {
-            pointEarnRedeemService.decreasePoint(
-                    event.getUserId(),
-                    PointBalance.of(event.getTotalAmount()),
-                    event.getOrderId());
+            pointEarnRedeemService.increaseSurveyeePoint(event.getUserId(),
+                    PointBalance.of(event.getPointPerPerson()),
+                    event.getSurveyAnswerId());
         }
         catch (PointException e) {
-            PointRedeemFailedEvent pointFailedEvent = new PointRedeemFailedEvent(event.getOrderId(), event.getUserId());
-            publishOutbox(pointFailedEvent);
+            SurveyAnswerEvent surveyAnswerEvent = new SurveyAnswerEvent(event.getUserId(),
+                    event.getPointPerPerson(),
+                    event.getSurveyAnswerId());
+            publishOutbox(surveyAnswerEvent);
         }
-        catch (Exception e){
-            PointRedeemFailedEvent pointFailedEvent = new PointRedeemFailedEvent(event.getOrderId(), event.getUserId());
-            publishOutbox(pointFailedEvent);
+        catch (Exception e) {
+            SurveyAnswerEvent surveyAnswerEvent = new SurveyAnswerEvent(event.getUserId(),
+                    event.getPointPerPerson(),
+                    event.getSurveyAnswerId());
+            publishOutbox(surveyAnswerEvent);
         }
     }
 
-    private void publishOutbox(PointRedeemFailedEvent event){
-        PointOutbox pointOutbox = PointOutbox.of(
-                "Order-Fail",
-                event.getTargetId(),
-                toJson(event)
-        );
+    private void publishOutbox(SurveyAnswerEvent event){
+        PointOutbox pointOutbox = PointOutbox.of("Answer-Fail",
+                event.getSurveyAnswerId(),
+                toJson(event));
         pointOutboxRepository.save(pointOutbox);
     }
-
-    private String toJson(Object event){
-        try{
+    private String toJson(Object event) {
+        try {
             return objectMapper.writeValueAsString(event);
-        }catch(JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             throw new PointException(PointErrorCode.CANNOT_CONVERT_PAYLOAD);
         }
     }
+
 }

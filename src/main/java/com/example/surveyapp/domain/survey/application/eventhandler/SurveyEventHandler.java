@@ -45,7 +45,7 @@ public class SurveyEventHandler {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
     @Transactional
-    public void handlePointRedeemSuccessEvent(SurveyPointRedeemSucceededEvent event){
+    public void handlePointRedeemSucceededEvent(SurveyPointRedeemSucceededEvent event){
         log.info("포인트 차감 성공 이벤트 받음");
         Survey survey = surveyQueryService.findSurvey(event.getSurveyId());
 
