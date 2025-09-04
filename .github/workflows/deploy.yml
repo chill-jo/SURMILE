@@ -57,6 +57,24 @@ jobs:
             mkdir -p /home/ec2-user/deploy
             chmod 755 /home/ec2-user/deploy
 
+      # 🔍 디버그 스텝 추가
+      - name: Check local survey-app content
+        run: |
+          echo "===== GitHub Actions 워크 디렉토리 ====="
+          pwd
+          ls -la
+          echo "===== survey-app 디렉토리 ====="
+          ls -R ./survey-app || echo "⚠️ survey-app 디렉토리가 없습니다"
+
+      - name: Try manual tar for debug
+        run: tar -zcf /tmp/test.tar.gz ./survey-app && ls -lh /tmp/test.tar.gz
+
+      - name: Debug PEM key format
+        run: |
+          echo "${{ secrets.EC2_PEM_KEY }}" > id_rsa
+          file id_rsa
+          head -5 id_rsa
+
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:
