@@ -75,8 +75,31 @@ jobs:
           file id_rsa
           head -5 id_rsa
 
-      # 🔹 EC2에 deploy 디렉토리 보장
-      - name: Ensure deploy directory exists on EC2
+
+      ###########################################
+      # ✅ Debug Steps (EC2 연결 문제 확인용)
+      ###########################################
+
+      - name: Check local survey-app content
+        run: |
+          echo "===== survey-app 디렉토리 내용 ====="
+          ls -R ./survey-app || echo "⚠️ survey-app 없음"
+
+      - name: Try manual tar for debug
+        run: tar -zcf /tmp/test.tar.gz ./survey-app && ls -lh /tmp/test.tar.gz
+
+      - name: Debug PEM key format
+        run: |
+          echo "${{ secrets.EC2_PEM_KEY }}" > id_rsa
+          file id_rsa || true
+          head -5 id_rsa || true
+          ssh-keygen -y -f id_rsa > /dev/null || echo "⚠️ PEM 키 문제 가능성"
+
+      - name: Check SSH connectivity to EC2
+        run: nc -vz -w 5 ${{ secrets.EC2_HOST }} 22 || echo "⚠️ 22번 포트 접근 불가"
+
+      - name: Ensure deploy dir exists on EC2
+
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -84,7 +107,12 @@ jobs:
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
             mkdir -p /home/ec2-user/deploy
-            chmod 777 /home/ec2-user/deploy
+
+            echo "deploy dir ready"
+
+      ###########################################
+      # ✅ 실제 배포 단계
+      ###########################################
 
       # 🔹 survey-app 안의 파일만 전송
       - name: SCP로 EC2에 파일 전송
@@ -106,7 +134,8 @@ jobs:
           script: |
 
             echo "===== 파일 전송 확인 ====="
-            ls -la /home/ec2-user/deploy
+
+            ls -la /home/ec2-user/deploy/survey-app
 
             rm -rf /home/ec2-user/rollback
             mkdir /home/ec2-user/rollback
@@ -115,8 +144,7 @@ jobs:
               cd /home/ec2-user/survey-app
               docker compose down || true
             fi
-            mv /home/ec2-user/survey-app /home/ec2-user/rollback || true
-
+            mv /home/ec2-user/survey-app /home/ec2-user/rollback
 
             rm -rf /home/ec2-user/survey-app
             mkdir /home/ec2-user/survey-app
