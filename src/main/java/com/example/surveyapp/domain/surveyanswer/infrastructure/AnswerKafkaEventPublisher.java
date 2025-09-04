@@ -15,11 +15,11 @@ public class AnswerKafkaEventPublisher implements AnswerEventPublisher {
 
     @Override
     public void answerPublishEvent(SurveyAnswerEvent event) {
-        kafkaTemplate.send("SurveyAnswer-created", event);
+        kafkaTemplate.send("survey-answer-created", event);
     }
 
     @Override
     public void donePublishEvent(SurveyDoneEvent event) {
-        kafkaTemplate.send("SurveyAnswer-Done", event);
+        kafkaTemplate.send("survey-answer-done", event);
     }
 }
