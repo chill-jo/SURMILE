@@ -3,10 +3,7 @@ package com.example.surveyapp.domain.point.application.eventhandler;
 import com.example.surveyapp.domain.point.application.PointService;
 import com.example.surveyapp.domain.user.domain.event.RegisterEvent;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
