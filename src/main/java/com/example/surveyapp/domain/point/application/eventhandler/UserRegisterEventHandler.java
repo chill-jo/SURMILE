@@ -11,8 +11,6 @@ public class UserRegisterEventHandler {
 
     private final PointService pointService;
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleUserRegisterEvent(RegisterEvent registerEvent){
         pointService.createPointWallet(registerEvent.getUserId());
     }

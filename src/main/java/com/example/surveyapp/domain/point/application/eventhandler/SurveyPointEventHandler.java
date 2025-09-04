@@ -24,8 +24,6 @@ public class SurveyPointEventHandler {
     private final ObjectMapper objectMapper;
     private final PointOutboxRepository pointOutboxRepository;
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSurveyCreateEvent(SurveyCreateEvent event){
         try{
             pointEarnRedeemService.decreaseSurveyorPoint(
@@ -39,8 +37,6 @@ public class SurveyPointEventHandler {
         }
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSurveyAnswerEvent(SurveyAnswerEvent event){
         pointEarnRedeemService.increaseSurveyeePoint(
                 event.getUserId(),
