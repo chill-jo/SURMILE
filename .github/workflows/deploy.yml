@@ -17,10 +17,8 @@ jobs:
           distribution: 'temurin'
 
       - name: 파일 전송을 위한 디렉토리 생성
-        run: |
-          mkdir ./survey-app
-          df -h
-          
+        run: mkdir ./survey-app
+
       - name: Fix Docker permissions # 이미 설치 되어 있는 도커 사용.
         run: |
           sudo chmod 666 /var/run/docker.sock
