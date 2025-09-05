@@ -3,7 +3,7 @@ services:
     image: zookeeper:latest
     container_name: zookeeper
     ports:
-      - "12181:2181"
+      - "2181:2181"
 
   kafka:
     image: bitnami/kafka:3.4.0
