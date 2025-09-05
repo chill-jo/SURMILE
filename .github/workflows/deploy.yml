@@ -19,7 +19,7 @@ jobs:
       - name: 파일 전송을 위한 디렉토리 생성
         run: mkdir ./survey-app
 
-      - name: Fix Docker permissions
+      - name: Fix Docker permissions # 이미 설치 되어 있는 도커 사용.
         run: |
           sudo chmod 666 /var/run/docker.sock
           docker info
@@ -41,46 +41,11 @@ jobs:
       - name: Docker 이미지 .tar 파일 생성
         run: docker save -o ./survey-app/app.tar app:latest
 
-      - name: 파일 생성 확인 (로컬)
+      - name: 파일 생성 확인
         run: |
-          echo "===== 로컬 survey-app 디렉토리 확인 ====="
-          pwd
-          ls -R ./survey-app
+          echo "===== 파일 목록 확인 ====="
+          ls -la ./survey-app/
 
-      ###########################################
-      # ✅ Debug Steps (if: always() 추가)
-      ###########################################
-
-      - name: Ping EC2 Host
-        if: always()
-        run: ping -c 3 ${{ secrets.EC2_HOST }} || echo "⚠️ ping 실패 (ICMP 차단일 수도 있음)"
-
-      - name: Check SSH connectivity to EC2
-        if: always()
-        run: nc -vz -w 5 ${{ secrets.EC2_HOST }} 22 || echo "⚠️ 22번 포트 접근 불가"
-
-      - name: Debug PEM key format
-        if: always()
-        run: |
-          echo "${{ secrets.EC2_PEM_KEY }}" > id_rsa
-          file id_rsa || true
-          head -5 id_rsa || true
-          ssh-keygen -y -f id_rsa > /dev/null || echo "⚠️ PEM 키 문제 가능성"
-
-      ###########################################
-      # ✅ 실제 배포 단계
-      ###########################################
-
-      - name: Ensure deploy dir exists on EC2
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PEM_KEY }}
-          script: |
-            mkdir -p /home/ec2-user/deploy
-            chmod 755 /home/ec2-user/deploy
-            
       - name: SCP로 EC2에 파일 전송
         uses: appleboy/scp-action@v1
         with:
@@ -89,7 +54,6 @@ jobs:
           key: ${{ secrets.EC2_PEM_KEY }}
           source: ./survey-app
           target: /home/ec2-user/deploy
-          debug: true
 
       - name: SSH를 통해 EC2에 접속 후 Docker Compose로 서비스 재시작
         uses: appleboy/ssh-action@v1
@@ -98,27 +62,34 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
+            # 파일 전송 확인
             echo "===== 파일 전송 확인 ====="
             ls -la /home/ec2-user/deploy/survey-app
-
+            
+            # 롤백 디렉토리 생성 및 이전 버전 백업
             rm -rf /home/ec2-user/rollback
             mkdir /home/ec2-user/rollback
-
+            
+            # 기존 서비스가 실행 중이면 중지하고 백업
             if [ -d "/home/ec2-user/survey-app" ]; then
               cd /home/ec2-user/survey-app
-              docker compose down || true
+              docker-compose down || true
             fi
             mv /home/ec2-user/survey-app /home/ec2-user/rollback
-
+            
+            # 새 버전 배포 준비
             rm -rf /home/ec2-user/survey-app
             mkdir /home/ec2-user/survey-app
             mv /home/ec2-user/deploy/survey-app /home/ec2-user
-
+            
+            # Docker Compose로 서비스 시작
             cd /home/ec2-user/survey-app
-            docker compose down --volumes || true
+            docker-compose down --volumes || true
             docker load -i app.tar
             docker-compose build --no-cache
             docker-compose up -d
 
+            # 배포 후 임시 파일 정리
             rm -rf /home/ec2-user/deploy
             mkdir /home/ec2-user/deploy
+            docker image prune -f
