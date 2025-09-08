@@ -5,7 +5,6 @@ import com.example.surveyapp.domain.user.domain.model.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @RequiredArgsConstructor
 public class JwtProviderImpl implements JwtProvider {
@@ -20,6 +19,11 @@ public class JwtProviderImpl implements JwtProvider {
     @Override
     public String substringToken(String tokenValue) {
         return jwtUtil.substringToken(tokenValue);
+    }
+
+    @Override
+    public String createServiceToken(Long userId, String serviceName){
+        return jwtUtil.createServiceToken(userId, serviceName);
     }
 
     @Override
