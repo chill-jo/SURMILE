@@ -87,15 +87,25 @@ public class JwtUtil {
 			.expiration(new Date(now.getTime() + REFRESH_TOKEN_TIME)) // 발급일로부터 14일
 			.signWith(key)
 			.compact();
+	}
 
+	public String createServiceToken(Long userId, String serviceName){
+		Date now = new Date();
+
+		return BEARER_PREFIX + Jwts.builder()
+				.setSubject(String.valueOf(userId))
+				.claim("service", serviceName)
+				.issuedAt(now)
+				.expiration(new Date(now.getTime() + ACCESS_TOKEN_TIME))
+				.signWith(key)
+				.compact();
 	}
 
 	// Refresh Token 유효 검증
 	public boolean isValidRefreshToken(String refreshToken) {
 
-		Long userId = Long.parseLong(extractUserId(refreshToken));
+		Long userId = Long.parseLong(getSubject(refreshToken));
 		return refreshToken.equals(redisTemplate.read(REFRESH_TOKEN + ":" + userId, String.class));
-
 	}
 
 	/**
@@ -134,7 +144,8 @@ public class JwtUtil {
 
 	public boolean validateToken(String token) {
 
-		Long userId = Long.parseLong(extractUserId(token));
+		String subject = getSubject(token);
+		Long userId = Long.parseLong(subject);
 		String expiredToken = redisTemplate.read(ACCESS_TOKEN + ":" + userId, String.class);
 		if (expiredToken != null && expiredToken.equals(token)) {
 			return false;
@@ -148,7 +159,16 @@ public class JwtUtil {
 		}
 	}
 
-	public String extractUserId(String token) {
+	public boolean validateServiceToken(String token){
+		try {
+			Claims claims = extractAllClaims(token);
+			return !claims.getExpiration().before(new Date());
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public String getSubject(String token) {
 		return extractAllClaims(token).getSubject();
 	}
 }

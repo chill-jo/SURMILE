@@ -9,18 +9,15 @@ import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateResponseDto;
 import com.example.surveyapp.domain.order.presentation.dto.OrderResponseDto;
 import com.example.surveyapp.domain.order.domain.event.OrderCreateEvent;
-import com.example.surveyapp.domain.order.application.facade.ProductFacade;
 import com.example.surveyapp.domain.order.domain.model.Order;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderItem;
 import com.example.surveyapp.domain.order.domain.model.vo.OrderItemPoints;
 import com.example.surveyapp.domain.order.domain.repository.OrderRepository;
-import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
 import com.example.surveyapp.global.reader.UserReader;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,9 +31,8 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final UserReader userReader;
-    private final ProductFacade productFacade;
     private final OrderResponseMapper orderResponseMapper;
-    private final ApplicationEventPublisher eventPublisher;
+    private final ProductClient productClient;
     private final ObjectMapper objectMapper;
     private final OrderOutboxRepository orderOutboxRepository;
 
@@ -44,7 +40,8 @@ public class OrderService {
     public OrderCreateResponseDto createOrder(OrderCreateRequestDto requestDto, Long userId) {
         userReader.validateUserIdOrThrow(userId);
 
-        ProductInfoDto product = productFacade.findProductInfo(requestDto.getProductId());
+        //ProductInfoDto product = productFacade.findProductInfo(requestDto.getProductId());
+        ProductClientResponseDto product = productClient.getProduct(userId, requestDto.getProductId());
 
         OrderItem item = OrderItem.of(requestDto.getProductId(),
                 product.getTitle(),
@@ -55,7 +52,7 @@ public class OrderService {
                 item
                 );
 
-        String status = product.getStatus().getStatus();
+        String status = product.getStatus();
 
         Order saveOrder = orderRepository.save(order);
 

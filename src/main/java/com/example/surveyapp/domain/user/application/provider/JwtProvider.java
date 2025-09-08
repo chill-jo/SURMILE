@@ -8,6 +8,8 @@ public interface JwtProvider {
 
     String substringToken(String token);
 
+    String createServiceToken(Long userId, String serviceName);
+
     String createRefreshToken(Long userId);
 
     String createAccessToken(Long userId, UserRoleEnum userRole);

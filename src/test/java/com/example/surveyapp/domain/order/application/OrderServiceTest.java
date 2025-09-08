@@ -10,10 +10,8 @@ import com.example.surveyapp.domain.order.exception.OrderException;
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateRequestDto;
 import com.example.surveyapp.domain.order.presentation.dto.OrderCreateResponseDto;
 import com.example.surveyapp.domain.order.presentation.dto.OrderResponseDto;
-import com.example.surveyapp.domain.order.application.facade.ProductFacade;
 import com.example.surveyapp.domain.order.domain.model.Order;
 import com.example.surveyapp.domain.order.domain.repository.OrderRepository;
-import com.example.surveyapp.domain.product.presentation.dto.ProductInfoDto;
 import com.example.surveyapp.domain.product.domain.model.Status;
 import com.example.surveyapp.global.reader.UserReader;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -52,13 +49,10 @@ class OrderServiceTest {
     private UserReader userReader;
 
     @Mock
-    private ProductFacade productFacade;
-
-    @Mock
     private OrderResponseMapper orderResponseMapper;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private ProductClient productClient;
 
     @Mock
     private OrderOutboxRepository orderOutboxRepository;
@@ -74,15 +68,18 @@ class OrderServiceTest {
         //테스트 전제 조건 및 환경 설정
         Long userId = 1L;
         Long productId = 1L;
-        ProductInfoDto productInfoDto = new ProductInfoDto("chicken", 2500L, Status.ON_SALE);
+        ProductClientResponseDto productResponseDto = new ProductClientResponseDto(1L, "chicken", 2500L, Status.ON_SALE.getStatus());
+        //ProductInfoDto productInfoDto = new ProductInfoDto("chicken", 2500L, Status.ON_SALE);
         Order order = OrderFixtureGenerator.generateOrderFixture(userId);
         OrderCreateRequestDto requestDto = new OrderCreateRequestDto(productId);
 
         // When
         //실행할 행동
         when(orderRepository.save(any(Order.class))).thenReturn(order);
-        when(productFacade.findProductInfo(productId)).thenReturn(productInfoDto);
+
+        //when(productFacade.findProductInfo(productId)).thenReturn(productInfoDto);
         doNothing().when(userReader).validateUserIdOrThrow(userId);
+        when(productClient.getProduct(userId, productId)).thenReturn(productResponseDto);
         when(orderOutboxRepository.save(any(OrderOutbox.class))).thenReturn(mock(OrderOutbox.class));
         when(objectMapper.writeValueAsString(any(OrderCreateEvent.class))).thenReturn("json-payload");
 
